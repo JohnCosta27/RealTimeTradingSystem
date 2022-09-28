@@ -10,3 +10,4 @@ A platform that allows multiple users to buy and sell resources, in real time. C
 
 ### Frontend
 - SolidJS (known for its speed)
+
