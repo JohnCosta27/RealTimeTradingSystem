@@ -1,4 +1,4 @@
-\documentclass[]{report}
+\documentclass[titlepage]{article}
 
 % Title Page
 \title{Real-time Trading Platform}
@@ -7,16 +7,47 @@
 \begin{document}
 \maketitle
 
-\begin{abstract}
-	At its core, my project - real-time trading platform, will allow users to participate in trades with other users in real-time, and also allow users to list their own assets which they which to sell. The price of buying and selling is entirely determined by the amount at which users decide to buy and sell assets, very similar to a stock exchange.
+\section{Project Description and Motivation}
+	My project will be a trading platform, that allows users to trade - in real time, with others users on the platform, on various assets. The price of buying and selling is entirely determined by the amount at which users decide to buy and sell assets, very similar to a stock exchange.
 	
-	At a glance, the project does not seem entirely exciting, but it takes inspiration from the great stock exchanges in the world: London Stock Exchange (LSE), and New York Stock Exchange (NYSE), inspiration not because they are innovative ideas, but because of the cheer amount of data that these institutions needs to process every second.
+	My primary inspirations is taken from the great stock exchanges in the world: London Stock Exchange (LSE), and New York Stock Exchange (NYSE), inspiration not because they are innovative ideas, but because of the cheer amount of data that these institutions needs to process every second, and how these institution, hold the entire economy of countries on their shoulders, therefore have to be designed and delivered with immense care.
 	
-	My project aims to go a step further than regular stock exchanges, apart from aiming at having 24 hours a day up-time, which enables users to buy and sell at any time of the day, I also want to provide the ability for users to list their own assets, which will provide a new way to sell.
+	I am aiming to provide a solution similar to that of a stock exchange, but not restricted to stocks, my platform could trade any asset. Furthermore, I am aiming to deliver a product that is able to be used 24 hours of the day, all year around. To do this, scalability and resilience must be at the core of every single decision I make.
+
+	Furthermore, an objective of my project is to provide real-time, blazingly fast service to the users exchanging assets. This is also the hardest part of the entire project, because everything will have to be built to not just handle hundreds of requests a second, but also scale to meet thousands of requests a second, providing a great challenge on my software architecture, as well as my backend design.
+
+	How does this then relate to Advanced Web Development. The only way that users will be able to interact with the platform is through a web interface, and to allow for such a complicated task, I need to use advanced concepts of web development, such as Single Page Applications (SPA), and multi-threaded processing on the client side using Web Workers or Service works. Furthermore, because the connection between client and server must be real-time I will need to use Web Sockets (WS), which is an application layer protocol for exchanging data through a persistent TCP connection. \\
+	\\
+	Summarising then, my core features are:
+	\begin{itemize}
+		\item Buying and selling assets in real-time with other users.
+		\item Allow all users to view all on-going and previous trades.
+		\item View historical data on all assets (This includes typical candle stick, and line charts)
+		\item View assets owned by all users on the platform.
+	\end{itemize}
+
+\pagebreak
+
+\section{Timeline}
+	Most of the implementation of the project should be done within term one, with some final testing going over to term two. Like this I can dedicate the majority of my time in the second term to finishing the report and doing final testing on the project.
 	
-	The primary objective of my project is to provide real-time, blazingly fast service to the users exchanging assets. This is also the hardest part of the entire project, because everything will have to be built to not just handle hundreds of requests a second, but also scale to meet thousands of requests a second, providing a great challenge on my software architecture, as well as my backend design.
+	\subsection{Term 1}
+	This will be where the majority of development work is done. Because a lot of these technologies I am only somewhat comfortable with, there will be a degree of prototyping in early days to make sure that I fully understand the technologies I need to use before making major commitments.
 	
-	There are plenty of services that provide a buying/selling platform, however these are usually for a fixed price and for a one time exchange, my platform will allow users to sell their assets in a much more interesting and potentially beneficial way, by strategically selling and buying.
-\end{abstract}
+	\begin{itemize}
+		\item Week 1: Complete project plan and finalise core features, research technologies that would be suited for the problem.
+		\item Week 2: Prototype with the choose technologies to create a very small MVP which enables users to trade across a Web Socket (WS) connection.
+		\item Week 3: ...
+		\item Week 4: tbc
+	\end{itemize} 
+	
+	\subsection{Term 2}
+	Term 2, as mentioned previosly will be mostly for testing and report writing. It is said that the last 20\% of a software project takes 80\% of the time, so I cannot entirely plan that I am done developing in Term 1, however I can promise to have that the previious 80\% complete.
+	
+	\begin{itemize}
+		\item Week 1: Deployment?
+		\item Week 2: Testing with users and BOTS
+    \item Week 3: Doing some more!
+	\end{itemize}
 
 \end{document}          
