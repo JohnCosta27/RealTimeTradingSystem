@@ -56,8 +56,8 @@ This will be where the majority of development work is done. Because a lot of th
 	\item Week 1: Complete project plan and finalise core features, research technologies that would be suited for the problem.
 	\item Week 2: Prototype with the choose technologies to create a very small MVP which enables users to trade across a Web Socket (WS) connection.
 	\item Week 3-8: Iteration 1 and report writing as I go along.
-  \item Week 9-10: Testing MVP from Iteration 1 and fixing any issues that come along the way. Also, report writing.
-  \item Week 11: Start Iteration 2.
+	\item Week 9-10: Testing MVP from Iteration 1 and fixing any issues that come along the way. Also, report writing.
+	\item Week 11: Start Iteration 2.
 \end{itemize}
 
 \subsection{Term 2}
@@ -65,8 +65,25 @@ Term 2 will be more dedicated to finalising the solution and making sure that my
 
 \begin{itemize}
 	\item Week 1-4: Iteration 2.
-  \item Week 5-6: Complete testing of the solution. Black box testing, stress testing and real user tests.
-  \item Week 7-11: Spare weeks for report writing and finishing any work that needs finishing.
+	\item Week 5-6: Complete testing of the solution. Black box testing, stress testing and real user tests.
+	\item Week 7-11: Spare weeks for report writing and finishing any work that needs finishing.
 \end{itemize}
+
+\pagebreak
+
+\section{Risks}
+Throughout  the duration of the project, I am bound to run into some various risks that might affect my ability to complele the project to the intended standard, outlined in this plan.
+
+\subsection{Platform Performance}
+The biggest risk to a real-time application might be performance. This means that the system would not be able to quickly fulfil client orders and result in an overall sluggish product. This would go directly against one of my project goals, which is to allow users to trade in real time, at very fast speeds. To mitigate this risk I will use Test Driven Development (TDD), to ensure the most robust code possible is written, I will also include performance tests (or stress tests), with my TDD process, in order to make sure the platform can handle many requests at speed.
+
+\subsection{Platform Scalability}
+As mentioned above, my platform must be very fast. However there is only so much I can do if I only run 1 instance of my backend. My project must automatically scale vertically (Creating more instances), as my application is not extremely resource intensitive, but there will be many connections at one time, requiring this type of scalability. To mitigate this risk I will employ an automatic scaling solution such as Kubernetes, which takes Docker containers and automatically scales them as the application grows.
+
+\subsection{Data Loss}
+It is needless to say that in a platform that lets users trade assets, it is absolutely crucial that my platform has no data loss, and because my platform is going to scale with multiple instances with multiple databses, it is imperative that no data is lost in transaction between the instances. It is also possible I employ some form of caching such as Redis, and the data here should never be of a permanent type, meaning it is ok to lose the data there. To mitigate this risk I will always use transaction in my databases, to make sure that a user never ends up losing anything.
+
+\subsection{Poor time management}
+This 3rd year of my university course will be the business year of my life, so I must use my time management skills to their fullest, and I cannot afford to plan my time poorly and result in me missing deadlines in the project, or moving slower through my timeline than I should. I will employ the help of organisation tools and methods such as the method outlined in the book Getting Things Done by David Allen, I will also use digital tools to help me implement this process such as: Digital Calendars, Todoist (A task management app), and Obsidean (A note taking app).
 
 \end{document}
