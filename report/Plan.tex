@@ -1,21 +1,26 @@
 \documentclass[titlepage]{article}
+\usepackage{hyperref}
 
 % Title Page
 \title{Real-time Trading Platform}
-\author{John Costa}
+\author{John Costao}
 
 \begin{document}
 \maketitle
-
+  
 \section{Project Description and Motivation}
-My project will be a trading platform, that allows users to trade - in real time, with others users on the platform, on various assets. The price of buying and selling is entirely determined by the amount at which users decide to buy and sell assets, very similar to a stock exchange.
+My project will be a trading platform, that allows users to trade - in real time, with others users on the platform, on various assets. The price of buying and selling is entirely determined by the amount at which users decide to buy and sell assets, very similar to a stock exchange. The user facing application should allow users to access charts of historical asset data, as well as view their current assets and buy/sell other assets. By the term assets, I don't mean real stocks, I mean some hypothetical asset the platform could be used to trade, it can be anything that can be bought or sold overtime, over the internet. \\
 
-My primary inspirations is taken from the great stock exchanges in the world: London Stock Exchange (LSE), and New York Stock Exchange (NYSE), inspiration not because they are innovative ideas, but because of the cheer amount of data that these institutions needs to process every second, and how these institution, hold the entire economy of countries on their shoulders, therefore have to be designed and delivered with immense care.
+\noindent
+My primary inspirations is taken from the great stock exchanges in the world: London Stock Exchange (LSE), and New York Stock Exchange (NYSE), inspiration not because they are innovative ideas, but because of the cheer amount of data that these institutions needs to process every second, and how these institution, hold the entire economy of countries on their shoulders, therefore have to be designed and delivered with immense care. \\
 
-I am aiming to provide a solution similar to that of a stock exchange, but not restricted to stocks, my platform could trade any asset. Furthermore, I am aiming to deliver a product that is able to be used 24 hours of the day, all year around. To do this, scalability and resilience must be at the core of every single decision I make.
+\noindent
+I am aiming to provide a solution similar to that of a stock exchange, but not restricted to stocks, my platform could trade any asset. Furthermore, I am aiming to deliver a product that is able to be used 24 hours of the day, all year around. To do this, scalability and resilience must be at the core of every single decision I make. In order to help me with this goal I will be reading through the book: Designing Data-Intensive Distributed Applications~\cite{kleppmann_2021}. In this book, Klapmann describes various aspects of building distributed applications and how to deal with the various challenges that come with that as well as how to quickly handle all the data that flows through them. \\
 
-Furthermore, an objective of my project is to provide real-time, blazingly fast service to the users exchanging assets. This is also the hardest part of the entire project, because everything will have to be built to not just handle hundreds of requests a second, but also scale to meet thousands of requests a second, providing a great challenge on my software architecture, as well as my backend design. The way I aim to solve these problems is by having a micro-services architecture, which splits the entire application into smaller services that can each scale individually, as well as each service having their own database. However this presents a challenge of its own, how do the micro-services interact with each other efficiently? I plan on using RabbitMQ as a messaging service between each service, it enables for easy communication between services, supporting various protocols, the one I will attempt to use is AMQP 0-9-1 (Insert citation here), allowing me to create queues between services that are efficiently managed by RabbitMQ.
+\noindent
+Furthermore, an objective of my project is to provide real-time, blazingly fast service to the users exchanging assets. This is also the hardest part of the entire project, because everything will have to be built to not just handle hundreds of requests a second, but also scale to meet thousands of requests a second, providing a great challenge on my software architecture, as well as my backend design. The way I aim to solve these problems is by having a micro-services architecture, which splits the entire application into smaller services that can each scale individually, as well as each service having their own database. However this presents a challenge of its own, how do the micro-services interact with each other efficiently? I plan on using RabbitMQ~\cite{rabbitmq} as a messaging service between each service, it enables for easy communication between services, supporting various protocols, the one I will attempt to use is AMQP 0-9-1 (Insert citation here), allowing me to create queues between services that are efficiently managed by RabbitMQ~\cite{rabbitmq}. \\
 
+\noindent
 How does this then relate to Advanced Web Development. The only way that users will be able to interact with the platform is through a web interface, and to allow for such a complicated task, I need to use advanced concepts of web development, such as Single Page Applications (SPA), and multi-threaded processing on the client side using Web Workers or Service works. Furthermore, because the connection between client and server must be real-time I will need to use Web Sockets (WS), which is an application layer protocol for exchanging data through a persistent TCP connection. \\
 \\
 Summarising then, my core features are:
@@ -37,7 +42,7 @@ This iteration will be a basic MVP (Minimal Viable Product), focusing on getting
 	\item Backend that allows for real-time trading (no scalability or multi-threading needed in this iteration).
 	\item Frontend that provides a basic interface to view and participate in trades
 	\item UI to allow users to view their assets
-	\item Some DevOps on the backend, using Docker to containarize my services.
+  \item Some DevOps on the backend, using Docker~\cite{docker} to containarize my services.
 \end{itemize}
 
 \subsubsection{Iteration 2}
@@ -85,5 +90,8 @@ It is needless to say that in a platform that lets users trade assets, it is abs
 
 \subsection{Poor time management}
 This 3rd year of my university course will be the business year of my life, so I must use my time management skills to their fullest, and I cannot afford to plan my time poorly and result in me missing deadlines in the project, or moving slower through my timeline than I should. I will employ the help of organisation tools and methods such as the method outlined in the book Getting Things Done by David Allen, I will also use digital tools to help me implement this process such as: Digital Calendars, Todoist (A task management app), and Obsidean (A note taking app).
+
+\bibliography{References} 
+\bibliographystyle{plain}
 
 \end{document}

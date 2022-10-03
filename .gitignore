@@ -1,4 +1,7 @@
 ## Core latex/pdflatex auxiliary files:
+*.bbl
+*.blg
+*.dvi
 *.aux
 *.lof
 *.log

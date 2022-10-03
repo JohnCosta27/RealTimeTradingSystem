@@ -5,3 +5,6 @@ First entry in the log book. This week I have taken the time to get organised, f
 
 ## 02/10/2022
 Finish the draft of the report, but does not yet include the bibliography. Still need to walk through the marking grid and tick all the boxes.
+
+## 03/10/2022
+Adding references to my plan - still not finished.
