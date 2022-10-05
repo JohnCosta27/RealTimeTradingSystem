@@ -9,7 +9,7 @@
 \maketitle
   
 \section{Project Description and Motivation}
-My project will be a trading platform, that allows users to trade - in real time, with others users on the platform, on various assets. The price of buying and selling is entirely determined by the amount at which users decide to buy and sell assets, very similar to a stock exchange. The user facing application should allow users to access charts of historical asset data, as well as view their current assets and buy/sell other assets. By the term assets, I don't mean real stocks, I mean some hypothetical asset the platform could be used to trade, it can be anything that can be bought or sold overtime, over the internet. \\
+My project will be a trading platform, that allows users to trade - in real time, with others users on the platform, on various assets, for a certain currency. The price of buying and selling is entirely determined by the amount at which users decide to buy and sell assets, very similar to a stock exchange. The user facing application should allow users to access charts of historical asset data, as well as view their current assets and buy/sell other assets. By the term assets, I don't mean real stocks, I mean some hypothetical asset the platform could be used to trade, it can be anything that can be bought or sold overtime, over the internet. \\
 
 \noindent
 My primary inspirations is taken from the great stock exchanges in the world: London Stock Exchange (LSE), and New York Stock Exchange (NYSE), inspiration not because they are innovative ideas, but because of the cheer amount of data that these institutions needs to process every second, and how these institution, hold the entire economy of countries on their shoulders, therefore have to be designed and delivered with immense care. \\
@@ -18,12 +18,22 @@ My primary inspirations is taken from the great stock exchanges in the world: Lo
 I am aiming to provide a solution similar to that of a stock exchange, but not restricted to stocks, my platform could trade any asset. Furthermore, I am aiming to deliver a product that is able to be used 24 hours of the day, all year around. To do this, scalability and resilience must be at the core of every single decision I make. In order to help me with this goal I will be reading through the book: Designing Data-Intensive Distributed Applications~\cite{kleppmann_2021}. In this book, Klapmann describes various aspects of building distributed applications and how to deal with the various challenges that come with that as well as how to quickly handle all the data that flows through them. \\
 
 \noindent
+In order to test that my solution does actually scale when various users are using it, I will create BOTS, which will trade in a random(ish) way. The point of this is to have accounts trade with each other in real-time and to be able to precisely control how many accounts and trades take place on the system at once. This specific testing will be very useful to really stretch my system to the max, and also see how much hardware my system will require to run a certain amount of accounts or trades. To do this I will not only need to create the BOTS, but also run them across various machines, because running them all from one machine would invalidate testing because they would come from the same network, I plan on using various machines across the internet (Virtual Machines (VMs) from AWS~\cite{aws}), as well as the machines I have available to me at home and colleagues. Apart from testing with BOTS, I will also include human trades to the mix by using the platform myself and having my friends try it out at the same time. What I will measure on these tests will be the average time a trade took to complete, as well as other requests that the users make to the server, and wether the system is able to maintain a consistent average time or if it spikes.
+
+\noindent
 Furthermore, an objective of my project is to provide real-time, blazingly fast service to the users exchanging assets. This is also the hardest part of the entire project, because everything will have to be built to not just handle hundreds of requests a second, but also scale to meet thousands of requests a second, providing a great challenge on my software architecture, as well as my backend design. The way I aim to solve these problems is by having a micro-services architecture, which splits the entire application into smaller services that can each scale individually, as well as each service having their own database. However this presents a challenge of its own, how do the micro-services interact with each other efficiently? I plan on using RabbitMQ~\cite{rabbitmq} as a messaging service between each service, it enables for easy communication between services, supporting various protocols, the one I will attempt to use is AMQP 0-9-1 (Insert citation here), allowing me to create queues between services that are efficiently managed by RabbitMQ~\cite{rabbitmq}. \\
+
+\noindent
+I have not mentioned the specifications of the trades - does the user need a certain amount of money? How would I create an eco-system of this sort? I cannot allow the users to use actual money in the product, and giving them infinite credits would discredit all trades because there would be no value in any asset. So I will instead a limited credit system, where each account gets a certain amount of credits to start (£50 000, or any other value), the important part is that the supply has to be limited in some way. Of course that people could however just create new accounts and get another set amount of credits, but for the purpose of my application this system will be sufficient, I could furthermore restrict the amount of accounts that I allow onto my system, precisely to reduce this problem. \\
 
 \noindent
 How does this then relate to Advanced Web Development. The only way that users will be able to interact with the platform is through a web interface, and to allow for such a complicated task, I need to use advanced concepts of web development, such as Single Page Applications (SPA), and multi-threaded processing on the client side using Web Workers or Service works. Furthermore, because the connection between client and server must be real-time I will need to use Web Sockets (WS), which is an application layer protocol for exchanging data through a persistent TCP connection. \\
 \\
-Summarising then, my core features are:
+
+\subsection{Features}
+To formalise the features that I want in my project, I have created two lists, one for core feature which must be present in the final product, and a few optional features which would be nice to have but are not mission critical. These features do not mention technical implementations and requirements for the solution, and instead talk about what a user of my product should be able to do.
+
+\subsubsection{Core Features}
 \begin{itemize}
 	\item Buying and selling assets in real-time with other users.
 	\item Allow all users to view all on-going and previous trades.
@@ -31,10 +41,16 @@ Summarising then, my core features are:
 	\item View assets owned by all users on the platform.
 \end{itemize}
 
+\subsubsection{Optional Features}
+\begin{itemize}
+  \item Queue trades, allow users to buy trades a specific times.
+  \item Auto buying/selling. Depending on the price of an asset, automatically buy or automatically sell an asset. In investment terms, an optional feature would be to implement Stop-Loss orders~\cite{stop_loss} and  take profit orders~\cite{take_profit}
+\end{itemize}
+
 \pagebreak
 
 \section{Timeline}
-Most of the implementation of the project should be done within term one, with some final testing going over to term two. Like this I can dedicate the majority of my time in the second term to finishing the report and doing final testing on the project. I will further split my development time into two iterations, and attempt to use an agile methodoly with my development.
+Most of the implementation of the project should be done within term one, with some final testing going over to term two. Like this I can dedicate the majority of my time in the second term to finishing the report and doing final testing on the project. I will further split my development time into two iterations, and attempt to use an agile methodoly with my development.  
 
 \subsubsection{Iteration 1}
 This iteration will be a basic MVP (Minimal Viable Product), focusing on getting features to work, instead of perfecting the entire product. Here I will do the following:

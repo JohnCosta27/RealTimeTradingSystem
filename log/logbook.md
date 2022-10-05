@@ -8,3 +8,6 @@ Finish the draft of the report, but does not yet include the bibliography. Still
 
 ## 03/10/2022
 Adding references to my plan - still not finished.
+
+## 05/10/2022
+Added testing, how currency will work and core and optional features to the plan.
