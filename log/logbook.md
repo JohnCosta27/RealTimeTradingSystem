@@ -11,3 +11,6 @@ Adding references to my plan - still not finished.
 
 ## 05/10/2022
 Added testing, how currency will work and core and optional features to the plan.
+
+## 07/10/2022
+Finished the plan, submitting it today.
