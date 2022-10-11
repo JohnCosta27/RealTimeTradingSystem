@@ -14,3 +14,6 @@ Added testing, how currency will work and core and optional features to the plan
 
 ## 07/10/2022
 Finished the plan, submitting it today.
+
+## 11/10/2022
+Started implementing the "hub" service, which is the first point of contact from the user.
