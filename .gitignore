@@ -19,3 +19,8 @@
 
 ## Dont include PDFs
 *.pdf
+
+## Ignore node module dependencies and builds
+
+node_modules
+dist
