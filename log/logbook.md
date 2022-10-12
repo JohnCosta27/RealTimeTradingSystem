@@ -17,3 +17,6 @@ Finished the plan, submitting it today.
 
 ## 11/10/2022
 Started implementing the "hub" service, which is the first point of contact from the user.
+
+## 12/10/2022
+Beginning template for the frontend application with all the dependencies installed.
