@@ -3,7 +3,7 @@ package main
 import (
 	"sync"
 
-	"johncosta.tech/connections"
+	"hub/connections"
 )
 
 func main() {

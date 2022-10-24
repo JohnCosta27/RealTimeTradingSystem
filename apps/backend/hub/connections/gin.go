@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"johncosta.tech/connections/routes"
+	"hub/connections/routes"
 )
 
 var Router *gin.Engine
