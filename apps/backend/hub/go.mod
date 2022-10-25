@@ -1,4 +1,4 @@
-module johncosta.tech
+module hub
 
 go 1.19
 

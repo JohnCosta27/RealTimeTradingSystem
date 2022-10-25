@@ -24,3 +24,9 @@
 
 node_modules
 dist
+
+## Ignore executables
+hub
+
+## Ignore environment
+.env

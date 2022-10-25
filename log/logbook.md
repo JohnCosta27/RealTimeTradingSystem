@@ -20,3 +20,12 @@ Started implementing the "hub" service, which is the first point of contact from
 
 ## 12/10/2022
 Beginning template for the frontend application with all the dependencies installed.
+
+## 24/10/2022
+It has been a while since I have made an alternation on my individual project, I have been poorly and focusing on my other subjects, but now I am back in full force.
+Today:
+- Setup docker file for the hub micro service and a docker compose file to allow for easy deployment and development.
+- Created a diagram for the overall system architecture.
+
+## 25/10/2022
+Connected frontend to the backend using websocket connection. I am still a week behind on my plan so I will have to work very hard this week to get back on schedule.

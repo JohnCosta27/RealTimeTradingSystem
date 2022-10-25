@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  hub:
+    build: ./hub
+    volumes:
+      - ./hub:/hub
+    ports:
+      - 4545:4545
