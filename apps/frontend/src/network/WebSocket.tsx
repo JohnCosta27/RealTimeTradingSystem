@@ -1,7 +1,5 @@
-import { fromEvent, Observable, Subject } from "rxjs";
 import { Component, createContext, JSX, useContext } from "solid-js";
-
-const WEBSOCKET_URL = "ws://localhost:4545/ws";
+import { Subject } from "rxjs";
 
 interface WebSocketContextType {
   websocket: WebSocket;
@@ -10,30 +8,29 @@ interface WebSocketContextType {
   send: (data: string) => void;
 }
 
-const wsObject = new WebSocket(WEBSOCKET_URL);
+interface WebSocketComponentProps {
+  children: JSX.Element;
+}
 
+const wsObject = new WebSocket(import.meta.env.VITE_HUB_WS_URL);
 const openSubject = new Subject<Event>();
 const messageSubject = new Subject<Event>();
+
 wsObject.onopen = (e) => {
   openSubject.next(e);
 };
-
 wsObject.onmessage = (e) => {
   messageSubject.next(e);
 }
 
 const ws: WebSocketContextType = {
-  websocket: new WebSocket(WEBSOCKET_URL),
+  websocket: wsObject,
   onOpen: openSubject,
   onMessage: messageSubject,
-  send: (data: string) => wsObject.send(data),
+  send: wsObject.send,
 };
 
 const WebSocketContext = createContext<WebSocketContextType>(ws);
-
-interface WebSocketComponentProps {
-  children: JSX.Element;
-}
 
 export const WebSocketComponent: Component<WebSocketComponentProps> = (
   props
