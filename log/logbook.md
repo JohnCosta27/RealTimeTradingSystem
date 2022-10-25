@@ -26,3 +26,6 @@ It has been a while since I have made an alternation on my individual project, I
 Today:
 - Setup docker file for the hub micro service and a docker compose file to allow for easy deployment and development.
 - Created a diagram for the overall system architecture.
+
+## 25/10/2022
+Connected frontend to the backend using websocket connection. I am still a week behind on my plan so I will have to work very hard this week to get back on schedule.
