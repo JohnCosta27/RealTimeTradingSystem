@@ -1,11 +1,14 @@
-import { render } from 'solid-js/web';
+import { render } from "solid-js/web";
 import { Component } from "solid-js";
-import './main.css';
+import { WebSocketComponent } from "./network/WebSocket";
+import "./main.css";
 
 const Main: Component = () => {
   return (
-    <h1 class="text-5xl">Hello World</h1>
-  )
-}
+    <WebSocketComponent>
+      <h1 class="text-5xl">Hello World</h1>
+    </WebSocketComponent>
+  );
+};
 
-render(() => <Main />, document.getElementById('root') as HTMLElement);
+render(() => <Main />, document.getElementById("root") as HTMLElement);
