@@ -1,9 +1,22 @@
-version: '3'
+version: "3"
 
 services:
   hub:
     build: ./hub
     volumes:
-      - ./hub:/hub
+      - ./hub:/app
     ports:
       - 4545:4545
+  postgres:
+    build: ./postgres
+    volumes:
+      - ./postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+    ports:
+      - 5443:5432

@@ -30,3 +30,6 @@ hub
 
 ## Ignore environment
 .env
+
+## Ignore database data volume
+db/
