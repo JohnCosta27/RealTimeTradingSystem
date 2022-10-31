@@ -1,12 +1,22 @@
 version: "3"
 
 services:
+  rabbitmq:
+    build: ./rabbitmq
+    ports:
+      - 15672:15672 #Management console
+      - 5672:5672 #Actual exchange
+    network_mode: host
   hub:
     build: ./hub
     volumes:
       - ./hub:/app
     ports:
       - 4545:4545
+    depends_on:
+      - rabbitmq
+    restart: on-failure
+    network_mode: host
   postgres:
     build: ./brain_postgres
     volumes:
@@ -20,8 +30,4 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
     ports:
       - 5443:5432
-  rabbitmq:
-    build: ./rabbitmq
-    ports:
-      - 15672:15672 #Management console
-      - 5672:5672 #Actual exchange
+    network_mode: host
