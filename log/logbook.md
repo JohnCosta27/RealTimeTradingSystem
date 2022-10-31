@@ -29,3 +29,6 @@ Today:
 
 ## 25/10/2022
 Connected frontend to the backend using websocket connection. I am still a week behind on my plan so I will have to work very hard this week to get back on schedule.
+
+## 31/10/2022
+Added RabbitMQ docker image, and created a test connection between hub and rabbitmq, it works.
