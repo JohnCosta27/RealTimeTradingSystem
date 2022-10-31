@@ -8,10 +8,10 @@ services:
     ports:
       - 4545:4545
   postgres:
-    build: ./postgres
+    build: ./brain_postgres
     volumes:
-      - ./postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./postgres/db:/var/lib/postgresql/data
+      - ./brain_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./brain_postgres/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
@@ -20,3 +20,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
     ports:
       - 5443:5432
+  rabbitmq:
+    build: ./rabbitmq
+    ports:
+      - 15672:15672 #Management console
+      - 5672:5672 #Actual exchange
