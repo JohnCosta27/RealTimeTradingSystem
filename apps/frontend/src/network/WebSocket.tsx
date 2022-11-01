@@ -15,6 +15,9 @@ interface WebSocketComponentProps {
 const wsObject = new WebSocket(import.meta.env.VITE_HUB_WS_URL);
 const openSubject = new Subject<Event>();
 const messageSubject = new Subject<Event>();
+setTimeout(() => {
+  wsObject.send("rabbit hello world")
+}, 1000);
 
 wsObject.onopen = (e) => {
   openSubject.next(e);
