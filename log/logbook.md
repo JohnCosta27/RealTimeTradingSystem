@@ -32,3 +32,6 @@ Connected frontend to the backend using websocket connection. I am still a week 
 
 ## 31/10/2022
 Added RabbitMQ docker image, and created a test connection between hub and rabbitmq, it works.
+
+## 05/11/2022
+Setup the SQL schemas for the required databases.
