@@ -42,7 +42,7 @@ func InitGin() {
 	}
 	defer ch.Close()
 
-	q, err := ch.QueueDeclare(
+	_, err = ch.QueueDeclare(
 		"TestQueue",
 		false,
 		false,
@@ -54,9 +54,6 @@ func InitGin() {
 		fmt.Println(err)
 		panic(err)
 	}
-	fmt.Println(q)
-	err = ch.Publish("", "TestQueue", false, false,
-		amqp.Publishing{ContentType: "text/plain", Body: []byte("Initial message")})
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
@@ -90,7 +87,7 @@ func InitGin() {
 		for {
 			//Read Message from client
 			mt, message, err := ws.ReadMessage()
-			fmt.Printf("RabbitMQ Status: %v\n", wsCh.IsClosed())
+      fmt.Println("New WS connection")
 
 			if err != nil {
 				fmt.Println(err)
