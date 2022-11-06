@@ -3,6 +3,7 @@ package connections
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"hub/connections/routes"
 
@@ -25,46 +26,38 @@ func InitGin() {
 	Router = gin.Default()
 	WsConnections = make([]*websocket.Conn, 0)
 
-  conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-  if err != nil {
-    fmt.Println(err)
-    panic(err)
-  }
-  defer conn.Close()
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	defer conn.Close()
 
-  fmt.Println("Successfully connected to RabbitMQ using AMQP")
+	fmt.Println("Successfully connected to RabbitMQ using AMQP")
 
-  ch, err := conn.Channel()
-  if err != nil {
-    fmt.Println(err)
-    panic(err)
-  }
-  defer ch.Close()
+	ch, err := conn.Channel()
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	defer ch.Close()
 
-  q, err := ch.QueueDeclare(
-    "TestQueue",
-    false,
-    false,
-    false,
-    false,
-    nil,
-  )
-  if err != nil {
-    fmt.Println(err)
-    panic(err)
-  }
-  fmt.Println(q)
-
-  err = ch.Publish("", "TestQueue", false, false, 
-    amqp.Publishing{ContentType: "text/plain", Body: []byte("Hello World")})
-  if err != nil {
-    fmt.Println(err)
-    panic(err)
-  }
+	_, err = ch.QueueDeclare(
+		"TestQueue",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
-  
+
 	Router.GET("/ws", func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -76,22 +69,48 @@ func InitGin() {
 		}
 		defer ws.Close()
 
+		wsConn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
+		defer wsConn.Close()
+
+		wsCh, err := wsConn.Channel()
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
+		fmt.Println("Opening new channel for new WS connection")
+
 		WsConnections = append(WsConnections, ws)
 		for {
 			//Read Message from client
 			mt, message, err := ws.ReadMessage()
+      fmt.Println("New WS connection")
+
 			if err != nil {
 				fmt.Println(err)
 				break
 			}
+			fmt.Println(string(message))
+
 			//If client message is ping will return pong
 			if string(message) == "ping" {
 				message = []byte("pong")
-			} else if string(message) == "rabbit" {
-        // Performing rabbitmq test
-        
-      }
+			} else if strings.Contains(string(message), "rabbit") {
+				// Performing rabbitmq test
+				err = wsCh.Publish("", "TestQueue", false, false,
+					amqp.Publishing{ContentType: "text/plain", Body: message})
+				message = []byte("sent to rabbitmq!")
 
+				// Close connection here
+				if err != nil {
+					fmt.Println(err)
+					panic(err)
+				}
+
+			}
 
 			//Response message to client
 			err = ws.WriteMessage(mt, message)
