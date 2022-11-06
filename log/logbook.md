@@ -35,3 +35,6 @@ Added RabbitMQ docker image, and created a test connection between hub and rabbi
 
 ## 05/11/2022
 Setup the SQL schemas for the required databases.
+
+## 06/11/2022
+Started work on the authentication system.
