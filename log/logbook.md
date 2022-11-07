@@ -38,3 +38,6 @@ Setup the SQL schemas for the required databases.
 
 ## 06/11/2022
 Started work on the authentication system.
+
+## 07/11/2022
+Finished register method in auth system, with some very nice code.

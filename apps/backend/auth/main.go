@@ -1,6 +1,7 @@
 package main
 
 import (
+	"auth/database"
 	"auth/routes"
 	"sync"
 
@@ -10,6 +11,8 @@ import (
 func main() {
   var wg sync.WaitGroup
   wg.Add(1)
+
+  database.InitDatabase()
 
   Router := gin.Default()
   routes.RegisterRoute(Router)
