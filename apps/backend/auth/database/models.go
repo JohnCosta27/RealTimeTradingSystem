@@ -17,6 +17,7 @@ type User struct {
   Base
   Firstname string
   Surname string
+  Email string
   Password string
   Password_salt string
 }
