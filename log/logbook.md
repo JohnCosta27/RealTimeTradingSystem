@@ -43,3 +43,7 @@ Started work on the authentication system.
 Finished register method in auth system, with some very nice code.
 I also finished the login method.
 Also finished the refresh method for JWTs. Basically did the entire Auth system.
+
+## 08/11/2022
+I am on a streak! 4 days with commits everyday, got a nice groove going.
+Connected frontend to backend login and register methods, learn about state management in SolidJs.

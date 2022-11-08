@@ -2,6 +2,7 @@ package main
 
 import (
 	"auth/database"
+	"auth/middleware"
 	"auth/routes"
 	"sync"
 
@@ -15,6 +16,7 @@ func main() {
   database.InitDatabase()
 
   Router := gin.Default()
+  Router.Use(middleware.AllowCors())
   routes.RegisterRoute(Router)
   routes.LoginRoute(Router)
   routes.RefreshRoute(Router)

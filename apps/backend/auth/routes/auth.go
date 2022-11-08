@@ -126,15 +126,15 @@ func RefreshRoute(r *gin.Engine) {
 				return
 			}
 
-			c.JSON(http.StatusOK, gin.H{
-				"access": access,
-			})
-			return
+		c.JSON(http.StatusOK, gin.H{
+			"access": access,
+		})
+      return
 
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"error": "bad jwt",
+			"success": "good egg",
 		})
 	})
 }
