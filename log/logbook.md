@@ -42,4 +42,4 @@ Started work on the authentication system.
 ## 07/11/2022
 Finished register method in auth system, with some very nice code.
 I also finished the login method.
-Only need to add JWT returns and auth system will be mostly finished.
+Also finished the refresh method for JWTs. Basically did the entire Auth system.

@@ -1,7 +1,7 @@
 package structs
 
 type RequestBody interface {
-	*RegisterBody | *LoginBody
+	*RegisterBody | *LoginBody | *RefreshBody
 }
 
 type RegisterBody struct {
@@ -12,22 +12,32 @@ type RegisterBody struct {
 }
 
 type LoginBody struct {
-	Email     string `json:"email"`
-	Password  string `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type RefreshBody struct {
+	Refresh string `json:"refresh"`
 }
 
 func GetRegisterBody() *RegisterBody {
 	return &RegisterBody{
-		Email:    "name@email.com",
-		Password: "password",
-    Firstname: "firstname",
-    Surname: "surname",
+		Email:     "name@email.com",
+		Password:  "password",
+		Firstname: "firstname",
+		Surname:   "surname",
 	}
 }
 
 func GetLoginBody() *LoginBody {
-  return &LoginBody{
-    Email: "name@email.com",
-    Password: "password",
+	return &LoginBody{
+		Email:    "name@email.com",
+		Password: "password",
+	}
+}
+
+func GetRefreshBody() *RefreshBody {
+  return &RefreshBody{
+    Refresh: "refresh-token",
   }
 }

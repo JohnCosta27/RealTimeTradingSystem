@@ -17,6 +17,7 @@ func main() {
   Router := gin.Default()
   routes.RegisterRoute(Router)
   routes.LoginRoute(Router)
+  routes.RefreshRoute(Router)
 
 	go Router.Run("0.0.0.0:4546")
 
