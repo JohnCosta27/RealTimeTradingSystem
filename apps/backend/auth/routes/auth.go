@@ -116,7 +116,6 @@ func RefreshRoute(r *gin.Engine) {
 		refreshBody := b.(*structs.RefreshBody)
 
 		if util.IsValidJwt(refreshBody.Refresh, "refresh") {
-
 			access, aErr := util.GenAccessToken()
 			if aErr != nil {
 				log.Println(aErr)
@@ -126,15 +125,10 @@ func RefreshRoute(r *gin.Engine) {
 				return
 			}
 
-		c.JSON(http.StatusOK, gin.H{
-			"access": access,
-		})
-      return
-
+			c.JSON(http.StatusOK, gin.H{
+				"access": access,
+			})
+			return
 		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"success": "good egg",
-		})
 	})
 }

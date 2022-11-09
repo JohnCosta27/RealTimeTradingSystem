@@ -2,6 +2,7 @@ import {
   Accessor,
   Component,
   createContext,
+  createEffect,
   createSignal,
   JSX,
   Match,
@@ -9,7 +10,7 @@ import {
   useContext,
 } from "solid-js";
 import { createMutation } from "@tanstack/solid-query";
-import { PostLogin, PostRegister } from "../network/requests";
+import { PostLogin, PostRefresh, PostRegister } from "../network/requests";
 
 interface AuthContextType {
   refresh?: string;
@@ -68,10 +69,36 @@ export const AuthProvider: Component<{ children: JSX.Element }> = (props) => {
     },
   });
 
+  const refresh = createMutation({
+    mutationFn: PostRefresh,
+    onSuccess: (res) => {
+      localStorage.setItem("access", res.data.access);
+
+      setAuth((prev) => ({
+        refresh: prev.refresh,
+        access: res.data.access,
+        isAuth: true,
+      }));
+    },
+  });
+
   return (
     <AuthContext.Provider value={auth}>
       <Switch>
-        <Match when={auth().isAuth}>{props.children}</Match>
+        <Match when={auth().isAuth}>
+          <>
+            <button
+              onClick={() => {
+                refresh.mutate({
+                  refresh: auth().refresh || "",
+                });
+              }}
+            >
+              Click to refresh
+            </button>
+            {props.children}
+          </>
+        </Match>
         <Match when={!auth().isAuth}>
           <button
             onClick={() => {
