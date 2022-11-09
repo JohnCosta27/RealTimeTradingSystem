@@ -10,18 +10,25 @@ import {
   useContext,
 } from "solid-js";
 import { createMutation } from "@tanstack/solid-query";
-import { PostLogin, PostRefresh, PostRegister } from "../network/requests";
+import { PostLogin, PostLoginType, PostRefresh, PostRefreshType, PostRegister, PostRegisterType } from "../network/requests";
+
+interface AuthMethods {
+    register: (vars: PostRegisterType) => void;
+    login: (vars: PostLoginType) => void;
+    refreshRes: (vars: PostRefreshType) => void;
+}
 
 interface AuthContextType {
   refresh?: string;
   access?: string;
   isAuth: boolean;
+  methods: AuthMethods;
 }
 
 const AuthContext = createContext<Accessor<AuthContextType>>();
 export const useAuth = () => useContext(AuthContext);
 
-const GetAuth = (): AuthContextType => {
+const GetAuth = (methods: AuthMethods): AuthContextType => {
   const access = localStorage.getItem("access");
   const refresh = localStorage.getItem("refresh");
 
@@ -30,24 +37,25 @@ const GetAuth = (): AuthContextType => {
       isAuth: true,
       access,
       refresh,
+      methods,
     };
   } else {
     return {
       isAuth: false,
+      methods,
     };
   }
 };
 
 export const AuthProvider: Component<{ children: JSX.Element }> = (props) => {
-  const [auth, setAuth] = createSignal<AuthContextType>(GetAuth());
-
   const register = createMutation({
     mutationFn: PostRegister,
     onSuccess: (res) => {
       localStorage.setItem("refresh", res.data.refresh);
       localStorage.setItem("access", res.data.access);
 
-      setAuth(() => ({
+      setAuth((prev) => ({
+        ...prev,
         refresh: res.data.refresh,
         access: res.data.access,
         isAuth: true,
@@ -61,7 +69,8 @@ export const AuthProvider: Component<{ children: JSX.Element }> = (props) => {
       localStorage.setItem("refresh", res.data.refresh);
       localStorage.setItem("access", res.data.access);
 
-      setAuth(() => ({
+      setAuth((prev) => ({
+        ...prev,
         refresh: res.data.refresh,
         access: res.data.access,
         isAuth: true,
@@ -75,12 +84,19 @@ export const AuthProvider: Component<{ children: JSX.Element }> = (props) => {
       localStorage.setItem("access", res.data.access);
 
       setAuth((prev) => ({
-        refresh: prev.refresh,
+        ...prev,
         access: res.data.access,
         isAuth: true,
       }));
     },
   });
+
+  const [auth, setAuth] = createSignal<AuthContextType>(GetAuth({
+    register: register.mutate,
+    login: login.mutate,
+    refreshRes: refresh.mutate,
+  }));
+
 
   return (
     <AuthContext.Provider value={auth}>
