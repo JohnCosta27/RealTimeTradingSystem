@@ -35,3 +35,15 @@ Added RabbitMQ docker image, and created a test connection between hub and rabbi
 
 ## 05/11/2022
 Setup the SQL schemas for the required databases.
+
+## 06/11/2022
+Started work on the authentication system.
+
+## 07/11/2022
+Finished register method in auth system, with some very nice code.
+I also finished the login method.
+Also finished the refresh method for JWTs. Basically did the entire Auth system.
+
+## 08/11/2022
+I am on a streak! 4 days with commits everyday, got a nice groove going.
+Connected frontend to backend login and register methods, learn about state management in SolidJs.
