@@ -8,6 +8,7 @@ import { App } from "./App";
 import "./index.css";
 import { AuthLayout } from "./auth/AuthLayout";
 import { Login } from "./auth/Login";
+import { Register } from "./auth/Register";
 
 export const Main: Component = () => {
   return (
@@ -20,6 +21,7 @@ export const Main: Component = () => {
             </Route>
             <Route path="/auth" component={AuthLayout}>
               <Route path="/login" component={Login} />
+              <Route path="/register" component={Register} />
             </Route>
           </Routes>
         </Router>
