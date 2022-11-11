@@ -5,7 +5,9 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { render } from "solid-js/web";
 import { QueryProvider } from "./network/QueryProvider";
 import { App } from "./App";
-import "./main.css";
+import "./index.css";
+import { AuthLayout } from "./auth/AuthLayout";
+import { Login } from "./auth/Login";
 
 export const Main: Component = () => {
   return (
@@ -15,6 +17,9 @@ export const Main: Component = () => {
           <Routes>
             <Route path="/" component={ProtectedRoute}>
               <Route path="/" component={App} />
+            </Route>
+            <Route path="/auth" component={AuthLayout}>
+              <Route path="/login" component={Login} />
             </Route>
           </Routes>
         </Router>
