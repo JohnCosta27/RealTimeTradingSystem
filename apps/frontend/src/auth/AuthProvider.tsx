@@ -2,20 +2,24 @@ import {
   Accessor,
   Component,
   createContext,
-  createEffect,
   createSignal,
   JSX,
-  Match,
-  Switch,
   useContext,
 } from "solid-js";
 import { createMutation } from "@tanstack/solid-query";
-import { PostLogin, PostLoginType, PostRefresh, PostRefreshType, PostRegister, PostRegisterType } from "../network/requests";
+import {
+  PostLogin,
+  PostLoginType,
+  PostRefresh,
+  PostRefreshType,
+  PostRegister,
+  PostRegisterType,
+} from "../network/requests";
 
 interface AuthMethods {
-    register: (vars: PostRegisterType) => void;
-    login: (vars: PostLoginType) => void;
-    refreshRes: (vars: PostRefreshType) => void;
+  register: (vars: PostRegisterType) => void;
+  login: (vars: PostLoginType) => void;
+  refreshRes: (vars: PostRefreshType) => void;
 }
 
 interface AuthContextType {
@@ -25,7 +29,16 @@ interface AuthContextType {
   methods: AuthMethods;
 }
 
-const AuthContext = createContext<Accessor<AuthContextType>>();
+const initState: AuthContextType = {
+  isAuth: false,
+  methods: {
+    register: () => {},
+    login: () => {},
+    refreshRes: () => {},
+  },
+};
+
+const AuthContext = createContext<Accessor<AuthContextType>>(() => initState);
 export const useAuth = () => useContext(AuthContext);
 
 const GetAuth = (methods: AuthMethods): AuthContextType => {
@@ -91,55 +104,15 @@ export const AuthProvider: Component<{ children: JSX.Element }> = (props) => {
     },
   });
 
-  const [auth, setAuth] = createSignal<AuthContextType>(GetAuth({
-    register: register.mutate,
-    login: login.mutate,
-    refreshRes: refresh.mutate,
-  }));
-
+  const [auth, setAuth] = createSignal<AuthContextType>(
+    GetAuth({
+      register: register.mutate,
+      login: login.mutate,
+      refreshRes: refresh.mutate,
+    })
+  );
 
   return (
-    <AuthContext.Provider value={auth}>
-      <Switch>
-        <Match when={auth().isAuth}>
-          <>
-            <button
-              onClick={() => {
-                refresh.mutate({
-                  refresh: auth().refresh || "",
-                });
-              }}
-            >
-              Click to refresh
-            </button>
-            {props.children}
-          </>
-        </Match>
-        <Match when={!auth().isAuth}>
-          <button
-            onClick={() => {
-              register.mutate({
-                firstname: "Solid",
-                surname: "Js",
-                email: `solid@js.com`,
-                password: "hello",
-              });
-            }}
-          >
-            Click to test register
-          </button>
-          <button
-            onClick={() => {
-              login.mutate({
-                email: `solid@js.com`,
-                password: "hello",
-              });
-            }}
-          >
-            Click to test login
-          </button>
-        </Match>
-      </Switch>
-    </AuthContext.Provider>
+    <AuthContext.Provider value={auth}>{props.children}</AuthContext.Provider>
   );
 };
