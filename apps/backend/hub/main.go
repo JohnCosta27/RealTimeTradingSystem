@@ -11,6 +11,7 @@ func main() {
 	wg.Add(1)
 
 	rabbitmq.InitRabbit()
+  go rabbitmq.RecieveMessages()
 	InitGin()
 
 	wg.Wait()
