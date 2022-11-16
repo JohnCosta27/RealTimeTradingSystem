@@ -8,4 +8,6 @@ package routes
 // something similar.
 
 const HEALTH_ROUTE = "/health"
+const HEALTH_AUTH_ROUTE = "/health-auth"
 const WS_SWITCH = "/ws"
+const ASSET_ROUTE = "/assets"
