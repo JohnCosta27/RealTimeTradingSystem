@@ -47,3 +47,6 @@ Also finished the refresh method for JWTs. Basically did the entire Auth system.
 ## 08/11/2022
 I am on a streak! 4 days with commits everyday, got a nice groove going.
 Connected frontend to backend login and register methods, learn about state management in SolidJs.
+
+## 22/11/2022
+It has been too long without an update, I have been very busy with deadlines recently. However today I have started the Interim report, and added a lot of detail.
