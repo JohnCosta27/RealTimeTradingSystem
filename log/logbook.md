@@ -50,3 +50,6 @@ Connected frontend to backend login and register methods, learn about state mana
 
 ## 22/11/2022
 It has been too long without an update, I have been very busy with deadlines recently. However today I have started the Interim report, and added a lot of detail.
+
+## 23/11/2022
+Adding sections about version control monorepos and git worktrees.

@@ -152,6 +152,9 @@ Making a website is very hard now a days.
 \subsubsection{Monorepo}
 For this project, we were provided with 1 GitLab repo, however my project consists of various different services and parts that normally would not belong in the same repo. However, there is a common technique in industry of keeping all your code base in the same repository (monorepo), hence making CI (Contant Integration) and development easy, because everything is in one place and not scattered across multiple different project repositories. I am not using any monorepo management software although these do exist (Turborepo, Monorepo, Bazel), I keep my different projects stored in the apps TODO: Add formatting direcotry, hence seperating these somewhat, and each apps configuration files are stored in their corresponding folder, leaving the overall structure of the repository nice and clean.
 
+\subsubsection{Bare repo and Worktrees}
+Git has a feature called worktrees, this feature is not very well known, however I think it is a very powerful feature and one I have used through this project. Starting with cloning a barerepo, this means that we clone a Git Repository without cloning any of the files in the folder, with the main branch checked out. However, a bare clone just clones the .git file withotu any of the files, and we can use worktrees to edit various branches, worktrees are a way to have multiple branches in a git repository checked out at the same time, in seperate folders. This feature is very powerful because I was often working on 2 things at the same time (Frontend, backend and maybe the report), and naturally these live in different branches, therefore it is extremely useful to have them all checkout out at the same time. TODO: ADD REFERENCE FOR WORKTREES.
+
 \subsection{Testing}
 
 \subsection{Documentation}
