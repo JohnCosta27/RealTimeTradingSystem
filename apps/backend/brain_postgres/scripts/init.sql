@@ -1,11 +1,17 @@
 CREATE TABLE users (
   id UUID PRIMARY KEY NOT NULL,
-  balance FLOAT NOT NULL
+  balance FLOAT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP
 );
 
 CREATE TABLE assets (
   id UUID PRIMARY KEY NOT NULL,
-  name VARCHAR(256)
+  name VARCHAR(256),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP
 );
 
 CREATE TABLE transactions (
@@ -14,10 +20,16 @@ CREATE TABLE transactions (
   seller UUID REFERENCES users(id) NOT NULL,
   price FLOAT NOT NULL,
   state VARCHAR(24),
-  assetId UUID REFERENCES assets(id) NOT NULL
+  assetId UUID REFERENCES assets(id) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP
 );
 
 CREATE TABLE userAssets (
   userId UUID REFERENCES users(id) NOT NULL,
-  assetId UUID REFERENCES assets(id) NOT NULL
+  assetId UUID REFERENCES assets(id) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP
 );

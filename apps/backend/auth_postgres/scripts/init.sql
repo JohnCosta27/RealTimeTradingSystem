@@ -15,9 +15,9 @@ CREATE TABLE users (
   surname VARCHAR(256) NOT NULL,
   password VARCHAR(512) NOT NULL,
   password_salt VARCHAR(512) NOT NULL,
-  created_at DATE NOT NULL,
-  updated_at DATE NOT NULL,
-  deleted_at DATE
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  deleted_at TIMESTAMP
 );
 
 CREATE TABLE user_session_logs (
@@ -25,7 +25,7 @@ CREATE TABLE user_session_logs (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   date date NOT NULL,
   type VARCHAR(24) NOT NULL,
-  created_at DATE NOT NULL,
-  updated_at DATE NOT NULL,
-  deleted_at DATE
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
+  deleted_at TIMESTAMP
 );

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"brain/database"
+	"brain/model"
 	"brain/rabbitmq"
+	"bytes"
+	"encoding/gob"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/rabbitmq/amqp091-go"
 )
@@ -14,6 +17,8 @@ func main() {
 	wg.Add(1)
 
 	rabbitmq.InitRabbit()
+
+  database.InitDatabase()
 
 	msgs, err := rabbitmq.GlobalChannel.Consume(
 		"TestQueue",
@@ -29,13 +34,18 @@ func main() {
 		panic(err)
 	}
 
+  var buf bytes.Buffer
+  enc := gob.NewEncoder(&buf)
+
 	go func() {
 		for d := range msgs {
-			fmt.Println("Waiting to reply...")
-      time.Sleep(time.Millisecond *  1000) // TODO: Remove this, here just for testing
 			fmt.Printf("Recieved message: %s\n", string(d.Body))
+
+      assets := model.GetAllAssets()
+      enc.Encode(&assets)
+
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,
-				amqp091.Publishing{ContentType: "text/plain", Body: []byte("Hello World"), CorrelationId: d.CorrelationId})
+				amqp091.Publishing{ContentType: "text/plain", Body: buf.Bytes(), CorrelationId: d.CorrelationId})
 		}
 	}()
 
