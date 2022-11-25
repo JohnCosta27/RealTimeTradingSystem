@@ -3,6 +3,8 @@ package main
 import (
 	"hub/rabbitmq"
 	"sync"
+
+	"hub/connections"
 )
 
 func main() {
@@ -10,11 +12,28 @@ func main() {
 
 	wg.Add(1)
 
-	rabbitmq.InitRabbit()
-  go rabbitmq.RecieveMessages()
-	InitGin()
+	localCh, err := conn.Channel()
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	fmt.Println("Successfully created a RabbitMQ channel")
+  GlobalChannel = localCh
 
-	wg.Wait()
+	_, err = GlobalChannel.QueueDeclare(
+		"TestQueue",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
 
-  rabbitmq.CloseRabbit()
+  InitGin()
+
+  wg.Wait()
 }
