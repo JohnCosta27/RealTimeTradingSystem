@@ -2,9 +2,8 @@ package main
 
 import (
 	"hub/rabbitmq"
-	"sync"
 
-	"hub/connections"
+	"sync"
 )
 
 func main() {
@@ -12,28 +11,8 @@ func main() {
 
 	wg.Add(1)
 
-	localCh, err := conn.Channel()
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	fmt.Println("Successfully created a RabbitMQ channel")
-  GlobalChannel = localCh
+	rabbitmq.InitRabbit()
+	InitGin()
 
-	_, err = GlobalChannel.QueueDeclare(
-		"TestQueue",
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-
-  InitGin()
-
-  wg.Wait()
+	wg.Wait()
 }

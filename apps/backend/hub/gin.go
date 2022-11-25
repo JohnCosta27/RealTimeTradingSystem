@@ -1,11 +1,10 @@
-package connections
+package main
 
 import (
 	"fmt"
+	"hub/routes"
 	"net/http"
 	"strings"
-
-	"hub/connections/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -25,35 +24,6 @@ var upgrader = websocket.Upgrader{
 func InitGin() {
 	Router = gin.Default()
 	WsConnections = make([]*websocket.Conn, 0)
-
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	defer conn.Close()
-
-	fmt.Println("Successfully connected to RabbitMQ using AMQP")
-
-	ch, err := conn.Channel()
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	defer ch.Close()
-
-	_, err = ch.QueueDeclare(
-		"TestQueue",
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
