@@ -27,6 +27,7 @@ func InitGin() {
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
+  routes.GetAssets(Router)
 
 	Router.GET("/ws", func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
