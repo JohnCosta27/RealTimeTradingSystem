@@ -1,7 +1,11 @@
 package rabbitmq
 
 import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
 	"log"
+	sharedtypes "sharedTypes"
 
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -81,11 +85,16 @@ func InitRabbit() {
 
 }
 
-func SendRPC(msg string) []byte {
+func SendRPC(msg sharedtypes.BrainReq) []byte {
   messageId := uuid.New().String()
+  fmt.Println(messageId)
+
+  var buf bytes.Buffer
+  enc := gob.NewEncoder(&buf)
+  enc.Encode(&msg)
 
 	GlobalChannel.Publish("", "TestQueue", false, false,
-		amqp.Publishing{ContentType: "text/plain", Body: []byte(msg), CorrelationId: messageId})
+		amqp.Publishing{ContentType: "text/plain", Body: buf.Bytes(), CorrelationId: messageId})
 
   // Iteration goes on until channel is closed (should be never),
   // only returns when we find the correct message

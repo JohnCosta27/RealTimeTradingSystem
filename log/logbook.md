@@ -50,3 +50,6 @@ Connected frontend to backend login and register methods, learn about state mana
 
 ## 23/11/2022
 This was a pretty big chunk of the backend done. I have a shared types library now and RPC communication working between hub and brain and sending back to the client. Need to implement the rest of the routes.
+
+## 26/11/2022
+There was a bug in the backend code, where some memory was declared in a different thread, and therefore was never updating, fixed it by redeclaring this memory.

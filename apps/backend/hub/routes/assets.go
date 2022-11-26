@@ -3,6 +3,7 @@ package routes
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"hub/rabbitmq"
 	"net/http"
 	sharedtypes "sharedTypes"
@@ -13,7 +14,11 @@ import (
 // Get all assets route
 func GetAssets(r *gin.Engine) {
   r.GET(ASSET_ROUTE, func(c *gin.Context) {
-    msg := rabbitmq.SendRPC("hello World!!!")
+    req := sharedtypes.BrainReq{
+      Url: "get-assets",
+    }
+
+    msg := rabbitmq.SendRPC(req)
     
     buf := bytes.NewBuffer(msg)
     dec := gob.NewDecoder(buf)
@@ -21,6 +26,7 @@ func GetAssets(r *gin.Engine) {
     var assets []sharedtypes.Asset
 
     dec.Decode(&assets)
+    fmt.Println(len(assets))
 
     c.JSON(http.StatusOK, gin.H{
       "assets": assets,

@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	sharedtypes "sharedTypes"
 	"sync"
 
 	"github.com/rabbitmq/amqp091-go"
@@ -18,7 +19,7 @@ func main() {
 
 	rabbitmq.InitRabbit()
 
-  database.InitDatabase()
+	database.InitDatabase()
 
 	msgs, err := rabbitmq.GlobalChannel.Consume(
 		"TestQueue",
@@ -34,15 +35,20 @@ func main() {
 		panic(err)
 	}
 
-  var buf bytes.Buffer
-  enc := gob.NewEncoder(&buf)
-
 	go func() {
 		for d := range msgs {
-			fmt.Printf("Recieved message: %s\n", string(d.Body))
+			msgBuffered := bytes.NewBuffer(d.Body)
+			dec := gob.NewDecoder(msgBuffered)
 
-      assets := model.GetAllAssets()
-      enc.Encode(&assets)
+			var req sharedtypes.BrainReq
+			dec.Decode(&req)
+
+			var buf bytes.Buffer
+			enc := gob.NewEncoder(&buf)
+
+			assets := model.GetAllAssets()
+			fmt.Println(len(assets))
+			enc.Encode(&assets)
 
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,
 				amqp091.Publishing{ContentType: "text/plain", Body: buf.Bytes(), CorrelationId: d.CorrelationId})
