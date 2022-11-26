@@ -30,3 +30,8 @@ dist
 
 ## Ignore database data volume
 db/
+
+## Ignore executables
+apps/backend/auth/auth
+apps/backend/brain/brain
+apps/backend/hub/hub
