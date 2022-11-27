@@ -53,3 +53,7 @@ This was a pretty big chunk of the backend done. I have a shared types library n
 
 ## 26/11/2022
 There was a bug in the backend code, where some memory was declared in a different thread, and therefore was never updating, fixed it by redeclaring this memory.
+
+## 27/11/2022
+Fixed a lot of stuff on the backend and did some refactoring so some dependencies are shared. Also started the transactions endpoint but decided that I would like to connect the assets to the frontend first.
+Today is also my birthday.
