@@ -53,3 +53,6 @@ It has been too long without an update, I have been very busy with deadlines rec
 
 ## 23/11/2022
 Adding sections about version control monorepos and git worktrees.
+
+## 27/11/2022
+Section about project management
