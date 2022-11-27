@@ -4,11 +4,11 @@ import (
 	"auth/database"
 	"auth/middleware"
 	"auth/structs"
-	"auth/util"
 	"crypto/sha512"
 	"encoding/hex"
 	"log"
 	"net/http"
+	"utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,21 +24,29 @@ func RegisterRoute(r *gin.Engine) {
 		b, _ := c.Get("body")
 		registerBody := b.(*structs.RegisterBody)
 
-		salt := util.GenSalt()
+		salt := utils.GenSalt()
 		hashBytes := sha512.Sum512([]byte(registerBody.Password + salt))
 		hashedPassword := hex.EncodeToString(hashBytes[:])
 
-		user := &database.User{
+		user := database.User{
 			Email:         registerBody.Email,
 			Firstname:     registerBody.Firstname,
 			Surname:       registerBody.Surname,
 			Password:      hashedPassword,
 			Password_salt: salt,
 		}
-		database.Db.Create(user)
+    res := database.Db.Create(&user)
 
-		refresh, rErr := util.GenRefreshToken()
-		access, aErr := util.GenAccessToken()
+    if res.Error != nil {
+      log.Println(res.Error)
+      c.JSON(http.StatusBadRequest, gin.H{
+        "Error": "Duplicate email found",
+      })
+      return
+    } 
+
+		refresh, rErr := utils.GenRefreshToken(user.ID.String())
+		access, aErr := utils.GenAccessToken(user.ID.String())
 		if rErr != nil || aErr != nil {
 			log.Println(rErr, aErr)
 			c.JSON(http.StatusOK, gin.H{
@@ -86,8 +94,8 @@ func LoginRoute(r *gin.Engine) {
 			return
 		}
 
-		refresh, rErr := util.GenRefreshToken()
-		access, aErr := util.GenAccessToken()
+		refresh, rErr := utils.GenRefreshToken(user.ID.String())
+		access, aErr := utils.GenAccessToken(user.ID.String())
 		if rErr != nil || aErr != nil {
 			log.Println(rErr, aErr)
 			c.JSON(http.StatusOK, gin.H{
@@ -115,20 +123,25 @@ func RefreshRoute(r *gin.Engine) {
 		b, _ := c.Get("body")
 		refreshBody := b.(*structs.RefreshBody)
 
-		if util.IsValidJwt(refreshBody.Refresh, "refresh") {
-			access, aErr := util.GenAccessToken()
-			if aErr != nil {
-				log.Println(aErr)
-				c.JSON(http.StatusOK, gin.H{
-					"error": "server error",
-				})
-				return
-			}
-
-			c.JSON(http.StatusOK, gin.H{
-				"access": access,
+		claims, err := utils.DecodeJwt(refreshBody.Refresh, "refresh")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Bad refresh token given",
 			})
 			return
 		}
+
+		access, aErr := utils.GenAccessToken(claims.Uuid)
+		if aErr != nil {
+			log.Println(aErr)
+			c.JSON(http.StatusOK, gin.H{
+				"error": "server error",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"access": access,
+		})
 	})
 }

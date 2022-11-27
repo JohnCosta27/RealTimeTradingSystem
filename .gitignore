@@ -25,11 +25,13 @@
 node_modules
 dist
 
-## Ignore executables
-hub
-
 ## Ignore environment
 .env
 
 ## Ignore database data volume
 db/
+
+## Ignore executables
+apps/backend/auth/auth
+apps/backend/brain/brain
+apps/backend/hub/hub

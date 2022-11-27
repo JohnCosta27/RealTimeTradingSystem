@@ -1,16 +1,18 @@
 package main
 
 import (
-	"sync"
+	"hub/rabbitmq"
 
-	"hub/connections"
+	"sync"
 )
 
 func main() {
-  var wg sync.WaitGroup
+	var wg sync.WaitGroup
 
-  wg.Add(1)
-  connections.InitGin()
+	wg.Add(1)
 
-  wg.Wait()
+	rabbitmq.InitRabbit()
+	InitGin()
+
+	wg.Wait()
 }
