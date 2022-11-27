@@ -4,10 +4,12 @@ go 1.19
 
 require (
   sharedTypes v1.0.0
+  utils v1.0.0
 )
 
 replace (
   sharedTypes v1.0.0 => ../shared-types
+  utils v1.0.0 => ../utils
 )
 
 require (

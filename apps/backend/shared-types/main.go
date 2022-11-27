@@ -17,3 +17,12 @@ type Asset struct {
 	Base
 	Name string `json:"Name"`
 }
+
+type Transaction struct {
+	Base
+	AssetId  string  `json:"AssetId"`
+	BuyerId  string  `json:"BuyerId"`
+	SellerId string  `json:"SellerId"`
+	State    string  `json:"State"`
+	Price    float64 `json:"Price"`
+}

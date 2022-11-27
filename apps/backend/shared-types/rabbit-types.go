@@ -4,7 +4,7 @@ package sharedtypes
 type BrainReq struct {
 	Url    string
 	Params map[string]string
-	Body   string //TODO: Add body request types here
+	Body   map[string]string  //TODO: Add body request types here
 }
 
 type CreateTransaction struct {
