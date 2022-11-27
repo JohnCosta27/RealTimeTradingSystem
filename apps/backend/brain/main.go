@@ -6,7 +6,6 @@ import (
 	"brain/rabbitmq"
 	"bytes"
 	"encoding/gob"
-	"fmt"
 	sharedtypes "sharedTypes"
 	"sync"
 
@@ -46,9 +45,11 @@ func main() {
 			var buf bytes.Buffer
 			enc := gob.NewEncoder(&buf)
 
-			assets := model.GetAllAssets()
-			fmt.Println(len(assets))
-			enc.Encode(&assets)
+      switch req.Url {
+        case "get-assets":
+          assets := model.GetAllAssets()
+          enc.Encode(&assets)
+      }
 
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,
 				amqp091.Publishing{ContentType: "text/plain", Body: buf.Bytes(), CorrelationId: d.CorrelationId})

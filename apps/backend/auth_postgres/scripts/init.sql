@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS user_session_logs CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
-	id uuid DEFAULT gen_random_uuid() PRIMARY KEY NULL,
+	id uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
   email VARCHAR(256) NOT NULL UNIQUE,
   firstname VARCHAR(256) NOT NULL,
   surname VARCHAR(256) NOT NULL,
