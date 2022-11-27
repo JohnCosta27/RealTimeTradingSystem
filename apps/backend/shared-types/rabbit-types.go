@@ -8,8 +8,8 @@ type BrainReq struct {
 }
 
 type CreateTransaction struct {
-	AssetId string  `json:"assetId"`
-	Type    string  `json:"type"`
+  AssetId string  `json:"assetId" binding:"required"`
+  Type    string  `json:"type" binding:"required"`
 }
 
 type HubPosts interface {
@@ -17,6 +17,5 @@ type HubPosts interface {
 }
 
 func GetTransactionBody() *CreateTransaction {
-	return &CreateTransaction{
-	}
+	return &CreateTransaction{}
 }

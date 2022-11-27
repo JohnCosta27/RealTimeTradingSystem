@@ -1,9 +1,10 @@
-package util
+package utils
 
 import (
 	"errors"
 	"fmt"
 	"time"
+  "math/rand"
 
 	"github.com/golang-jwt/jwt"
 )
@@ -19,13 +20,14 @@ var ACCESS_TIME = 1 * time.Hour
 type Claims struct {
 	Exp  string
 	Type string
+  Uuid string // The users UUID
 }
 
 func (c Claims) Valid() error {
-	if c.Exp == "" || c.Type == "" {
+	if c.Type == "" || c.Uuid == "" {
 		return errors.New("Bad claims")
 	}
-	return nil
+  return nil
 }
 
 func GenJwt() *jwt.Token {
@@ -33,23 +35,26 @@ func GenJwt() *jwt.Token {
 	return token
 }
 
-func GenRefreshToken() (string, error) {
+func GenRefreshToken(userId string) (string, error) {
 	token := GenJwt()
 	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(REFRESH_TIME)
-	claims["type"] = "refresh"
+	claims["Exp"] = time.Now().Add(REFRESH_TIME)
+	claims["Type"] = "refresh"
+  claims["Uuid"] = userId
 	return token.SignedString(jwtKey)
 }
 
-func GenAccessToken() (string, error) {
+func GenAccessToken(userId string) (string, error) {
 	token := GenJwt()
 	claims := token.Claims.(jwt.MapClaims)
 	claims["Exp"] = time.Now().Add(ACCESS_TIME)
 	claims["Type"] = "access"
+  claims["Uuid"] = userId
 	return token.SignedString(jwtKey)
 }
 
-func IsValidJwt(tokenString string, tokenType string) bool {
+// Returns the claims from the token, or an error if it is not valid
+func DecodeJwt(tokenString string, tokenType string) (Claims, error) {
 	c := Claims{}
 	_, err := jwt.ParseWithClaims(tokenString, &c, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -58,11 +63,25 @@ func IsValidJwt(tokenString string, tokenType string) bool {
 
 		return jwtKey, nil
 	})
+  return c, err;
+}
 
-	if err != nil {
-		fmt.Println(err)
-		return false
+func IsValidJwt(tokenString string, tokenType string) bool {
+  claims, err := DecodeJwt(tokenString, tokenType)
+  if err != nil {
+    return false
+  }
+
+	return claims.Type == tokenType
+}
+
+var SALT_SIZE = 64
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.><,?/'@#][{}=+-_!£$%^&*]")
+
+func GenSalt() string {
+	b := make([]rune, SALT_SIZE)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
-
-	return c.Type == tokenType
+	return string(b)
 }

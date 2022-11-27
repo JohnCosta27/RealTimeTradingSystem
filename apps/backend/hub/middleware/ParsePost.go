@@ -11,7 +11,6 @@ import (
 func ParsePostMiddleware[T sharedtypes.HubPosts](GetStruct func() T) gin.HandlerFunc {
   return func (c *gin.Context) {
     BodyStruct := GetStruct()
-    log.Println(BodyStruct)
 
     err := c.ShouldBindJSON(BodyStruct)
 
