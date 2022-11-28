@@ -1,8 +1,11 @@
 package sharedtypes
 
+import "github.com/google/uuid"
+
 // TODO: Use enums for route selection
 type BrainReq struct {
 	Url    string
+  Access uuid.UUID
 	Params map[string]string
 	Body   map[string]string  //TODO: Add body request types here
 }

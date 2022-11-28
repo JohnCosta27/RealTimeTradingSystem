@@ -20,17 +20,17 @@ CREATE TABLE transactions (
   seller UUID REFERENCES users(id),
   price FLOAT NOT NULL,
   state VARCHAR(24),
-  assetId UUID REFERENCES assets(id) NOT NULL,
+  asset_id UUID REFERENCES assets(id) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  deleted_at TIMESTAMPf2e6a94f-b50b-4b7d-9c32-f444104715ba
+  deleted_at TIMESTAMP
 );
 
-CREATE TABLE userAssets (
+CREATE TABLE user_assets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
   amount FLOAT NOT NULL,
-  userId UUID REFERENCES users(id) NOT NULL,
-  assetId UUID REFERENCES assets(id) NOT NULL,
+  user_id UUID REFERENCES users(id) NOT NULL,
+  asset_id UUID REFERENCES assets(id) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   deleted_at TIMESTAMP
@@ -38,4 +38,4 @@ CREATE TABLE userAssets (
 
 INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 2000);
 INSERT INTO assets VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715bb', 'Test Asset #1');
-INSERT INTO userAssets (userId, assetId, amount) VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 'f2e6a94f-b50b-4b7d-9c32-f444104715bb', 10);
+INSERT INTO user_assets (user_id, asset_id, amount) VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 'f2e6a94f-b50b-4b7d-9c32-f444104715bb', 10);

@@ -30,6 +30,8 @@ func InitGin() {
   routes.GetAssets(Router)
   routes.PostTrade(Router)
 
+  routes.UserRoutes(Router)
+
 	Router.GET("/ws", func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {

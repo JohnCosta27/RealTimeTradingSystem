@@ -3,7 +3,6 @@ package routes
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 	"hub/rabbitmq"
 	"net/http"
 	sharedtypes "sharedTypes"
@@ -23,10 +22,8 @@ func GetAssets(r *gin.Engine) {
     buf := bytes.NewBuffer(msg)
     dec := gob.NewDecoder(buf)
 
-    var assets []sharedtypes.Asset
-
+    assets := []sharedtypes.Asset{}
     dec.Decode(&assets)
-    fmt.Println(len(assets))
 
     c.JSON(http.StatusOK, gin.H{
       "assets": assets,

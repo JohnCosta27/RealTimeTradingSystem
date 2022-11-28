@@ -49,6 +49,9 @@ func main() {
         case "get-assets":
           assets := model.GetAllAssets()
           enc.Encode(&assets)
+        case "get-user-assets":
+          assets := model.GetUserAssets(req.Access) 
+          enc.Encode(&assets)
       }
 
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,
