@@ -3,7 +3,6 @@ package routes
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 	"hub/middleware"
 	"hub/rabbitmq"
 	"net/http"

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"hub/middleware"
 	"hub/routes"
 	"net/http"
 	"strings"
@@ -25,10 +26,13 @@ func InitGin() {
 	Router = gin.Default()
 	WsConnections = make([]*websocket.Conn, 0)
 
+  Router.Use(middleware.AllowCors())
+
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
   routes.GetAssets(Router)
   routes.PostTrade(Router)
+  
 
 	Router.GET("/ws", func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
