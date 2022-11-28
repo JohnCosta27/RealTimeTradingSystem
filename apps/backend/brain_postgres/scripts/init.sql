@@ -23,7 +23,7 @@ CREATE TABLE transactions (
   assetId UUID REFERENCES assets(id) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  deleted_at TIMESTAMP
+  deleted_at TIMESTAMPf2e6a94f-b50b-4b7d-9c32-f444104715ba
 );
 
 CREATE TABLE userAssets (
@@ -36,6 +36,6 @@ CREATE TABLE userAssets (
   deleted_at TIMESTAMP
 );
 
-INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 2000)
-INSERT INTO assets VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715bb', 'Test Asset #1')
-INSERT INTO userAssets (userId, assetId, amount) VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 'f2e6a94f-b50b-4b7d-9c32-f444104715bb', 10)
+INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 2000);
+INSERT INTO assets VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715bb', 'Test Asset #1');
+INSERT INTO userAssets (userId, assetId, amount) VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 'f2e6a94f-b50b-4b7d-9c32-f444104715bb', 10);
