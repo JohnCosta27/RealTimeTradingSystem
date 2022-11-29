@@ -61,3 +61,6 @@ Today is also my birthday.
 ## 29/11/2022
  - Model methods to get user assets, create and complete transaction. Various bug fixes and connected the frontend to view assets. Some things are very prototypy, so will need refactoring
  - Endpoints for the trading of assets are complete, now I need further testing.
+
+## 29/11/2022
+ - Achieved a goal today. All the backend is fully dockerised and running in containers!
