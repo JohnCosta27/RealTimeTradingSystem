@@ -19,6 +19,7 @@ CREATE TABLE transactions (
   buyer UUID REFERENCES users(id),
   seller UUID REFERENCES users(id),
   price FLOAT NOT NULL,
+  amount FLOAT NOT NULL,
   state VARCHAR(24),
   asset_id UUID REFERENCES assets(id) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),

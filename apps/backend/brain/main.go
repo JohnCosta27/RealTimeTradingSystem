@@ -7,8 +7,10 @@ import (
 	"bytes"
 	"encoding/gob"
 	sharedtypes "sharedTypes"
+	"strconv"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/rabbitmq/amqp091-go"
 )
 
@@ -45,14 +47,22 @@ func main() {
 			var buf bytes.Buffer
 			enc := gob.NewEncoder(&buf)
 
-      switch req.Url {
-        case "get-assets":
-          assets := model.GetAllAssets()
-          enc.Encode(&assets)
-        case "get-user-assets":
-          assets := model.GetUserAssets(req.Access) 
-          enc.Encode(&assets)
-      }
+			switch req.Url {
+			case "get-assets":
+				assets := model.GetAllAssets()
+				enc.Encode(&assets)
+			case "get-user-assets":
+				assets := model.GetUserAssets(req.Access)
+				enc.Encode(&assets)
+			case "create-trade":
+				var transaction sharedtypes.Transaction
+				price, errPrice := strconv.ParseFloat(req.Body["Price"], 64)
+				amount, errAmount := strconv.ParseFloat(req.Body["Amount"], 64)
+				if errPrice == nil && errAmount != nil {
+					transaction, _ = model.StartTradeAsset(req.Body["Type"], price, amount, req.Access, uuid.MustParse(req.Body["AssetId"]))
+				}
+				enc.Encode(&transaction)
+			}
 
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,
 				amqp091.Publishing{ContentType: "text/plain", Body: buf.Bytes(), CorrelationId: d.CorrelationId})
