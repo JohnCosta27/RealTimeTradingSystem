@@ -11,6 +11,7 @@ import (
 	"utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 /*
@@ -28,7 +29,14 @@ func RegisterRoute(r *gin.Engine) {
 		hashBytes := sha512.Sum512([]byte(registerBody.Password + salt))
 		hashedPassword := hex.EncodeToString(hashBytes[:])
 
+    id := uuid.New()
+
+    userBase := database.Base {
+      ID: id,
+    }
+
 		user := database.User{
+      Base: userBase,
 			Email:         registerBody.Email,
 			Firstname:     registerBody.Firstname,
 			Surname:       registerBody.Surname,
@@ -36,6 +44,9 @@ func RegisterRoute(r *gin.Engine) {
 			Password_salt: salt,
 		}
     res := database.Db.Create(&user)
+
+    // TODO: Make this transaction safe. Across databases...
+    database.BrainDb.Exec("INSERT INTO users (id, balance) VALUES (?, 0)", id.String())
 
     if res.Error != nil {
       log.Println(res.Error)

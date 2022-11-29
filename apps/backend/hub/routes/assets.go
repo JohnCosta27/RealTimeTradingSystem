@@ -22,8 +22,7 @@ func GetAssets(r *gin.Engine) {
     buf := bytes.NewBuffer(msg)
     dec := gob.NewDecoder(buf)
 
-    var assets []sharedtypes.Asset
-
+    assets := []sharedtypes.Asset{}
     dec.Decode(&assets)
 
     c.JSON(http.StatusOK, gin.H{
