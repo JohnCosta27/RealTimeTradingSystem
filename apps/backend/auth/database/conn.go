@@ -9,7 +9,7 @@ var Db *gorm.DB
 var BrainDb *gorm.DB
 
 func InitDatabase() {
-	dsn := "host=localhost user=johnc password=meh dbname=local_project_auth port=5432 sslmode=disable"
+	dsn := "host=localhost user=postgres password=postgres dbname=postgres port=5442 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
   Db = db
 
