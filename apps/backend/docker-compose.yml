@@ -11,9 +11,9 @@ services:
 
   # Hub service is the entry point for all thing (except authentication)
   hub:
-    build: ./hub
-    volumes:
-      - ./hub:/app
+    build: 
+      context: .
+      dockerfile: ./Hub.Dockerfile
     ports:
       - 4545:4545
     depends_on:
@@ -23,9 +23,9 @@ services:
 
   # Brain service consumes RabbitMQ request and deals with permanent storage
   brain:
-    build: ./brain
-    volumes:
-      - ./brain:/app
+    build: 
+      context: .
+      dockerfile: ./Brain.Dockerfile
     ports:
       - 5672:5672
     depends_on: 
@@ -33,6 +33,7 @@ services:
       - rabbitmq
     restart: on-failure
     network_mode: host
+
   brain_postgres:
     build: ./brain_postgres
     volumes:
@@ -46,10 +47,11 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
     ports:
       - 5443:5432
+
   auth:
-    build: ./auth
-    volumes:
-      - ./auth:/app
+    build: 
+      context: .
+      dockerfile: ./Auth.Dockerfile
     ports:
       - 4546:4546
     depends_on: 
@@ -57,6 +59,7 @@ services:
       - auth_postgres
     restart: on-failure
     network_mode: host
+
   auth_postgres:
     build: ./auth_postgres
     volumes:

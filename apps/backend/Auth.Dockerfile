@@ -1,15 +1,14 @@
 FROM golang:1.19.3-alpine3.16
 
-WORKDIR /hub
+WORKDIR /auth
 
-ADD ./hub .
+ADD ./auth .
 
 COPY ./shared-types ../shared-types
 COPY ./utils ../utils
 
-RUN go build -o hub
+RUN go build -o auth
 
-EXPOSE 4545
+EXPOSE 4546
 
-# Run web server
-CMD [ "/hub/hub" ]
+CMD [ "/auth/auth" ]
