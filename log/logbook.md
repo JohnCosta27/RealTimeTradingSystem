@@ -59,4 +59,5 @@ Fixed a lot of stuff on the backend and did some refactoring so some dependencie
 Today is also my birthday.
 
 ## 29/11/2022
-Model methods to get user assets, create and complete transaction. Various bug fixes and connected the frontend to view assets. Some things are very prototypy, so will need refactoring
+ - Model methods to get user assets, create and complete transaction. Various bug fixes and connected the frontend to view assets. Some things are very prototypy, so will need refactoring
+ - Endpoints for the trading of assets are complete, now I need further testing.
