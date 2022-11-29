@@ -160,3 +160,9 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 
   return transaction, nil
 }
+
+func GetAllTransactions() []sharedtypes.Transaction {
+  var transactions []sharedtypes.Transaction
+  database.Db.Find(&transactions)
+  return transactions
+}

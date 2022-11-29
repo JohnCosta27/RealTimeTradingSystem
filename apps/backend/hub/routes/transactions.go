@@ -93,9 +93,29 @@ func PostCompleteTrade() gin.HandlerFunc {
   }
 }
 
+func GetAllTrades() gin.HandlerFunc {
+  return func(c *gin.Context) {
+    bodyReq := sharedtypes.BrainReq {
+      Url: "get-trades",
+    } 
+    msg := rabbitmq.SendRPC(bodyReq)
+
+    var trades []sharedtypes.Transaction
+
+		buf := bytes.NewBuffer(msg)
+		dec := gob.NewDecoder(buf)
+    dec.Decode(&trades)
+
+    c.JSON(http.StatusOK, gin.H{
+      "trades": trades,
+    })
+  }
+}
+
 func TradeRoutes(r *gin.Engine) {
   tradeGroup := r.Group(TRADE_ROUTE)
   tradeGroup.Use(middleware.Auth())
   tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
   tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
+  tradeGroup.GET("/", GetAllTrades())
 }

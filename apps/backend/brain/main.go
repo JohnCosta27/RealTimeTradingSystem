@@ -61,16 +61,19 @@ func main() {
 				amount, errAmount := strconv.ParseFloat(req.Body["Amount"], 64)
 				if errPrice == nil && errAmount == nil {
 					transaction, err = model.StartTradeAsset(req.Body["Type"], price, amount, req.Access, uuid.MustParse(req.Body["AssetId"]))
-          log.Println(err)
+					log.Println(err)
 				}
 				enc.Encode(&transaction)
-      case "complete-trade":
-        transaction, err := model.CompleteTradeAsset(uuid.MustParse(req.Body["TransactionId"]), req.Access)
-        if err != nil {
-          log.Println(err)
-        }
-           
+			case "complete-trade":
+				transaction, err := model.CompleteTradeAsset(uuid.MustParse(req.Body["TransactionId"]), req.Access)
+				if err != nil {
+					log.Println(err)
+				}
+
 				enc.Encode(&transaction)
+      case "get-trades":
+        transactions := model.GetAllTransactions()
+        enc.Encode(&transactions)
 			}
 
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,

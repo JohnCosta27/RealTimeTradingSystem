@@ -32,6 +32,14 @@ export const GetUserAssets: GetRequestType<{ assets: GetUserAssets[] }> = (
   });
 };
 
+export const GetAllTrades: GetRequestType<{}> = (auth) => {
+  return axios.get(`${HubUrl}/trade/`, {
+    headers: {
+      access: auth,
+    }
+  });
+}
+
 export interface PostCreateTransactionType {
   access: string;
   transactionBody: {
