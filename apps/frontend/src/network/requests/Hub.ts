@@ -5,6 +5,12 @@ export interface GetAssets extends BaseType {
   Name: string;
 }
 
+export interface GetUserAssets extends BaseType {
+  Amount: number;
+  Asset: GetAssets;
+}
+
+
 export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
   return axios.get(`${HubUrl}/assets/`, {
     headers: {
@@ -12,3 +18,11 @@ export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
     },
   });
 };
+
+export const GetUserAssets: GetRequestType<{ assets: GetUserAssets[] }> = (auth) => {
+  return axios.get(`${HubUrl}/users/assets`, {
+    headers: {
+      access: auth,
+    },
+  });
+}

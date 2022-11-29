@@ -12,7 +12,7 @@ func AllowCors() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Headers", "*")
 
 		if c.Request.Method == "OPTIONS" {
-			c.Status(http.StatusOK)
+      c.AbortWithStatus(http.StatusOK)
 			return
 		}
 
