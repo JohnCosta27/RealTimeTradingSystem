@@ -1,7 +1,8 @@
 import { createQuery } from "@tanstack/solid-query";
-import { Component, createEffect, For, Match, Switch } from "solid-js";
+import { Component, For, Match, Show, Switch } from "solid-js";
 import { useAuth } from "./auth/AuthProvider";
 import { GetAssets, GetUserAssets } from "./network/requests";
+import { CreateTransaction } from "./ui/CreateTransaction";
 
 // Main page of the application
 export const App: Component = () => {
@@ -18,8 +19,8 @@ export const App: Component = () => {
   );
 
   return (
-    <div class="w-full h-screen bg-base-100 grid gap-4 p-4">
-      <div class="w-96 grid-cols-1 flex flex-col gap-4 border-2 border-secondary p-4">
+    <div class="w-full h-screen bg-base-100 grid grid-cols-3 gap-4 p-4">
+      <div class="grid-span-1 flex flex-col gap-4 border-2 border-secondary p-4">
         <Switch>
           <Match when={assets.isLoading}>
             <p>Loading...</p>
@@ -35,7 +36,7 @@ export const App: Component = () => {
           </Match>
         </Switch>
       </div>
-      <div class="w-96 grid-cols-1 flex flex-col gap-4 border-2 border-secondary p-4">
+      <div class="grid-span-1 flex flex-col gap-4 border-2 border-secondary p-4">
         <Switch>
           <Match when={userAssets.isLoading}>
             <p>Loading...</p>
@@ -52,6 +53,9 @@ export const App: Component = () => {
           </Match>
         </Switch>
       </div>
+      <Show when={userAssets.data !== undefined} fallback={<p>Loading</p>}>
+        <CreateTransaction assets={userAssets.data!.assets} />
+      </Show>
     </div>
   );
 };
