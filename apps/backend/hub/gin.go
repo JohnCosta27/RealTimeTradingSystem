@@ -28,8 +28,7 @@ func InitGin() {
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
   routes.GetAssets(Router)
-  routes.PostTrade(Router)
-
+  routes.TradeRoutes(Router)
   routes.UserRoutes(Router)
 
 	Router.GET("/ws", func(c *gin.Context) {

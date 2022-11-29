@@ -16,8 +16,8 @@ CREATE TABLE assets (
 
 CREATE TABLE transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-  buyer UUID REFERENCES users(id),
-  seller UUID REFERENCES users(id),
+  buyer_id UUID REFERENCES users(id),
+  seller_id UUID REFERENCES users(id),
   price FLOAT NOT NULL,
   amount FLOAT NOT NULL,
   state VARCHAR(24),

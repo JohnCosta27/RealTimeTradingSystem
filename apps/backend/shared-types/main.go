@@ -36,9 +36,9 @@ type Transaction struct {
 	Base
 	AssetId  string  `json:"AssetId"`
 	BuyerId  string  `json:"BuyerId"`
-	Buyer    User    `gorm:"embedded"`
+  Buyer    User    `json:"Buyer" gorm:"embedded"`
 	SellerId string  `json:"SellerId"`
-	Seller   User    `gorm:"embedded"`
+  Seller   User    `json:"Seller" gorm:"embedded"`
 	State    string  `json:"State"`
 	Price    float64 `json:"Price"`
 	Amount   float64 `json:"Amount"`
@@ -46,9 +46,10 @@ type Transaction struct {
 
 type User struct {
 	Base
-	Balance      float64       `json:"Balance"`
-	UserAssets   []UserAsset   `json:"UserAssets"`
-	Transactions []Transaction `json:"Transactions"`
+	Balance          float64       `json:"Balance"`
+	UserAssets       []UserAsset   `json:"UserAssets"`
+	BuyTransactions  []Transaction `json:"BuyTransactions" gorm:"foreignKey:BuyerId"`
+	SellTransactions []Transaction `json:"SellTransactions" gorm:"foreignKey:SellerId"`
 }
 
 type UserAsset struct {

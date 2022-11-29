@@ -27,7 +27,6 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		}
 
 		database.Db.First(&user)
-
 		// Will need to LOCK the users balance.
 		// TODO: Add new database table for locked funds.
 		if user.Balance < price {
@@ -39,6 +38,7 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.Price = price
 		transaction.Amount = amount
 		transaction.BuyerId = userId.String()
+    database.Db.Omit("seller_id, balance").Create(&transaction)
 
 	} else {
 		// Selling the asset, we must check the user has enough of this asset.
@@ -56,10 +56,10 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.Price = price
 		transaction.Amount = amount
 		transaction.SellerId = userId.String()
+    database.Db.Omit("buyer_id, balance").Create(&transaction)
 
 	}
 
-	database.Db.Create(&transaction)
 	return transaction, nil
 }
 
@@ -114,6 +114,7 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     newUserAsset.Amount = newUserAsset.Amount + transaction.Amount
 
     transaction.State = "completed"
+    transaction.BuyerId = user.ID.String()
     
     database.Db.Save(&oldUserAsset)
     database.Db.Save(&newUserAsset)
@@ -144,12 +145,13 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     newUserAsset.Amount = newUserAsset.Amount - transaction.Amount
 
     transaction.State = "completed"
+    transaction.SellerId = user.ID.String()
     
-    database.Db.Save(&oldUserAsset)
-    database.Db.Save(&newUserAsset)
+    database.Db.Omit("name").Save(&oldUserAsset)
+    database.Db.Omit("name").Save(&newUserAsset)
     database.Db.Save(&user)
     database.Db.Save(&buyer)
-    database.Db.Save(&transaction)
+    database.Db.Omit("balance").Save(&transaction)
 
   }
 

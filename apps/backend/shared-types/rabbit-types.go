@@ -25,14 +25,24 @@ type StartTrade struct {
 }
 
 type CreateTransaction struct {
-	AssetId string `json:"assetId" binding:"required"`
-	Type    string `json:"type" binding:"required"`
+	AssetId string  `json:"assetId" binding:"required"`
+	Type    string  `json:"type" binding:"required"`
+	Amount  float64 `json:"Amount" binding:"required"`
+	Price   float64 `json:"Price" binding:"required"`
+}
+
+type CompleteTransaction struct {
+	TransactionId string `json:"TransactionId" binding:"required"`
 }
 
 type HubPosts interface {
-	*CreateTransaction
+	*CreateTransaction | *CompleteTransaction
 }
 
 func GetTransactionBody() *CreateTransaction {
 	return &CreateTransaction{}
+}
+
+func GetCompleteTransaction() *CompleteTransaction {
+  return &CompleteTransaction{}
 }
