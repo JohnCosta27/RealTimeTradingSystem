@@ -64,3 +64,14 @@ Today is also my birthday.
 
 ## 29/11/2022
  - Achieved a goal today. All the backend is fully dockerised and running in containers!
+## 22/11/2022
+It has been too long without an update, I have been very busy with deadlines recently. However today I have started the Interim report, and added a lot of detail.
+
+## 23/11/2022
+Adding sections about version control monorepos and git worktrees.
+
+## 27/11/2022
+Section about project management
+
+## 30/11/2022 - Achievement
+Finished the first draft of the report!
