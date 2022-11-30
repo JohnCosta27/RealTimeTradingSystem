@@ -56,3 +56,6 @@ Adding sections about version control monorepos and git worktrees.
 
 ## 27/11/2022
 Section about project management
+
+## 30/11/2022 - Achievement
+Finished the first draft of the report!
