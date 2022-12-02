@@ -55,5 +55,26 @@ describe("Register route testing", () => {
         expect(res.body["refresh"]).not.toBeNull();
         done();
       });
-  })
+  });
+
+  it("Should return error when trying to register same email", (done: jest.DoneCallback) => {
+    request(AuthUrl)
+      .post(r)
+      .send({
+        email: "testing@email.com",
+        firstname: "John",
+        surname: "Costa",
+        password: "SafePassword123.",
+      })
+      .expect(400)
+      .end((err, res) => {
+        expect(err).toBeNull();
+        expect(res.body).toMatchInlineSnapshot(`
+{
+  "Error": "Duplicate email found",
+}
+`);
+        done();
+      });
+  });
 });
