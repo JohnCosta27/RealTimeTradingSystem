@@ -1,9 +1,19 @@
+import { PrismaClient as AuthPrismaClient } from '../generated/auth';
 import request from "supertest";
 import { AuthUrl } from "../config";
 
 const r = "/register";
 
+const authClient = new AuthPrismaClient();
+
 describe("Register route testing", () => {
+
+  beforeAll((done: jest.DoneCallback) => {
+    authClient.users.deleteMany({}).then(() => {
+      done();
+    });
+  });
+
   it("Should have application/json type", (done: jest.DoneCallback) => {
     request(AuthUrl).post(r).expect("Content-Type", /json/).end(done);
   });
@@ -28,4 +38,22 @@ describe("Register route testing", () => {
         done();
       });
   });
+
+  it("Should success when all fields are provided", (done: jest.DoneCallback) => {
+    request(AuthUrl)
+      .post(r)
+      .send({
+        email: "testing@email.com",
+        firstname: "John",
+        surname: "Costa",
+        password: "SafePassword123.",
+      })
+      .expect(200)
+      .end((err, res) => {
+        expect(err).toBeNull();
+        expect(res.body["access"]).not.toBeNull();
+        expect(res.body["refresh"]).not.toBeNull();
+        done();
+      });
+  })
 });
