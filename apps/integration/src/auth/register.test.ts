@@ -1,8 +1,6 @@
 import { PrismaClient as AuthPrismaClient } from '../generated/auth';
 import request from "supertest";
-import { AuthUrl } from "../config";
-
-const r = "/register";
+import { AuthUrl, r } from "../config";
 
 const authClient = new AuthPrismaClient();
 
