@@ -12,7 +12,6 @@ import (
 // Trade asset needs to check the user has enough of that asset first.
 func StartTradeAsset(tradeType string, price float64, amount float64, userId uuid.UUID, assetId uuid.UUID) (sharedtypes.Transaction, error) {
 	var transaction sharedtypes.Transaction
-	var userAsset sharedtypes.UserAsset
 
 	if tradeType != "buy" && tradeType != "sell" {
 		return transaction, errors.New("Invalid trade type")
@@ -43,10 +42,14 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 	} else {
 		// Selling the asset, we must check the user has enough of this asset.
 		// TODO: Add a LOCKED asset table
+    userAsset := sharedtypes.UserAsset {
+      UserId: userId.String(),
+      AssetId: assetId.String(),
+    }
 
-		database.Db.Table("user_assets").Select("user_id, asset_id, amount").Where("user_id = ? AND asset_id = ?", userId.String(), assetId.String()).First(&userAsset)
+    database.Db.First(&userAsset)
 
-		if userAsset.Amount > amount {
+		if userAsset.Amount < amount {
 			log.Println("The user does not have enough of this asset.")
 			return transaction, errors.New("The user does not have enough of this asset.")
 		}
@@ -156,4 +159,10 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
   }
 
   return transaction, nil
+}
+
+func GetAllTransactions() []sharedtypes.Transaction {
+  var transactions []sharedtypes.Transaction
+  database.Db.Find(&transactions)
+  return transactions
 }

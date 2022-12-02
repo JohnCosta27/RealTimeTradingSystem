@@ -1,5 +1,5 @@
 import axios  from "axios"
-import { AuthUrl, RequestType } from './index';
+import { AuthUrl, PostRequestType } from './index';
 
 export interface PostRegisterType {
   firstname: string;
@@ -27,14 +27,14 @@ export interface PostRefreshRes {
   access: string;
 }
 
-export const PostRegister: RequestType<PostRegisterType, PostAuthResponse> = (body) => {
+export const PostRegister: PostRequestType<PostRegisterType, PostAuthResponse> = (body) => {
   return axios.post<PostAuthResponse>(`${AuthUrl}/register`, body)
 }
 
-export const PostLogin: RequestType<PostLoginType, PostAuthResponse> = (body) => {
+export const PostLogin: PostRequestType<PostLoginType, PostAuthResponse> = (body) => {
   return axios.post<PostAuthResponse>(`${AuthUrl}/login`, body);
 }
 
-export const PostRefresh: RequestType<PostRefreshType, PostRefreshRes> = (body) => {
+export const PostRefresh: PostRequestType<PostRefreshType, PostRefreshRes> = (body) => {
   return axios.post<PostRefreshRes>(`${AuthUrl}/refresh`, body);
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"hub/middleware"
 	"hub/routes"
 	"net/http"
 	"strings"
@@ -24,6 +25,8 @@ var upgrader = websocket.Upgrader{
 func InitGin() {
 	Router = gin.Default()
 	WsConnections = make([]*websocket.Conn, 0)
+
+  Router.Use(middleware.AllowCors())
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
