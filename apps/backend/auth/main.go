@@ -17,6 +17,7 @@ func main() {
 
   Router := gin.Default()
   Router.Use(middleware.AllowCors())
+  Router.Use(middleware.SetJson())
   routes.RegisterRoute(Router)
   routes.LoginRoute(Router)
   routes.RefreshRoute(Router)

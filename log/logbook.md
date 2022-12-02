@@ -75,3 +75,6 @@ Section about project management
 
 ## 30/11/2022 - Achievement
 Finished the first draft of the report!
+
+## 02/12/2022
+Integration testing setup.
