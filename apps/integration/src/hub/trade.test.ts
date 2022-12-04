@@ -34,13 +34,21 @@ describe("Trade routes testing", () => {
   it("Should return active trades", (done: jest.DoneCallback) => {
     request(HubUrl)
       .get(trade)
-      .set('access', access)
+      .set("access", access)
       .expect(200)
       .end((err, res) => {
         expect(err).toBeNull();
-        console.log(res.body);
-        expect(res.body["trades"])
+        expect(res.body["trades"]).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              Id: expect.any(String),
+              Price: expect.any(Number),
+              Amount: expect.any(Number),
+              AssetId: expect.any(String),
+            }),
+          ])
+        );
         done();
       });
-  })
+  });
 });
