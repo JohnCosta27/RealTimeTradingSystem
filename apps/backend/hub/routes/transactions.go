@@ -1,8 +1,7 @@
 package routes
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"hub/middleware"
 	"hub/rabbitmq"
@@ -41,13 +40,15 @@ func PostTrade() gin.HandlerFunc {
 		}
 
 		msg := rabbitmq.SendRPC(bodyReq)
-
-		buf := bytes.NewBuffer(msg)
-		dec := gob.NewDecoder(buf)
-
 		var newTrade sharedtypes.Transaction
+		err = json.Unmarshal(msg, &newTrade)
 
-		dec.Decode(&newTrade)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "This service has encountered an issue",
+			})
+			return
+		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
@@ -80,12 +81,15 @@ func PostCompleteTrade() gin.HandlerFunc {
 
 		msg := rabbitmq.SendRPC(bodyReq)
 
-		buf := bytes.NewBuffer(msg)
-		dec := gob.NewDecoder(buf)
-
 		var newTrade sharedtypes.Transaction
+		err = json.Unmarshal(msg, &newTrade)
 
-		dec.Decode(&newTrade)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "This service has encountered an issue",
+			})
+			return
+		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
@@ -101,10 +105,14 @@ func GetAllTrades() gin.HandlerFunc {
     msg := rabbitmq.SendRPC(bodyReq)
 
     var trades []sharedtypes.Transaction
+    err := json.Unmarshal(msg, &trades)
 
-		buf := bytes.NewBuffer(msg)
-		dec := gob.NewDecoder(buf)
-    dec.Decode(&trades)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "This service has encountered an issue",
+			})
+			return
+		}
 
     c.JSON(http.StatusOK, gin.H{
       "trades": trades,

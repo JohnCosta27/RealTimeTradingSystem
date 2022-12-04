@@ -4,8 +4,7 @@ import (
 	"brain/database"
 	"brain/model"
 	"brain/rabbitmq"
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"log"
 	sharedtypes "sharedTypes"
 	"strconv"
@@ -39,22 +38,20 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			msgBuffered := bytes.NewBuffer(d.Body)
-			dec := gob.NewDecoder(msgBuffered)
-
 			var req sharedtypes.BrainReq
-			dec.Decode(&req)
+      err := json.Unmarshal(d.Body, &req)
 
-			var buf bytes.Buffer
-			enc := gob.NewEncoder(&buf)
+      var returnValue []byte
 
 			switch req.Url {
 			case "get-assets":
 				assets := model.GetAllAssets()
-				enc.Encode(&assets)
+        returnValue, _ = json.Marshal(&assets)
+
 			case "get-user-assets":
 				assets := model.GetUserAssets(req.Access)
-				enc.Encode(&assets)
+        returnValue, _ = json.Marshal(&assets)
+
 			case "create-trade":
 				var transaction sharedtypes.Transaction
 				price, errPrice := strconv.ParseFloat(req.Body["Price"], 64)
@@ -63,21 +60,22 @@ func main() {
 					transaction, err = model.StartTradeAsset(req.Body["Type"], price, amount, req.Access, uuid.MustParse(req.Body["AssetId"]))
 					log.Println(err)
 				}
-				enc.Encode(&transaction)
+        returnValue, _ = json.Marshal(&transaction)
+      
 			case "complete-trade":
 				transaction, err := model.CompleteTradeAsset(uuid.MustParse(req.Body["TransactionId"]), req.Access)
 				if err != nil {
 					log.Println(err)
 				}
+        returnValue, _ = json.Marshal(&transaction)
 
-				enc.Encode(&transaction)
       case "get-trades":
         transactions := model.GetAllTransactions()
-        enc.Encode(&transactions)
+        returnValue, _ = json.Marshal(&transactions)
 			}
 
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,
-				amqp091.Publishing{ContentType: "text/plain", Body: buf.Bytes(), CorrelationId: d.CorrelationId})
+				amqp091.Publishing{ContentType: "text/plain", Body: returnValue, CorrelationId: d.CorrelationId})
 		}
 	}()
 

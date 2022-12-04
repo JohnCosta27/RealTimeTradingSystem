@@ -4,10 +4,10 @@ import "github.com/google/uuid"
 
 // TODO: Use enums for route selection
 type BrainReq struct {
-	Url    string
-	Access uuid.UUID
-	Params map[string]string
-	Body   map[string]string
+	Url    string            `json:"url"`
+	Access uuid.UUID         `json:"access"`
+	Params map[string]string `json:"params"`
+	Body   map[string]string `json:"body"`
 }
 
 type ReqBody interface {
@@ -44,5 +44,5 @@ func GetTransactionBody() *CreateTransaction {
 }
 
 func GetCompleteTransaction() *CompleteTransaction {
-  return &CompleteTransaction{}
+	return &CompleteTransaction{}
 }

@@ -1,9 +1,7 @@
 package rabbitmq
 
 import (
-	"bytes"
-	"encoding/gob"
-	"fmt"
+	"encoding/json"
 	"log"
 	sharedtypes "sharedTypes"
 
@@ -87,21 +85,19 @@ func InitRabbit() {
 
 func SendRPC(msg sharedtypes.BrainReq) []byte {
   messageId := uuid.New().String()
-  fmt.Println(messageId)
 
-  var buf bytes.Buffer
-  enc := gob.NewEncoder(&buf)
-  enc.Encode(&msg)
+  // TODO: Better error handling
+  data, _ := json.Marshal(msg)
 
 	GlobalChannel.Publish("", "TestQueue", false, false,
-		amqp.Publishing{ContentType: "text/plain", Body: buf.Bytes(), CorrelationId: messageId})
+		amqp.Publishing{ContentType: "text/plain", Body: data, CorrelationId: messageId})
 
   // Iteration goes on until channel is closed (should be never),
   // only returns when we find the correct message
   for range newMessage {
     for id, msg := range rpcMessages {
       if id == messageId {
-        // Free up the memory not needed anymore
+        // Free up the memory, not needed anymore
         delete(rpcMessages, id)
         return msg
       }

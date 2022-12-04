@@ -1,8 +1,7 @@
 package routes
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"hub/middleware"
 	"hub/rabbitmq"
 	"net/http"
@@ -13,33 +12,37 @@ import (
 )
 
 func GetUserAssets() gin.HandlerFunc {
-  return func (c *gin.Context) {
+	return func(c *gin.Context) {
 
-    // We can ignore the error because we have a check auth middleware.
-    userId, _ := c.Get("userId")
+		// We can ignore the error because we have a check auth middleware.
+		userId, _ := c.Get("userId")
 
-    req := sharedtypes.BrainReq{
-      Url: "get-user-assets",
-      // Safe casting because in the middleware we create a uuid object.
-      Access: userId.(uuid.UUID),
-    }
+		req := sharedtypes.BrainReq{
+			Url: "get-user-assets",
+			// Safe casting because in the middleware we create a uuid object.
+			Access: userId.(uuid.UUID),
+		}
 
-    msg := rabbitmq.SendRPC(req)
-    
-    buf := bytes.NewBuffer(msg)
-    dec := gob.NewDecoder(buf)
+		msg := rabbitmq.SendRPC(req)
 
-    assets := []sharedtypes.UserAsset{}
-    dec.Decode(&assets)
+		assets := []sharedtypes.UserAsset{}
+		err := json.Unmarshal(msg, &assets)
 
-    c.JSON(http.StatusOK, gin.H{
-      "assets": assets,
-    }) 
-  }
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "This service has encountered an issue",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"assets": assets,
+		})
+	}
 }
 
 func UserRoutes(r *gin.Engine) {
-  userGroup := r.Group(USER_ROUTE)
-  userGroup.Use(middleware.Auth())
-  userGroup.GET(ASSET_ROUTE, GetUserAssets())
+	userGroup := r.Group(USER_ROUTE)
+	userGroup.Use(middleware.Auth())
+	userGroup.GET(ASSET_ROUTE, GetUserAssets())
 }

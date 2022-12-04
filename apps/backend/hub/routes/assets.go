@@ -1,8 +1,7 @@
 package routes
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"hub/rabbitmq"
 	"net/http"
 	sharedtypes "sharedTypes"
@@ -18,12 +17,15 @@ func GetAssets(r *gin.Engine) {
     }
 
     msg := rabbitmq.SendRPC(req)
-    
-    buf := bytes.NewBuffer(msg)
-    dec := gob.NewDecoder(buf)
-
     assets := []sharedtypes.Asset{}
-    dec.Decode(&assets)
+		err := json.Unmarshal(msg, &assets)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "This service has encountered an issue",
+			})
+			return
+		}
 
     c.JSON(http.StatusOK, gin.H{
       "assets": assets,
