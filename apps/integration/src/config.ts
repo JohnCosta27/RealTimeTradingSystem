@@ -11,6 +11,9 @@ export const userAssets = '/users/assets';
 export const assets = '/assets';
 export const trade = '/trade/';
 
+export const testEmail = 'testing1@user.com';
+export const testPassword = 'password';
+
 if (!HubUrl) {
   throw new Error("HUB_URL must be present in .env file");
 }

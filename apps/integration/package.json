@@ -27,6 +27,7 @@
     "schema": "./src/prisma/auth.prisma"
   },
   "dependencies": {
-    "@prisma/client": "^4.7.1"
+    "@prisma/client": "^4.7.1",
+    "ts-node": "^10.9.1"
   }
 }

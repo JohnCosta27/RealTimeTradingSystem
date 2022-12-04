@@ -1,7 +1,9 @@
-import crypto from 'crypto';
-import { PrismaClient as AuthPrismaClient} from './generated/auth';
-import { PrismaClient as BrainPrismaClient } from './generated/brain';
+import crypto from "crypto";
+import { PrismaClient as AuthPrismaClient } from "./generated/auth";
+import { PrismaClient as BrainPrismaClient } from "./generated/brain";
 
+const testEmail = 'testing1@user.com';
+const testPassword = 'password';
 
 export default async function() {
   const authClient = new AuthPrismaClient();
@@ -20,22 +22,26 @@ export default async function() {
   const uuid = crypto.randomUUID();
   const otherUuid = crypto.randomUUID();
 
-  const hash = crypto.createHash('sha512');
-  const userPassword = hash.update('password', 'utf8');
+  const userPassword = crypto
+    .createHash("sha512")
+    .update(testPassword, "utf8")
+    .digest("hex");
 
-  const otherHash = crypto.createHash('sha512');
-  const otherUserPassword = otherHash.update('password', 'utf8');
+  const otherPassword = crypto
+    .createHash("sha512")
+    .update(testPassword, "utf8")
+    .digest("hex");
 
   await authClient.users.create({
     data: {
       id: uuid,
       firstname: "Testing1",
       surname: "User",
-      email: "testing1@user.com",
+      email: testEmail,
       password_salt: "",
-      password: userPassword.digest('hex'),
-    }
-  });
+      password: userPassword,
+    },
+  }).catch(e => console.log(e));
 
   await authClient.users.create({
     data: {
@@ -44,28 +50,28 @@ export default async function() {
       surname: "User",
       email: "testing2@user.com",
       password_salt: "",
-      password: otherUserPassword.digest('hex'),
-    }
+      password: otherPassword,
+    },
   });
 
   await brainClient.users.create({
     data: {
       id: uuid,
       balance: 10000,
-    }
+    },
   });
 
   await brainClient.users.create({
     data: {
       id: otherUuid,
       balance: 10000,
-    }
+    },
   });
 
   const gold = await brainClient.assets.create({
     data: {
       name: "Gold",
-    }
+    },
   });
 
   await brainClient.user_assets.create({
@@ -73,19 +79,18 @@ export default async function() {
       asset_id: gold.id,
       user_id: uuid,
       amount: 10,
-    }
+    },
   });
 
-  const trade = await brainClient.transactions.create({
+  await brainClient.transactions.create({
     data: {
       seller_id: uuid,
       amount: 10,
       price: 1000,
       asset_id: gold.id,
-      state: 'in-market',
-    }
+      state: "in-market",
+    },
   });
-  console.log(trade);
 
   console.log("Created test data");
-};
+}

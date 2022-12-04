@@ -1,4 +1,4 @@
-import { AuthUrl, HubUrl, l, userAssets } from "config";
+import { AuthUrl, HubUrl, l, testEmail, testPassword, userAssets } from "config";
 import request from "supertest";
 
 describe("User Asset routes testing", () => {
@@ -7,11 +7,10 @@ describe("User Asset routes testing", () => {
     request(AuthUrl)
       .post(l)
       .send({
-        email: "testing@user.com",
-        password: "password",
+        email: testEmail,
+        password: testPassword,
       })
       .end((_, res) => {
-        console.log(res.body);
         access = res.body["access"];
         done();
       });

@@ -1,4 +1,4 @@
-import { AuthUrl, HubUrl, l, trade } from "config";
+import { AuthUrl, HubUrl, l, testEmail, testPassword, trade } from "config";
 import request from "supertest";
 
 describe("Trade routes testing", () => {
@@ -7,8 +7,8 @@ describe("Trade routes testing", () => {
     request(AuthUrl)
       .post(l)
       .send({
-        email: "testing@user.com",
-        password: "password",
+        email: testEmail,
+        password: testPassword,
       })
       .end((_, res) => {
         access = res.body["access"];
