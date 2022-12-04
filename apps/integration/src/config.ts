@@ -7,6 +7,9 @@ export const AuthUrl = process.env.AUTH_URL;
 export const r = '/register';
 export const l = '/login';
 export const re = '/refresh';
+export const userAssets = '/users/assets';
+export const assets = '/assets';
+export const trade = '/trade/';
 
 if (!HubUrl) {
   throw new Error("HUB_URL must be present in .env file");

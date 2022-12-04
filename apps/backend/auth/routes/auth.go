@@ -135,7 +135,6 @@ func RefreshRoute(r *gin.Engine) {
 		refreshBody := b.(*structs.RefreshBody)
 
 		claims, err := utils.DecodeJwt(refreshBody.Refresh, "refresh")
-    log.Println(claims);
 		if err != nil || claims.Type != "refresh" {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Bad refresh token given",
