@@ -10,6 +10,8 @@ export const re = '/refresh';
 export const userAssets = '/users/assets';
 export const assets = '/assets';
 export const trade = '/trade/';
+export const createTrade = '/trade/create';
+export const completeTrade = '/trade/complete';
 
 export const testEmail = 'testing1@user.com';
 export const testPassword = 'password';
