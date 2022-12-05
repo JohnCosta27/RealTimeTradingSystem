@@ -6,7 +6,7 @@
 % Title Page
 \title{Real-time Trading Platform - Interim Report}
 \author{John Costa - 100943301}
-\date{06 Oct 2022 \\
+\date{06 Oct 2022} \\ \\
   \\
   \Large{Final Year Project \\
 Supervised By: Julien Lague \\
@@ -483,5 +483,139 @@ As you can see the docker compose file is quite extensively because it has to co
 
 \bibliography{ref}
 \bibliographystyle{plain}
+
+\section{Logbook}
+
+\textbf{29/09/2022} \\
+First entry in the log book. This week I have taken the time to get organised, finalise my project idea and talk to my superviser about it. I finalised the list of features that I wanted to have in the final product. Also got a draft of my plan.
+\\
+
+\noindent
+\textbf{02/10/2022} \\
+Finish the draft of the plan, but does not yet include the bibliography. Still need to walk through the marking grid and tick all the boxes.
+
+\\
+\noindent
+\textbf{03/10/2022} \\
+Completed the bibliography for now. However the work is not complete.
+
+\\
+\noindent
+\textbf{05/10/2022} \\
+Added testing, how currency will work and core and optional features to the plan.
+
+\\
+\noindent
+\textbf{07/10/2022} \\
+Finished the plan, submitting it today.
+
+\\
+\noindent
+\textbf{11/10/2022} \\
+Started implementing the "hub" service, which is the first point of contact from the user.
+
+\\
+\noindent
+\textbf{12/10/2022} \\
+Beginning template for the frontend application with all the dependencies installed.
+
+\\
+\noindent
+\textbf{24/10/2022} \\
+- Setup docker file for the hub micro service and a docker compose file to allow for easy deployment and development.
+- Created a diagram for the overall system architecture.
+
+\\
+\noindent
+\textbf{25/10/2022} \\
+Connected frontend to the backend using websocket connection. I am still a week behind on my plan so I will have to work very hard this week to get back on schedule.
+
+\\
+\noindent
+\textbf{31/10/2022} \\
+Added RabbitMQ docker image, and created a test connection between hub and rabbitmq, it works.
+
+\\
+\noindent
+\textbf{05/11/2022} \\
+Setup the SQL schemas for the required databases.
+
+\\
+\noindent
+\textbf{06/11/2022} \\
+Started work on the authentication system.
+
+\\
+\noindent
+\textbf{07/11/2022} \\
+Finished register method in auth system, with some very nice code.
+I also finished the login method.
+Also finished the refresh method for JWTs. Basically did the entire Auth system.
+
+\\
+\noindent
+\textbf{08/11/2022} \\
+Connected frontend to backend login and register methods, learn about state management in SolidJs.
+
+\\
+\noindent
+\textbf{23/11/2022} \\
+I have a shared types library now and RPC communication working between hub and brain and sending back to the client. Need to implement the rest of the routes.
+
+\\
+\noindent
+\textbf{26/11/2022} \\
+There was a bug in the backend code, where some memory was declared in a different thread, and therefore was never updating, fixed it by redeclaring this memory.
+
+\\
+\noindent
+\textbf{27/11/2022} \\
+Fixed a lot of stuff on the backend and did some refactoring so some dependencies are shared. Also started the transactions endpoint but decided that I would like to connect the assets to the frontend first.
+
+\\
+\noindent
+\textbf{29/11/2022} \\
+ - Model methods to get user assets, create and complete transaction. Various bug fixes and connected the frontend to view assets. Some things are very prototypy, so will need refactoring
+ - Endpoints for the trading of assets are complete, now I need further testing.
+
+\\
+\noindent
+\textbf{29/11/2022} \\
+ - All the backend is fully dockerised and running in containers!
+
+\\
+\noindent
+\textbf{22/11/2022} \\
+Started interim report, completed a first draft of the structure and included a lot of my research.
+
+\\
+\noindent
+\textbf{23/11/2022} \\
+Adding sections about version control monorepos and git worktrees.
+
+\\
+\noindent
+\textbf{27/11/2022} \\
+Section about project management
+
+\\
+\noindent
+\textbf{30/11/2022} \\
+Finished the first draft of the report!
+
+\\
+\noindent
+\textbf{04/12/2022} \\
+Finished integration testing app, it tests the authentication system and most of the routes on the hub.
+
+\\
+\noindent
+\textbf{05/12/2022} \\
+Final draft of the interim report completed
+
+\\
+\noindent
+\textbf{02/12/2022} \\
+Integration testing setup.
 
 \end{document}
