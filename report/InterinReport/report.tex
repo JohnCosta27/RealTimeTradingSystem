@@ -75,6 +75,21 @@ Microservices architectures also create a big dependency on standards throughout
 
 One of the techniques we can use to better standardise our microservices is by definition how are APIs look like (routes, body required data, etc...), outside of the service we are building. This way we can know how to communicate with our range of services, without having to have some pre-existing knowledge about the code itself. Furthermore this makes refactoring a lot easier, because we no longer need to change code, but instead we need to change some configuration file which defined what the route was going to look like in the first place.
 
+\subsubsection{Scaling}
+Scaling is the ability a system has to increase or decrease resources depending on demand placed on the system. Scaling is essential for a modern system which could at any time see a spike in demain, or fall completely flat at certain points throughout the day. Scaling allows us to be sure our system not only meets user demands, but also scales down when there isn't as much demand, saving money and energy on infrastructure. There are two main ways of scaling an application.
+
+\subsubsection{Vertical Scaling}
+Vertical scaling is the process of increasing system resources to your systems instance on demand. So if the system sees an increase in demand, we might want to increase the CPU or RAM. This is possible because of modern Cloud infrastructure, which can control resources like this. \\
+
+Vertical scaling is useful for applications which cannot be broken up into multiple instances, however they tend to be limited as the instance has to stay in the same physical location (Not useful if your traffic comes from another area of the world). Also, some problems cannot be solved with vertical scaling, maybe a process is busy waiting, and therefore increase CPU won't increase performance.
+
+\subsubsection{Horizontal Scaling}
+Horizontal scaling is the process of creating more instances of your running application/service. This could mean starting up another computer with the same program running in another region or it could be as simple as spinning up another docker container (more on that below). \\
+
+Although horizontal scaling is limited when the application is all contained within one package (often refered to as a monolith), we do not have the same problem when our application has been broken up into microservices. With microservices we can take the part of our application that is experiencing increased load and spin up more instances, often these instances could be in another physical location or on the same machine. \\
+
+Throughout my project I will mostly focus on horizontal scaling, because the technologies I use facilitate them and it tends to be the most flexible with modern architectures.
+
 \subsubsection{Docker}
 Docker is an application which uses OS-level virtualization to deliver application in packages called containers. Docker containers do not include a Guest OS, and only contain the binaries and system libraries necessary to run the required application, leading to an increased performance, decrease container size and more portability across machines. Other virtualization technologies such as KVM ~\cite{kvm}, require a host operating system in order to run the isolated environment, this means docker beats KVM in terms of performance in almost every regard ~\cite{docker_performance}, and it even competes with native performance. To run containers, the host machine requires the docker engine, which acts as a sort of hypervisor. This makes docker extremely portable across machines, as the docker engine is not a full hypervisor and allows the host machine to run normally, as well as hosting the docker engine.
 
@@ -258,6 +273,27 @@ For the frontend I am using Jest ~\cite{jest}, which gives you testing utilities
 
 \subsubsection{Integration Testing}
 Integration testing includes the testing of an application or multiple applications running together, but falls short of the entire system. In my project, the Hub and Brain system would need integration tests because these systems work very close together. \\
+
+In my project I created a subproject dedicated to integration testing with the backend system, this includes API testing down to the route level, creating mock data for the database and expecting a certain amount of data returned at each endpoint. Below is a snipped from my integration testings, for a route which should return assets in the system.
+
+\begin{verbatim}
+  it("Should give error on non-registered account", (done: jest.DoneCallback) => {
+    request(AuthUrl).post(l).send({
+      email: "notregister@email.com",
+      password: "password",
+    }).expect(400).end((err, res) => {
+      expect(err).toBeNull();
+      expect(res.body).toMatchInlineSnapshot(`
+        {
+          "error": "this account doesn't exist",
+        }
+      `);
+      done();
+    });
+  });
+\end{verbatim}
+
+Just like any good test, these tests are automatic, and describe themselves. I am making a request to the AuthUrl, sending some data and expencting certain data to come back to me. \\
 
 \subsubsection{End-to-End Testing}
 End-to-end testing is the closest to the real world. These tests are mostly (but not always), done on the frontend application, because this is where the user would interact with the system from. The purpose behind these tests is the test the overall functionality of the system, without worrying about any of the details. \\

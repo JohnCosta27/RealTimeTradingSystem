@@ -4,10 +4,10 @@
 First entry in the log book. This week I have taken the time to get organised, finalise my project idea and talk to my superviser about it. I finalised the list of features that I wanted to have in the final product. Also got a draft of my plan.
 
 ## 02/10/2022
-Finish the draft of the report, but does not yet include the bibliography. Still need to walk through the marking grid and tick all the boxes.
+Finish the draft of the plan, but does not yet include the bibliography. Still need to walk through the marking grid and tick all the boxes.
 
 ## 03/10/2022
-Adding references to my plan - still not finished.
+Completed the bibliography for now. However the work is not complete.
 
 ## 05/10/2022
 Added testing, how currency will work and core and optional features to the plan.
@@ -22,8 +22,6 @@ Started implementing the "hub" service, which is the first point of contact from
 Beginning template for the frontend application with all the dependencies installed.
 
 ## 24/10/2022
-It has been a while since I have made an alternation on my individual project, I have been poorly and focusing on my other subjects, but now I am back in full force.
-Today:
 - Setup docker file for the hub micro service and a docker compose file to allow for easy deployment and development.
 - Created a diagram for the overall system architecture.
 
@@ -45,11 +43,10 @@ I also finished the login method.
 Also finished the refresh method for JWTs. Basically did the entire Auth system.
 
 ## 08/11/2022
-I am on a streak! 4 days with commits everyday, got a nice groove going.
 Connected frontend to backend login and register methods, learn about state management in SolidJs.
 
 ## 23/11/2022
-This was a pretty big chunk of the backend done. I have a shared types library now and RPC communication working between hub and brain and sending back to the client. Need to implement the rest of the routes.
+I have a shared types library now and RPC communication working between hub and brain and sending back to the client. Need to implement the rest of the routes.
 
 ## 26/11/2022
 There was a bug in the backend code, where some memory was declared in a different thread, and therefore was never updating, fixed it by redeclaring this memory.
@@ -63,9 +60,10 @@ Today is also my birthday.
  - Endpoints for the trading of assets are complete, now I need further testing.
 
 ## 29/11/2022
- - Achieved a goal today. All the backend is fully dockerised and running in containers!
+ - All the backend is fully dockerised and running in containers!
+
 ## 22/11/2022
-It has been too long without an update, I have been very busy with deadlines recently. However today I have started the Interim report, and added a lot of detail.
+Started interim report, completed a first draft of the structure and included a lot of my research.
 
 ## 23/11/2022
 Adding sections about version control monorepos and git worktrees.
@@ -73,5 +71,11 @@ Adding sections about version control monorepos and git worktrees.
 ## 27/11/2022
 Section about project management
 
-## 30/11/2022 - Achievement
+## 30/11/2022
 Finished the first draft of the report!
+
+# 04/12/2022
+Finished integration testing app, it tests the authentication system and most of the routes on the hub.
+
+# 05/12/2022
+Final draft of the interim report completed
