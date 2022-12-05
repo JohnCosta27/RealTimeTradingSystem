@@ -79,3 +79,5 @@ Finished integration testing app, it tests the authentication system and most of
 
 # 05/12/2022
 Final draft of the interim report completed
+## 02/12/2022
+Integration testing setup.
