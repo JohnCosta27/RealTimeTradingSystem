@@ -20,6 +20,8 @@ There are a few dependencies in the project so, there are some requirements:
 
 ## Running the project
 ### Frontend
+To run the frontend you will also need an .env file, which has already been filled out in the `.env.example` file, you can just rename this file to `.env`.
+
 ```
 cd apps/frontend
 pnpm install
@@ -34,6 +36,8 @@ docker-compose up --build //The flag is optional but ensures the containers are 
 
 ### Integration Testing
 Integration testing must be done whilst the backend services are running, so you must perform the stage above and only after run this. Will make this process nicer in the future.
+
+You will also need a `.env` file, which you need to create in the integration testing folder. There is an example `.env.example` file, for convinient, you can just rename this file to `.env` and it will work, as it is prefilled with localhost information.
 ```
 cd apps/integration
 npm install
