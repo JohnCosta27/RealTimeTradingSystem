@@ -1,5 +1,5 @@
 import { createQuery } from "@tanstack/solid-query";
-import { Component, createEffect, For, Match, Show, Switch } from "solid-js";
+import { Component, For, Match, Show, Switch } from "solid-js";
 import { useAuth } from "./auth/AuthProvider";
 import { GetAllTrades, GetAssets, GetUserAssets } from "./network/requests";
 import { CreateTransaction } from "./ui/CreateTransaction";
@@ -22,10 +22,6 @@ export const App: Component = () => {
     () => ["all-trades"],
     () => GetAllTrades(auth().access).then((res) => res.data)
   );
-
-  createEffect(() => {
-    console.log(allTrades.data);
-  })
 
   return (
     <div class="w-full h-screen bg-base-100 grid grid-cols-3 gap-4 p-4">

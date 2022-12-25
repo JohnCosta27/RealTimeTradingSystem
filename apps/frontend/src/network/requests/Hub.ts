@@ -15,7 +15,7 @@ export interface GetUserAssets extends BaseType {
 }
 
 export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
-  return axios.get(`${HubUrl}/assets/`, {
+  return axios.get(`${HubUrl}/assets`, {
     headers: {
       access: auth,
     },
