@@ -9,6 +9,8 @@ import "./index.css";
 import { AuthLayout } from "./auth/AuthLayout";
 import { Login } from "./auth/Login";
 import { Register } from "./auth/Register";
+import { FrontLayout } from "./pages/FrontLayout";
+import { Assets } from "./Assets";
 
 export const Main: Component = () => {
   return (
@@ -17,7 +19,9 @@ export const Main: Component = () => {
         <Router>
           <Routes>
             <Route path="/" component={ProtectedRoute}>
-              <Route path="/" component={App} />
+              <Route path="/" component={FrontLayout}>
+                <Route path="/" component={Assets} />
+              </Route>
             </Route>
             <Route path="/auth" component={AuthLayout}>
               <Route path="/login" component={Login} />
