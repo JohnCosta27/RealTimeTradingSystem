@@ -22,7 +22,7 @@ export const FrontLayout: Component = () => {
         </Link>
       </div>
       <div class="w-full p-4 flex justify-center">
-        <div class="w-full max-w-5xl">
+        <div class="w-full max-w-6xl">
           <Outlet />
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { createQuery } from "@tanstack/solid-query";
 import { Component, For, Match, Switch } from "solid-js";
 import { useAuth } from "./auth/AuthProvider";
-import { GetAssets } from "./network/requests";
+import { GetAssets }  from "./network/requests";
 import { Asset } from "./ui/Asset";
 import { Loading } from "./ui/Loading";
 
