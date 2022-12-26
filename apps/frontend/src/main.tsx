@@ -11,6 +11,7 @@ import { Login } from "./auth/Login";
 import { Register } from "./auth/Register";
 import { FrontLayout } from "./pages/FrontLayout";
 import { Assets } from "./Assets";
+import { Test } from "./Test";
 
 export const Main: Component = () => {
   return (
@@ -21,6 +22,7 @@ export const Main: Component = () => {
             <Route path="/" component={ProtectedRoute}>
               <Route path="/" component={FrontLayout}>
                 <Route path="/" component={Assets} />
+                <Route path="/assets" element={<>Hello</>} />
               </Route>
             </Route>
             <Route path="/auth" component={AuthLayout}>
