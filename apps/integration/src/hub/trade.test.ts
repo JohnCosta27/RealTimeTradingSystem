@@ -1,20 +1,34 @@
-import { AuthUrl, createTrade, HubUrl, l, testData, trade } from "config";
+import {
+  AuthUrl,
+  completeTrade,
+  createTrade,
+  HubUrl,
+  l,
+  testData,
+  trade,
+} from "config";
 import request from "supertest";
 
 let access: string;
+let otherAccess: string;
 
 describe("Trade routes testing", () => {
   beforeAll((done: jest.DoneCallback) => {
-    request(AuthUrl)
-      .post(l)
-      .send({
+    // Waits until both requests are finished before exiting the setup
+    Promise.all([
+      request(AuthUrl).post(l).send({
         email: testData.users[0].email,
         password: testData.users[0].password,
-      })
-      .end((_, res) => {
-        access = res.body["access"];
-        done();
-      });
+      }),
+      request(AuthUrl).post(l).send({
+        email: testData.users[1].email,
+        password: testData.users[1].password,
+      }),
+    ]).then((responses) => {
+      access = responses[0].body["access"];
+      otherAccess = responses[1].body["access"];
+      done();
+    });
   });
 
   it("Request without a JWT should returned unauthorized", (done: jest.DoneCallback) => {
@@ -55,6 +69,7 @@ describe("Trade routes testing", () => {
 });
 
 describe("Create trade endpoint", () => {
+  let transactionId: string;
   it("Request without a JWT should returned unauthorized", (done: jest.DoneCallback) => {
     request(HubUrl)
       .post(createTrade)
@@ -120,6 +135,22 @@ describe("Create trade endpoint", () => {
         expect(res.body["trade"]["BuyerId"]).toEqual("");
         expect(res.body["trade"]["Price"]).toEqual(10);
         expect(res.body["trade"]["Amount"]).toEqual(10);
+        transactionId = res.body["trade"]["Id"];
+        done();
+      });
+  });
+
+  it("Should be able to buy something", (done: jest.DoneCallback) => {
+    request(HubUrl)
+      .post(completeTrade)
+      .set("access", otherAccess)
+      .send({
+        TransactionId: transactionId,
+      })
+      .expect(200)
+      .end((err, res) => {
+        console.log(err);
+        console.log(res.body);
         done();
       });
   });

@@ -62,14 +62,12 @@ func main() {
 				}
         returnValue, _ = json.Marshal(&transaction)
       
-      /*
 			case "complete-trade":
 				transaction, err := model.CompleteTradeAsset(uuid.MustParse(req.Body["TransactionId"]), req.Access)
 				if err != nil {
 					log.Println(err)
 				}
         returnValue, _ = json.Marshal(&transaction)
-      */
 
       case "get-trades":
         transactions := model.GetAllTransactions()

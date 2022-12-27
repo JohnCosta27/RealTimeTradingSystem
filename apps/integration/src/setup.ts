@@ -112,7 +112,7 @@ export async function Setup(): Promise<TestData> {
       {
         id: secondUser!.id,
         balance: DEFAULT_BALANCE,
-        email: firstUser!.email,
+        email: secondUser!.email,
         password: DEFAULT_PASSWORD,
       }
     ],
