@@ -36,6 +36,7 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
+    transaction.BuyerId = userId.String()
     database.Db.Omit("seller_id, balance").Create(&transaction)
 	} else {
 		// Selling the asset, we must check the user has enough of this asset.
@@ -56,6 +57,7 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
+    transaction.SellerId = userId.String()
     database.Db.Omit("buyer_id, balance").Create(&transaction)
 	}
 

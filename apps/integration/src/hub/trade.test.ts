@@ -1,11 +1,4 @@
-import {
-  AuthUrl,
-  createTrade,
-  HubUrl,
-  l,
-  testData,
-  trade,
-} from "config";
+import { AuthUrl, createTrade, HubUrl, l, testData, trade } from "config";
 import request from "supertest";
 
 let access: string;
@@ -109,13 +102,24 @@ describe("Create trade endpoint", () => {
       .send({
         Amount: 10,
         Price: 10,
-        assetId: testData.userAssets.find(i => i.userId === testData.users[0].id)?.assetId,
+        assetId: testData.userAssets.find(
+          (i) => i.userId === testData.users[0].id
+        )?.assetId,
         type: "sell",
       })
       .expect(200)
       .end((err, res) => {
         expect(err).toBeNull();
-        console.log(res.body);
+        expect(res.body["trade"]).toEqual(
+          expect.objectContaining({
+            Id: expect.any(String),
+            AssetId: expect.any(String),
+            SellerId: expect.any(String),
+          })
+        );
+        expect(res.body["trade"]["BuyerId"]).toEqual("");
+        expect(res.body["trade"]["Price"]).toEqual(10);
+        expect(res.body["trade"]["Amount"]).toEqual(10);
         done();
       });
   });
