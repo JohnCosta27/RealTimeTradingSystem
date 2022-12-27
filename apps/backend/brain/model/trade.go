@@ -36,9 +36,7 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
-		transaction.BuyerId = userId.String()
     database.Db.Omit("seller_id, balance").Create(&transaction)
-
 	} else {
 		// Selling the asset, we must check the user has enough of this asset.
 		// TODO: Add a LOCKED asset table
@@ -58,14 +56,13 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
-		transaction.SellerId = userId.String()
     database.Db.Omit("buyer_id, balance").Create(&transaction)
-
 	}
 
 	return transaction, nil
 }
 
+/*
 // Used to take an in market transaction and completeing it.
 // Because on the make transaction we locked the users assets and money to make the transaction.
 // We can go ahead and proceed without many checks needed.
@@ -160,6 +157,7 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 
   return transaction, nil
 }
+*/
 
 func GetAllTransactions() []sharedtypes.Transaction {
   var transactions []sharedtypes.Transaction

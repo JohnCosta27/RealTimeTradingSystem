@@ -1,17 +1,9 @@
-import { PrismaClient as AuthPrismaClient } from '../generated/auth';
+import crypto from 'crypto';
 import request from "supertest";
 import { AuthUrl, r } from "../config";
 
-const authClient = new AuthPrismaClient();
-
 describe("Register route testing", () => {
-
-  beforeAll((done: jest.DoneCallback) => {
-    authClient.users.deleteMany({}).then(() => {
-      done();
-    });
-  });
-
+  const testRegisterEmail = crypto.randomUUID();
   it("Should have application/json type", (done: jest.DoneCallback) => {
     request(AuthUrl).post(r).expect("Content-Type", /json/).end(done);
   });
@@ -41,7 +33,7 @@ describe("Register route testing", () => {
     request(AuthUrl)
       .post(r)
       .send({
-        email: "testing@email.com",
+        email: testRegisterEmail,
         firstname: "John",
         surname: "Costa",
         password: "SafePassword123.",
@@ -59,7 +51,7 @@ describe("Register route testing", () => {
     request(AuthUrl)
       .post(r)
       .send({
-        email: "testing@email.com",
+        email: testRegisterEmail,
         firstname: "John",
         surname: "Costa",
         password: "SafePassword123.",

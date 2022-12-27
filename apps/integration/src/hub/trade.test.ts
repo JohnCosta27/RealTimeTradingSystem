@@ -1,4 +1,11 @@
-import { AuthUrl, createTrade, HubUrl, l, testEmail, testPassword, trade } from "config";
+import {
+  AuthUrl,
+  createTrade,
+  HubUrl,
+  l,
+  testData,
+  trade,
+} from "config";
 import request from "supertest";
 
 let access: string;
@@ -8,8 +15,8 @@ describe("Trade routes testing", () => {
     request(AuthUrl)
       .post(l)
       .send({
-        email: testEmail,
-        password: testPassword,
+        email: testData.users[0].email,
+        password: testData.users[0].password,
       })
       .end((_, res) => {
         access = res.body["access"];
@@ -73,9 +80,9 @@ describe("Create trade endpoint", () => {
   it("Should return the data format when sending wrong data", (done: jest.DoneCallback) => {
     request(HubUrl)
       .post(createTrade)
-      .set('access', access)
+      .set("access", access)
       .send({
-        wrong: 'data',
+        wrong: "data",
       })
       .expect(400)
       .end((err, res) => {
@@ -94,4 +101,22 @@ describe("Create trade endpoint", () => {
         done();
       });
   });
-})
+
+  it("Should be able to create a sell transaction", (done: jest.DoneCallback) => {
+    request(HubUrl)
+      .post(createTrade)
+      .set("access", access)
+      .send({
+        Amount: 10,
+        Price: 10,
+        assetId: testData.userAssets.find(i => i.userId === testData.users[0].id)?.assetId,
+        type: "sell",
+      })
+      .expect(200)
+      .end((err, res) => {
+        expect(err).toBeNull();
+        console.log(res.body);
+        done();
+      });
+  });
+});

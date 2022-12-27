@@ -1,29 +1,22 @@
-import { AuthUrl, r, re } from "config";
-import { PrismaClient } from "generated/auth";
+import { AuthUrl, l, re, testData } from "config";
 import request from "supertest";
-
-const authClient = new PrismaClient();
 
 describe("Register route testing", () => {
   let accessToken = "";
   let refreshToken = "";
 
   beforeAll((done: jest.DoneCallback) => {
-    authClient.users.deleteMany({}).then(() => {
-      request(AuthUrl)
-        .post(r)
-        .send({
-          email: "refresh@testing.com",
-          firstname: "John",
-          surname: "Costa",
-          password: "SafePassword123.",
-        })
-        .end((_, res) => {
-          accessToken = res.body["access"];
-          refreshToken = res.body["refresh"];
-          done();
-        });
-    });
+    request(AuthUrl)
+      .post(l)
+      .send({
+        email: testData.users[0].email,
+        password: testData.users[0].password,
+      })
+      .end((_, res) => {
+        accessToken = res.body["access"];
+        refreshToken = res.body["refresh"];
+        done();
+      });
   });
 
   it("Should return error and body structure", (done: jest.DoneCallback) => {
@@ -60,7 +53,7 @@ describe("Register route testing", () => {
 `);
         done();
       });
-  })
+  });
 
   it("Should return access token", (done: jest.DoneCallback) => {
     request(AuthUrl)
