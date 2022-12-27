@@ -110,6 +110,7 @@ describe("Create trade endpoint", () => {
       });
   });
 
+  let sellerId: string;
   it("Should be able to create a sell transaction", (done: jest.DoneCallback) => {
     request(HubUrl)
       .post(createTrade)
@@ -130,12 +131,13 @@ describe("Create trade endpoint", () => {
             Id: expect.any(String),
             AssetId: expect.any(String),
             SellerId: expect.any(String),
+            BuyerId: "",
+            Price: 10,
+            Amount: 10
           })
         );
-        expect(res.body["trade"]["BuyerId"]).toEqual("");
-        expect(res.body["trade"]["Price"]).toEqual(10);
-        expect(res.body["trade"]["Amount"]).toEqual(10);
         transactionId = res.body["trade"]["Id"];
+        sellerId = res.body["trade"]["SellerId"];
         done();
       });
   });
@@ -149,8 +151,12 @@ describe("Create trade endpoint", () => {
       })
       .expect(200)
       .end((err, res) => {
-        console.log(err);
-        console.log(res.body);
+        expect(err).toBeNull();
+        expect(res.body["trade"]).toEqual(expect.objectContaining({
+          SellerId: sellerId,
+          State: "completed",
+          BuyerId: expect.any(String) ,
+        }))
         done();
       });
   });
