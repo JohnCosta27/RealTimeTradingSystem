@@ -22,7 +22,7 @@ export const Assets: Component = () => {
         </Match>
         <Match when={assets.data}>
           <For each={assets.data!.assets}>
-            {(asset) => <Asset name={asset.Name} />}
+            {(asset) => <Asset name={asset.Name} price={10} />}
           </For>
         </Match>
       </Switch>

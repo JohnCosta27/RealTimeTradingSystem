@@ -14,6 +14,15 @@ export interface GetUserAssets extends BaseType {
   Asset: GetAssets;
 }
 
+export interface GetTransaction extends BaseType {
+  AssetId: string;
+  BuyerId: string;
+  SellerId: string;
+  Price: number;
+  Amount: number;
+  State: "in-market" | "complete";
+}
+
 export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
   return axios.get(`${HubUrl}/assets`, {
     headers: {
@@ -32,13 +41,15 @@ export const GetUserAssets: GetRequestType<{ assets: GetUserAssets[] }> = (
   });
 };
 
-export const GetAllTrades: GetRequestType<{}> = (auth) => {
+export const GetAllTrades: GetRequestType<{ trades: GetTransaction[] }> = (
+  auth
+) => {
   return axios.get(`${HubUrl}/trade/`, {
     headers: {
       access: auth,
-    }
+    },
   });
-}
+};
 
 export interface PostCreateTransactionType {
   access: string;
@@ -50,13 +61,18 @@ export interface PostCreateTransactionType {
   };
 }
 
-export interface PostCreateTransactionRes {}
+export interface PostCompleteTransactionType {
+  access: string;
+  body: {
+    TransactionId: string;
+  };
+}
 
 export const PostCreateTransaction: PostRequestType<
   PostCreateTransactionType,
-  PostCreateTransactionRes
+  GetTransaction
 > = (body) => {
-  return axios.post<PostCreateTransactionRes>(
+  return axios.post<GetTransaction>(
     `${HubUrl}/trade/create`,
     body.transactionBody,
     {
@@ -65,4 +81,15 @@ export const PostCreateTransaction: PostRequestType<
       },
     }
   );
+};
+
+export const PostCompleteTransaction: PostRequestType<
+  PostCompleteTransactionType,
+  GetTransaction
+> = (body) => {
+  return axios.post<GetTransaction>(`${HubUrl}/trade/complete`, body.body, {
+    headers: {
+      access: body.access,
+    },
+  });
 };

@@ -20,9 +20,7 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
   });
 
   return (
-    <div class="grid-span-1 flex flex-col gap-4 border-2 border-secondary p-4">
-      <h1>Create Transaction</h1>
-      <p>Sell something</p>
+    <div class="grid-span-1 flex flex-col gap-4">
       <div class="dropdown">
         <label tabindex="0" class="btn m-1">
           Asset
@@ -41,7 +39,6 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
         </ul>
       </div>
       <p>Selected Asset: {sellAsset()}</p>
-      <p>Max Sell Amount: {props.assets.find(i => i.Asset.Id === sellAsset())?.Amount}</p>
       <p>Max Sell Amount: {props.assets.find(i => i.Asset.Id === sellAsset())?.Amount}</p>
         <label class="label">
           <span class="label-text">Amount</span>
