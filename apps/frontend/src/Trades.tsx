@@ -1,4 +1,4 @@
-import { createMutation, createQuery } from "@tanstack/solid-query";
+import { createMutation, createQuery, useQueryClient } from "@tanstack/solid-query";
 import { Component, createEffect, For, Match, Show, Switch } from "solid-js";
 import { useAuth } from "./auth/AuthProvider";
 import {
@@ -12,6 +12,7 @@ import { Loading } from "./ui/Loading";
 
 export const Trades: Component = () => {
   const auth = useAuth();
+  const query = useQueryClient();
 
   const assets = createQuery(
     () => ["assets"],
@@ -30,7 +31,10 @@ export const Trades: Component = () => {
 
   const completeTrade = createMutation({
     mutationFn: PostCompleteTransaction,
-    onSuccess: (res) => console.log(res),
+    onSuccess: (res) => {
+      console.log(res);
+      query.invalidateQueries({queryKey: ["all-trades"]});
+    }
   });
 
   return (
