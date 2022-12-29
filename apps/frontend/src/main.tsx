@@ -4,14 +4,12 @@ import { AuthProvider } from "./auth/AuthProvider";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { render } from "solid-js/web";
 import { QueryProvider } from "./network/QueryProvider";
-import { App } from "./App";
 import "./index.css";
 import { AuthLayout } from "./auth/AuthLayout";
 import { Login } from "./auth/Login";
 import { Register } from "./auth/Register";
 import { FrontLayout } from "./pages/FrontLayout";
 import { Assets } from "./Assets";
-import { Test } from "./Test";
 import { Trades } from "./Trades";
 import { UserAssets } from "./UserAssets";
 

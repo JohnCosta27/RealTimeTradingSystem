@@ -32,7 +32,6 @@ export const Trades: Component = () => {
   const completeTrade = createMutation({
     mutationFn: PostCompleteTransaction,
     onSuccess: (res) => {
-      console.log(res);
       query.invalidateQueries({queryKey: ["all-trades"]});
     }
   });
