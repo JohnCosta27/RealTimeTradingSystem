@@ -1,20 +1,34 @@
-import { AuthUrl, createTrade, HubUrl, l, testEmail, testPassword, trade } from "config";
+import {
+  AuthUrl,
+  completeTrade,
+  createTrade,
+  HubUrl,
+  l,
+  testData,
+  trade,
+} from "config";
 import request from "supertest";
 
 let access: string;
+let otherAccess: string;
 
 describe("Trade routes testing", () => {
   beforeAll((done: jest.DoneCallback) => {
-    request(AuthUrl)
-      .post(l)
-      .send({
-        email: testEmail,
-        password: testPassword,
-      })
-      .end((_, res) => {
-        access = res.body["access"];
-        done();
-      });
+    // Waits until both requests are finished before exiting the setup
+    Promise.all([
+      request(AuthUrl).post(l).send({
+        email: testData.users[0].email,
+        password: testData.users[0].password,
+      }),
+      request(AuthUrl).post(l).send({
+        email: testData.users[1].email,
+        password: testData.users[1].password,
+      }),
+    ]).then((responses) => {
+      access = responses[0].body["access"];
+      otherAccess = responses[1].body["access"];
+      done();
+    });
   });
 
   it("Request without a JWT should returned unauthorized", (done: jest.DoneCallback) => {
@@ -55,6 +69,7 @@ describe("Trade routes testing", () => {
 });
 
 describe("Create trade endpoint", () => {
+  let transactionId: string;
   it("Request without a JWT should returned unauthorized", (done: jest.DoneCallback) => {
     request(HubUrl)
       .post(createTrade)
@@ -73,9 +88,9 @@ describe("Create trade endpoint", () => {
   it("Should return the data format when sending wrong data", (done: jest.DoneCallback) => {
     request(HubUrl)
       .post(createTrade)
-      .set('access', access)
+      .set("access", access)
       .send({
-        wrong: 'data',
+        wrong: "data",
       })
       .expect(400)
       .end((err, res) => {
@@ -94,4 +109,55 @@ describe("Create trade endpoint", () => {
         done();
       });
   });
-})
+
+  let sellerId: string;
+  it("Should be able to create a sell transaction", (done: jest.DoneCallback) => {
+    request(HubUrl)
+      .post(createTrade)
+      .set("access", access)
+      .send({
+        Amount: 10,
+        Price: 10,
+        assetId: testData.userAssets.find(
+          (i) => i.userId === testData.users[0].id
+        )?.assetId,
+        type: "sell",
+      })
+      .expect(200)
+      .end((err, res) => {
+        expect(err).toBeNull();
+        expect(res.body["trade"]).toEqual(
+          expect.objectContaining({
+            Id: expect.any(String),
+            AssetId: expect.any(String),
+            SellerId: expect.any(String),
+            BuyerId: "",
+            Price: 10,
+            Amount: 10
+          })
+        );
+        transactionId = res.body["trade"]["Id"];
+        sellerId = res.body["trade"]["SellerId"];
+        done();
+      });
+  });
+
+  it("Should be able to buy something", (done: jest.DoneCallback) => {
+    request(HubUrl)
+      .post(completeTrade)
+      .set("access", otherAccess)
+      .send({
+        TransactionId: transactionId,
+      })
+      .expect(200)
+      .end((err, res) => {
+        expect(err).toBeNull();
+        expect(res.body["trade"]).toEqual(expect.objectContaining({
+          SellerId: sellerId,
+          State: "completed",
+          BuyerId: expect.any(String) ,
+        }))
+        done();
+      });
+  });
+});

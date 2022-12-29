@@ -1,11 +1,21 @@
 import crypto from "crypto";
+import fs from "fs";
 import { PrismaClient as AuthPrismaClient } from "./generated/auth";
 import { PrismaClient as BrainPrismaClient } from "./generated/brain";
 
-const testEmail = 'testing1@user.com';
-const testPassword = 'password';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-export default async function() {
+export interface TestData {
+  users: Array<{id: string; balance: number; email: string; password: string}>;
+  assets: Array<{id: string}>
+  userAssets: Array<{id: string, userId: string; assetId: string}>
+}
+
+const DEFAULT_BALANCE = 10000;
+const DEFAULT_PASSWORD = "password";
+
+export async function Setup(): Promise<TestData> {
   const authClient = new AuthPrismaClient();
   const brainClient = new BrainPrismaClient();
 
@@ -16,7 +26,6 @@ export default async function() {
   await brainClient.transactions.deleteMany({});
   await brainClient.assets.deleteMany({});
   await brainClient.users.deleteMany({});
-
   console.log("Purged databases successfully");
 
   const uuid = crypto.randomUUID();
@@ -24,26 +33,26 @@ export default async function() {
 
   const userPassword = crypto
     .createHash("sha512")
-    .update(testPassword, "utf8")
+    .update(DEFAULT_PASSWORD, "utf8")
     .digest("hex");
 
   const otherPassword = crypto
     .createHash("sha512")
-    .update(testPassword, "utf8")
+    .update(DEFAULT_PASSWORD, "utf8")
     .digest("hex");
 
-  await authClient.users.create({
+  const firstUser = await authClient.users.create({
     data: {
       id: uuid,
       firstname: "Testing1",
       surname: "User",
-      email: testEmail,
+      email: "testing1@email.com",
       password_salt: "",
       password: userPassword,
     },
   }).catch(e => console.log(e));
 
-  await authClient.users.create({
+  const secondUser = await authClient.users.create({
     data: {
       id: otherUuid,
       firstname: "Testing2",
@@ -57,14 +66,14 @@ export default async function() {
   await brainClient.users.create({
     data: {
       id: uuid,
-      balance: 10000,
+      balance: DEFAULT_BALANCE,
     },
   });
 
   await brainClient.users.create({
     data: {
       id: otherUuid,
-      balance: 10000,
+      balance: DEFAULT_BALANCE,
     },
   });
 
@@ -74,17 +83,17 @@ export default async function() {
     },
   });
 
-  await brainClient.user_assets.create({
+  const userAsset = await brainClient.user_assets.create({
     data: {
       asset_id: gold.id,
-      user_id: uuid,
-      amount: 10,
+      user_id: firstUser!.id,
+      amount: 20,
     },
   });
 
   await brainClient.transactions.create({
     data: {
-      seller_id: uuid,
+      seller_id: firstUser!.id,
       amount: 10,
       price: 1000,
       asset_id: gold.id,
@@ -92,5 +101,46 @@ export default async function() {
     },
   });
 
-  console.log("Created test data");
+  const testData: TestData = {
+    users: [
+      {
+        id: firstUser!.id,
+        balance: DEFAULT_BALANCE,
+        email: firstUser!.email,
+        password: DEFAULT_PASSWORD,
+      },
+      {
+        id: secondUser!.id,
+        balance: DEFAULT_BALANCE,
+        email: secondUser!.email,
+        password: DEFAULT_PASSWORD,
+      }
+    ],
+    assets: [
+      {
+        id: gold.id
+      }
+    ],
+    userAssets: [
+      {
+        id: userAsset.id,
+        assetId: gold.id,
+        userId: firstUser!.id
+      }
+    ]
+  }
+
+  return testData;
 }
+
+Setup().then((testData) => {
+  console.log("Test data generation complete! Saving to file...");
+  fs.writeFile('./testData.json', JSON.stringify(testData), (err) => {
+    if (err) {
+      console.log(err);
+      throw new Error("Unable to write test data to file");
+    } else {
+      console.log("Test data saved!");
+    }
+  });
+});

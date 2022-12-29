@@ -36,9 +36,7 @@ type Transaction struct {
 	Base
 	AssetId  string  `json:"AssetId"`
 	BuyerId  string  `json:"BuyerId"`
-  Buyer    User    `json:"Buyer" gorm:"embedded"`
 	SellerId string  `json:"SellerId"`
-  Seller   User    `json:"Seller" gorm:"embedded"`
 	State    string  `json:"State"`
 	Price    float64 `json:"Price"`
 	Amount   float64 `json:"Amount"`

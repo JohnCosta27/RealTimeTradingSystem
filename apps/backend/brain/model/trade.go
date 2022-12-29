@@ -36,9 +36,8 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
-		transaction.BuyerId = userId.String()
+    transaction.BuyerId = userId.String()
     database.Db.Omit("seller_id, balance").Create(&transaction)
-
 	} else {
 		// Selling the asset, we must check the user has enough of this asset.
 		// TODO: Add a LOCKED asset table
@@ -58,9 +57,8 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
-		transaction.SellerId = userId.String()
+    transaction.SellerId = userId.String()
     database.Db.Omit("buyer_id, balance").Create(&transaction)
-
 	}
 
 	return transaction, nil
@@ -100,6 +98,7 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
         ID: uuid.MustParse(transaction.SellerId),
       },
     }
+    database.Db.First(&seller)
 
     var oldUserAsset sharedtypes.UserAsset
     var newUserAsset sharedtypes.UserAsset
@@ -107,30 +106,31 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     // Get the user asset of the seller.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.SellerId, transaction.AssetId).First(&oldUserAsset)
 
-    // Get the user asset of the buyer
-		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
-
     user.Balance = user.Balance - transaction.Price
     seller.Balance = seller.Balance + transaction.Price
+
+    newUserAsset.UserId = user.ID.String()
+    newUserAsset.Amount = transaction.Amount
+    newUserAsset.AssetId = transaction.AssetId
     
     oldUserAsset.Amount = oldUserAsset.Amount - transaction.Amount
-    newUserAsset.Amount = newUserAsset.Amount + transaction.Amount
+
+    database.Db.Omit("name").Create(&newUserAsset)
 
     transaction.State = "completed"
     transaction.BuyerId = user.ID.String()
     
-    database.Db.Save(&oldUserAsset)
-    database.Db.Save(&newUserAsset)
+    database.Db.Omit("name").Save(&oldUserAsset)
     database.Db.Save(&user)
     database.Db.Save(&seller)
     database.Db.Save(&transaction)
-
 	} else {
     buyer := sharedtypes.User {
       Base: sharedtypes.Base {
         ID: uuid.MustParse(transaction.BuyerId),
       },
     }
+    database.Db.First(&buyer)
 
     var oldUserAsset sharedtypes.UserAsset
     var newUserAsset sharedtypes.UserAsset
@@ -138,24 +138,24 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     // Get the user asset of the seller.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.BuyerId, transaction.AssetId).First(&oldUserAsset)
 
-    // Get the user asset of the buyer
-		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
-
     user.Balance = user.Balance + transaction.Price
     buyer.Balance = buyer.Balance - transaction.Price
     
     oldUserAsset.Amount = oldUserAsset.Amount + transaction.Amount
-    newUserAsset.Amount = newUserAsset.Amount - transaction.Amount
+
+    newUserAsset.UserId = userId.String()
+    newUserAsset.Amount = transaction.Amount
+    newUserAsset.AssetId = transaction.AssetId
+
+    database.Db.Create(&newUserAsset)
 
     transaction.State = "completed"
     transaction.SellerId = user.ID.String()
     
-    database.Db.Omit("name").Save(&oldUserAsset)
-    database.Db.Omit("name").Save(&newUserAsset)
+    database.Db.Save(&oldUserAsset)
     database.Db.Save(&user)
     database.Db.Save(&buyer)
-    database.Db.Omit("balance").Save(&transaction)
-
+    database.Db.Save(&transaction)
   }
 
   return transaction, nil

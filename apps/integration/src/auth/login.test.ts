@@ -1,4 +1,4 @@
-import { AuthUrl, l, testEmail, testPassword } from "config";
+import { AuthUrl, l, testData } from "config";
 import request from "supertest";
 
 describe("Register route testing", () => {
@@ -37,8 +37,8 @@ describe("Register route testing", () => {
 
   it("Should allow user to sign-in", (done: jest.DoneCallback) => {
     request(AuthUrl).post(l).send({
-      email: testEmail,
-      password: testPassword,
+      email: testData.users[0].email,
+      password: testData.users[0].password,
     }).expect(200).end((err, res) => {
       expect(err).toBeNull();
       expect(res.body["access"]).toBeDefined();
