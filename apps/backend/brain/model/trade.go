@@ -105,22 +105,22 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 
     // Get the user asset of the seller.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.SellerId, transaction.AssetId).First(&oldUserAsset)
+		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
 
     user.Balance = user.Balance - transaction.Price
     seller.Balance = seller.Balance + transaction.Price
 
-    newUserAsset.UserId = user.ID.String()
-    newUserAsset.Amount = transaction.Amount
+    newUserAsset.UserId = userId.String()
+    newUserAsset.Amount += transaction.Amount
+    oldUserAsset.Amount -= oldUserAsset.Amount 
     newUserAsset.AssetId = transaction.AssetId
-    
-    oldUserAsset.Amount = oldUserAsset.Amount - transaction.Amount
-
-    database.Db.Omit("name").Create(&newUserAsset)
 
     transaction.State = "completed"
-    transaction.BuyerId = user.ID.String()
+    transaction.BuyerId = userId.String()
     
+    database.Db.Omit("name").Save(&newUserAsset)
     database.Db.Omit("name").Save(&oldUserAsset)
+
     database.Db.Save(&user)
     database.Db.Save(&seller)
     database.Db.Save(&transaction)
@@ -137,22 +137,21 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 
     // Get the user asset of the seller.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.BuyerId, transaction.AssetId).First(&oldUserAsset)
+		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
 
     user.Balance = user.Balance + transaction.Price
     buyer.Balance = buyer.Balance - transaction.Price
     
-    oldUserAsset.Amount = oldUserAsset.Amount + transaction.Amount
-
+    oldUserAsset.Amount += oldUserAsset.Amount + transaction.Amount
     newUserAsset.UserId = userId.String()
-    newUserAsset.Amount = transaction.Amount
+    newUserAsset.Amount -= transaction.Amount
     newUserAsset.AssetId = transaction.AssetId
 
-    database.Db.Create(&newUserAsset)
-
     transaction.State = "completed"
-    transaction.SellerId = user.ID.String()
+    transaction.SellerId = userId.String()
     
-    database.Db.Save(&oldUserAsset)
+    database.Db.Omit("name").Save(&newUserAsset)
+    database.Db.Omit("name").Save(&oldUserAsset)
     database.Db.Save(&user)
     database.Db.Save(&buyer)
     database.Db.Save(&transaction)
