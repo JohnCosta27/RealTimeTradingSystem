@@ -36,6 +36,10 @@ export const Trades: Component = () => {
     }
   });
 
+  createEffect(() => {
+    console.log(allTrades.data);
+  });
+
   return (
     <div class="w-full h-full p-4 grid grid-cols-2 gap-4">
       <div class="w-full col-span-1 bg-neutral-focus rounded shadow-lg flex flex-col p-4">
@@ -83,8 +87,8 @@ export const Trades: Component = () => {
       </div>
       <div class="w-full col-span-2 bg-neutral-focus rounded shadow-lg flex flex-col p-4">
         <h2 class="text-2xl">Create Trade</h2>
-        <Show when={userAssets.data} fallback={<Loading />}>
-          <CreateTransaction assets={userAssets.data!.assets} />
+        <Show when={userAssets.data && assets.data} fallback={<Loading />}>
+          <CreateTransaction assets={userAssets.data!.assets} allAssets={assets.data!.assets}/>
         </Show>
       </div>
     </div>
