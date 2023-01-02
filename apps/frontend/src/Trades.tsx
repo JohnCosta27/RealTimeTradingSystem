@@ -70,7 +70,6 @@ export const Trades: Component = () => {
         </Show>
       </div>
       <div class="w-full col-span-2 row-span-2 bg-neutral-focus rounded shadow-lg flex flex-col p-4">
-        <h2 class="text-2xl">Create Trade</h2>
         <Show when={userAssets.data && assets.data} fallback={<Loading />}>
           <CreateTransaction
             assets={userAssets.data!.assets}

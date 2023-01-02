@@ -1,11 +1,11 @@
-import { createMutation } from "@tanstack/solid-query";
-import { Component, createSignal, For, Match, Switch } from "solid-js";
-import { useAuth } from "../auth/AuthProvider";
+import { createMutation } from '@tanstack/solid-query';
+import { Component, createSignal, For, Match, Show, Switch } from 'solid-js';
+import { useAuth } from '../auth/AuthProvider';
 import {
   GetAssets,
   GetUserAssets,
   PostCreateTransaction,
-} from "../network/requests";
+} from '../network/requests';
 
 interface CreateTransactionProps {
   assets: GetUserAssets[];
@@ -15,10 +15,10 @@ interface CreateTransactionProps {
 export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
   const auth = useAuth();
 
-  const [sellAsset, setSellAsset] = createSignal("");
+  const [sellAsset, setSellAsset] = createSignal<GetAssets>();
   const [sellAmount, setSellAmount] = createSignal(0);
   const [sellPrice, setSellPrice] = createSignal(0);
-  const [type, setType] = createSignal<"buy" | "sell">("sell");
+  const [type, setType] = createSignal<'buy' | 'sell'>('sell');
 
   const sell = createMutation({
     mutationFn: PostCreateTransaction,
@@ -26,88 +26,91 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
   });
 
   return (
-    <div class="grid-span-1 flex flex-col gap-4">
-      <div class="flex gap-4">
-        <p class="text-xl">Buy</p>
-        <input
-          type="checkbox"
-          class="toggle toggle-secondary"
-          checked={type() === "sell"}
-          onChange={() =>
-            type() === "sell" ? setType("buy") : setType("sell")
-          }
-        />
-        <p class="text-xl">Sell</p>
-      </div>
-      <div class="dropdown">
-        <label tabindex="0" class="btn m-1">
-          Asset
+    <div class="w-full h-full grid grid-cols-2 gap-2">
+      <div class="w-full flex flex-col">
+        <div class="flex items-center justify-center gap-4">
+          <p class="text-3xl">Buy</p>
+          <input
+            type="checkbox"
+            class="toggle toggle-secondary"
+            checked={type() === 'sell'}
+            onChange={() =>
+              type() === 'sell' ? setType('buy') : setType('sell')
+            }
+          />
+          <p class="text-3xl">Sell</p>
+        </div>
+        <label class="label">
+          <span class="label-text">Amount</span>
         </label>
-        <ul
-          tabindex="0"
-          class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
-        >
-          <Switch>
-            <Match when={type() === "sell"}>
-              <For each={props.assets}>
-                {(asset) => (
-                  <li onClick={() => setSellAsset(asset.Asset.Id)}>
-                    <p>{asset.Asset.Name}</p>
-                  </li>
-                )}
-              </For>
-            </Match>
-            <Match when={type() === "buy"}>
-              <For each={props.allAssets}>
-                {(asset) => (
-                  <li onClick={() => setSellAsset(asset.Id)}>
-                    <p>{asset.Name}</p>
-                  </li>
-                )}
-              </For>
-            </Match>
-          </Switch>
-        </ul>
+        <input
+          type="number"
+          placeholder="69"
+          class="input input-secondary input-bordered w-full"
+          onChange={(e) => setSellAmount(parseFloat(e.currentTarget.value))}
+        />
+        <label class="label">
+          <span class="label-text">Price</span>
+        </label>
+        <input
+          type="number"
+          placeholder="420"
+          class="input input-secondary input-bordered w-full"
+          onChange={(e) => setSellPrice(parseFloat(e.currentTarget.value))}
+        />
+        <div class="flex flex-col mt-auto">
+          <button
+            class="btn btn-secondary"
+            onClick={() =>
+              sell.mutate({
+                access: auth().access || '',
+                transactionBody: {
+                  assetId: sellAsset()!.Id,
+                  type: type(),
+                  Price: sellPrice(),
+                  Amount: sellAmount(),
+                },
+              })
+            }
+          >
+            Click to sell!
+          </button>
+        </div>
       </div>
-      <p>Selected Asset: {sellAsset()}</p>
-      <p>
-        Max Sell Amount:{" "}
-        {props.assets.find((i) => i.Asset.Id === sellAsset())?.Amount}
-      </p>
-      <label class="label">
-        <span class="label-text">Amount</span>
-      </label>
-      <input
-        type="number"
-        placeholder="Amount..."
-        class="input input-secondary input-bordered w-full"
-        onChange={(e) => setSellAmount(parseFloat(e.currentTarget.value))}
-      />
-      <label class="label">
-        <span class="label-text">Price</span>
-      </label>
-      <input
-        type="number"
-        placeholder="Price..."
-        class="input input-secondary input-bordered w-full"
-        onChange={(e) => setSellPrice(parseFloat(e.currentTarget.value))}
-      />
-      <button
-        class="btn btn-secondary"
-        onClick={() =>
-          sell.mutate({
-            access: auth().access || "",
-            transactionBody: {
-              assetId: sellAsset(),
-              type: type(),
-              Price: sellPrice(),
-              Amount: sellAmount(),
-            },
-          })
-        }
-      >
-        Click to sell!
-      </button>
+      <div class="w-full flex flex-col gap-4">
+        <div class="dropdown w-full">
+          <label tabindex="0" class="btn m-1 w-full">
+            <Show when={sellAsset()?.Name} fallback={<>Select Asset</>}>
+              {sellAsset()!.Name}
+            </Show>
+          </label>
+          <ul
+            tabindex="0"
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
+          >
+            <Switch>
+              <Match when={type() === 'sell'}>
+                <For each={props.assets}>
+                  {(asset) => (
+                    <li onClick={() => setSellAsset(asset.Asset)}>
+                      <p>{asset.Asset.Name}</p>
+                    </li>
+                  )}
+                </For>
+              </Match>
+              <Match when={type() === 'buy'}>
+                <For each={props.allAssets}>
+                  {(asset) => (
+                    <li onClick={() => setSellAsset(asset)}>
+                      <p>{asset.Name}</p>
+                    </li>
+                  )}
+                </For>
+              </Match>
+            </Switch>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
