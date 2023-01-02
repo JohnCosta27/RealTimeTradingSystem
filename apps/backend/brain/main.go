@@ -45,6 +45,10 @@ func main() {
       var returnValue []byte
 
 			switch req.Url {
+      case "get-user":
+        user := model.GetUser(req.Access)
+        returnValue, _ = json.Marshal(&user)
+
 			case "get-assets":
 				assets := model.GetAllAssets()
         returnValue, _ = json.Marshal(&assets)
