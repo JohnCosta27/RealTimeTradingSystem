@@ -6,6 +6,7 @@ import (
 	"brain/rabbitmq"
 	"encoding/json"
 	"log"
+	"net/http"
 	sharedtypes "sharedTypes"
 	"strconv"
 	"sync"
@@ -72,6 +73,18 @@ func main() {
       case "get-trades":
         transactions := model.GetAllTransactions()
         returnValue, _ = json.Marshal(&transactions)
+
+      case "get-asset-trades":
+        transactions, err := model.GetAllAssetTrades(req.Body["AssetId"])
+        if err != nil {
+          returnValue, _ = json.Marshal(&sharedtypes.BrainRes{
+            ErrorCode: http.StatusNotFound,
+          })
+        } else {
+          returnValue, _ = json.Marshal(&sharedtypes.BrainRes{
+            Response: transactions,
+          })
+        }
 			}
 
 			rabbitmq.GlobalChannel.Publish("", "CallbackQueue", false, false,

@@ -53,7 +53,7 @@ func PostTrade() gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
 		})
-  }
+	}
 }
 
 func PostCompleteTrade() gin.HandlerFunc {
@@ -94,18 +94,18 @@ func PostCompleteTrade() gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
 		})
-  }
+	}
 }
 
 func GetAllTrades() gin.HandlerFunc {
-  return func(c *gin.Context) {
-    bodyReq := sharedtypes.BrainReq {
-      Url: "get-trades",
-    } 
-    msg := rabbitmq.SendRPC(bodyReq)
+	return func(c *gin.Context) {
+		bodyReq := sharedtypes.BrainReq{
+			Url: "get-trades",
+		}
+		msg := rabbitmq.SendRPC(bodyReq)
 
-    var trades []sharedtypes.Transaction
-    err := json.Unmarshal(msg, &trades)
+		var trades []sharedtypes.Transaction
+		err := json.Unmarshal(msg, &trades)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -114,16 +114,54 @@ func GetAllTrades() gin.HandlerFunc {
 			return
 		}
 
-    c.JSON(http.StatusOK, gin.H{
-      "trades": trades,
-    })
-  }
+		c.JSON(http.StatusOK, gin.H{
+			"trades": trades,
+		})
+	}
+}
+
+func GetAllTradesAssets() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		bodyReqBody := make(map[string]string)
+		bodyReqBody["AssetId"] = c.GetHeader("AssetId")
+
+		bodyReq := sharedtypes.BrainReq{
+			Url:  "get-asset-trades",
+			Body: bodyReqBody,
+		}
+
+		msg := rabbitmq.SendRPC(bodyReq)
+
+		var res sharedtypes.BrainRes
+		err := json.Unmarshal(msg, &res)
+    fmt.Println(res)
+
+		if res.ErrorCode != 0 || err != nil {
+			if res.ErrorCode == http.StatusNotFound {
+				c.JSON(http.StatusNotFound, gin.H{
+					"error": "This asset could not be found",
+				})
+				return
+			}
+
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "This service has encountered an issue",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"trades": res.Response,
+		})
+
+	}
 }
 
 func TradeRoutes(r *gin.Engine) {
-  tradeGroup := r.Group(TRADE_ROUTE)
-  tradeGroup.Use(middleware.Auth())
-  tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
-  tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
-  tradeGroup.GET("/", GetAllTrades())
+	tradeGroup := r.Group(TRADE_ROUTE)
+	tradeGroup.Use(middleware.Auth())
+	tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
+	tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
+	tradeGroup.GET(ASSET_TRADES_ROUTE, GetAllTradesAssets())
+	tradeGroup.GET("/", GetAllTrades())
 }

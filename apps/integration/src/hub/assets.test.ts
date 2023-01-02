@@ -2,10 +2,10 @@ import { HubUrl, assets } from "config";
 import request from "supertest";
 
 describe("Asset routes testing", () => {
-  it("Should return without JWT (for possible listing of public assets somewhere outside the website)", (done: jest.DoneCallback) => {
+  it("Should return error without authentication", (done: jest.DoneCallback) => {
     request(HubUrl)
       .get(assets)
-      .expect(200)
+      .expect(400)
       .end((err, res) => {
         expect(err).toBeNull();
         expect(res.body["assets"]).toEqual(

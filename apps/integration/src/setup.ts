@@ -8,8 +8,9 @@ dotenv.config();
 
 export interface TestData {
   users: Array<{id: string; balance: number; email: string; password: string}>;
-  assets: Array<{id: string}>
-  userAssets: Array<{id: string, userId: string; assetId: string}>
+  assets: Array<{id: string}>;
+  userAssets: Array<{id: string, userId: string; assetId: string}>;
+  transactions: Array<{id: string, price: number, amount: number, assetId: string}>;
 }
 
 const DEFAULT_BALANCE = 10000;
@@ -91,7 +92,7 @@ export async function Setup(): Promise<TestData> {
     },
   });
 
-  await brainClient.transactions.create({
+  const transaction = await brainClient.transactions.create({
     data: {
       seller_id: firstUser!.id,
       amount: 10,
@@ -126,6 +127,14 @@ export async function Setup(): Promise<TestData> {
         id: userAsset.id,
         assetId: gold.id,
         userId: firstUser!.id
+      }
+    ],
+    transactions: [
+      {
+        id: transaction.id,
+        assetId: transaction.asset_id,
+        amount: transaction.amount,
+        price: transaction.price,
       }
     ]
   }

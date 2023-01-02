@@ -16,8 +16,6 @@ type Base struct {
 type Asset struct {
 	Base
 	Name         string        `json:"Name"`
-	UserAssets   []UserAsset   `json:"UserAssets"`
-	Transactions []Transaction `json:"Transactions"`
 }
 
 // Transaction State:
