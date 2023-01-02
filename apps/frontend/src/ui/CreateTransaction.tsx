@@ -27,7 +27,7 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
 
   return (
     <div class="w-full h-full grid grid-cols-2 gap-2">
-      <div class="w-full flex flex-col">
+      <div class="w-full flex flex-col min-h-[30vh]">
         <div class="flex items-center justify-center gap-4">
           <p class="text-3xl">Buy</p>
           <input
@@ -79,7 +79,7 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
       </div>
       <div class="w-full flex flex-col gap-4">
         <div class="dropdown w-full">
-          <label tabindex="0" class="btn m-1 w-full">
+          <label tabindex="0" class="btn m-1 w-full hover:bg-accent-focus">
             <Show when={sellAsset()?.Name} fallback={<>Select Asset</>}>
               {sellAsset()!.Name}
             </Show>
