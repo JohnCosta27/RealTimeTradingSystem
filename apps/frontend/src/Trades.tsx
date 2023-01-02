@@ -31,7 +31,7 @@ export const Trades: Component = () => {
 
   const completeTrade = createMutation({
     mutationFn: PostCompleteTransaction,
-    onSuccess: (res) => {
+    onSuccess: () => {
       query.invalidateQueries({queryKey: ["all-trades"]});
     }
   });
@@ -52,6 +52,19 @@ export const Trades: Component = () => {
                 <p>Price: {trade.Price}</p>
                 <p>Asset: {trade.AssetId}</p>
                 <p>Buyer: {trade.BuyerId}</p>
+                <button
+                  class="btn"
+                  onClick={() =>
+                    completeTrade.mutate({
+                      access: auth().access || "",
+                      body: {
+                        TransactionId: trade.Id,
+                      },
+                    })
+                  }
+                >
+                  Sell
+                </button>
               </div>
             )}
           </For>
