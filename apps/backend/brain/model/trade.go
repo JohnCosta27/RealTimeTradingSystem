@@ -107,6 +107,10 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.SellerId, transaction.AssetId).First(&oldUserAsset)
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
 
+    if (user.Balance < transaction.Price) {
+      return transaction, errors.New("The buyer does not have enough money")
+    }
+
     user.Balance = user.Balance - transaction.Price
     seller.Balance = seller.Balance + transaction.Price
 
@@ -138,6 +142,10 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     // Get the user asset of the seller.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.BuyerId, transaction.AssetId).First(&oldUserAsset)
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
+
+    if (newUserAsset.Amount < transaction.Amount) {
+      return transaction, errors.New("The seller does not have enough of the asset")
+    }
 
     user.Balance = user.Balance + transaction.Price
     buyer.Balance = buyer.Balance - transaction.Price

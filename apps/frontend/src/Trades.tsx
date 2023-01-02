@@ -31,13 +31,10 @@ export const Trades: Component = () => {
 
   const completeTrade = createMutation({
     mutationFn: PostCompleteTransaction,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      console.log(res);
       query.invalidateQueries({queryKey: ["all-trades"]});
     }
-  });
-
-  createEffect(() => {
-    console.log(allTrades.data);
   });
 
   return (
