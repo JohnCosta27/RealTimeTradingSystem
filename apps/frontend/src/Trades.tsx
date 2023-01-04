@@ -3,7 +3,7 @@ import {
   createQuery,
   useQueryClient,
 } from '@tanstack/solid-query';
-import { Component, createEffect, For, Match, Show, Switch } from 'solid-js';
+import { Component, For, Show } from 'solid-js';
 import { useAuth } from './auth/AuthProvider';
 import {
   GetAllTrades,

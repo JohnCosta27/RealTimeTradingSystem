@@ -1,29 +1,29 @@
-import Chart from 'chart.js/auto';
-import { Component, onMount } from 'solid-js';
+import { useParams } from '@solidjs/router';
+import { createQuery } from '@tanstack/solid-query';
+import { Component, Show } from 'solid-js';
+import { AssetChart } from './AssetChart';
+import { useAuth } from './auth/AuthProvider';
+import { GetAllTrades } from './network/requests';
+import { Loading } from './ui/Loading';
 
 export const ChartPage: Component = () => {
-  onMount(() => {
-    const ctx = document.getElementById('asset_canvas') as HTMLCanvasElement;
+  const auth = useAuth();
+  const params = useParams();
 
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['a', 'b', 'c', 'd', 'e', 'f'],
-        datasets: [
-          {
-            label: 'Price of asset',
-            data: [12, 19, 21, 19, 15, 17],
-            borderWidth: 1,
-            tension: 0.1,
-          },
-        ],
-      },
-    });
-  });
+  const allTrades = createQuery(
+    () => ['all-trades'],
+    () => GetAllTrades(auth().access).then((res) => res.data),
+  );
 
   return (
     <div class="w-full h-full p-4 flex flex-col gap-4 bg-neutral-focus rounded shadow-lg">
-      <canvas width={1000} height={600} id="asset_canvas" />
+      <Show when={allTrades.data} fallback={<Loading />}>
+        <AssetChart
+          prices={allTrades
+            .data!.trades.filter((t) => t.AssetId === params.id)
+            .map((t) => t.Price / t.Amount)}
+        />
+      </Show>
     </div>
   );
 };

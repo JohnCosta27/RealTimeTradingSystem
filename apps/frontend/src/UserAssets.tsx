@@ -10,7 +10,7 @@ export const UserAssets: Component = () => {
 
   const userAssets = createQuery(
     () => ["userAssets"],
-    () => GetUserAssets(auth().access).then((res) => console.log(res.data) || res.data)
+    () => GetUserAssets(auth().access).then((res) => res.data)
   );
 
   return (
@@ -23,7 +23,7 @@ export const UserAssets: Component = () => {
         <Match when={userAssets.data !== undefined}>
           <For each={userAssets.data!.assets}>
             {(asset) => (
-              <Asset name={asset.Asset.Name} amount={asset.Amount} price={20} />
+              <Asset id={asset.Asset.Id} name={asset.Asset.Name} amount={asset.Amount} price={20} />
             )}
           </For>
         </Match>

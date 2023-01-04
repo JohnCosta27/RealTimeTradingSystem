@@ -25,7 +25,7 @@ export const Main: Component = () => {
                 <Route path="/" component={Assets} />
                 <Route path="/assets" component={UserAssets} />
                 <Route path="/trades" component={Trades} />
-                <Route path="/chart" component={ChartPage} />
+                <Route path="/assets/:id" component={ChartPage} />
               </Route>
             </Route>
             <Route path="/auth" component={AuthLayout}>
