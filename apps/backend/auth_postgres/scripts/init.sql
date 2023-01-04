@@ -30,4 +30,8 @@ CREATE TABLE user_session_logs (
   deleted_at TIMESTAMP
 );
 
-INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 'johncosta027@gmail.com', 'John', 'Costa', 'SafePassword123.', '60f892852ffb8e2f9d8da41db12e0ed52ebe93df069c1465decab320864c3ad42f9ae390294837bbcb10d642f43edac9e6edcca338170323bb7adf4c916844fb');
+INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 'johncosta027@gmail.com', 'John', 'Costa', '8e0eaa40b46a74f68b75ed68716ae11cdbae260a78419cbe9b2f412018695e6f02b9d4980c1a4014fe7864b75d92551eab4effae2035e74230a1dff06b744a67', '');
+
+INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715bb', 'testing1@email.com', 'Test', 'Account1', '8e0eaa40b46a74f68b75ed68716ae11cdbae260a78419cbe9b2f412018695e6f02b9d4980c1a4014fe7864b75d92551eab4effae2035e74230a1dff06b744a67', '');
+
+INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715bc', 'testing2@email.com', 'Test', 'Account2', '8e0eaa40b46a74f68b75ed68716ae11cdbae260a78419cbe9b2f412018695e6f02b9d4980c1a4014fe7864b75d92551eab4effae2035e74230a1dff06b744a67', '');
