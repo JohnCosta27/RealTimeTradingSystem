@@ -15,7 +15,7 @@ export const TradeCard: Component<TradeCardProps> = (props) => {
       </div>
       <div class="col-span-1 w-full flex justify-end">
         <p class="text-end text-2xl p-4 w-min rounded-xl text-accent-focus">
-          ${Math.floor((props.trade.Amount / props.trade.Price) * 100) / 100}
+          ${Math.floor((props.trade.Price / props.trade.Amount) * 100) / 100}
         </p>
       </div>
       <button

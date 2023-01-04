@@ -1,4 +1,4 @@
-import { createMutation } from '@tanstack/solid-query';
+import { createMutation, useQueryClient } from '@tanstack/solid-query';
 import { Component, createSignal, For, Match, Show, Switch } from 'solid-js';
 import { useAuth } from '../auth/AuthProvider';
 import {
@@ -14,6 +14,7 @@ interface CreateTransactionProps {
 
 export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
   const auth = useAuth();
+  const query = useQueryClient();
 
   const [sellAsset, setSellAsset] = createSignal<GetAssets>();
   const [sellAmount, setSellAmount] = createSignal(0);
@@ -22,7 +23,10 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
 
   const sell = createMutation({
     mutationFn: PostCreateTransaction,
-    onSuccess: (res) => console.log(res),
+    onSuccess: (res) => {
+      console.log(res);
+      query.invalidateQueries();
+    },
   });
 
   return (
@@ -73,7 +77,9 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
               })
             }
           >
-            Click to sell!
+            <Show when={type() === 'buy'} fallback={<>Sell</>}>
+              Buy
+            </Show>
           </button>
         </div>
       </div>

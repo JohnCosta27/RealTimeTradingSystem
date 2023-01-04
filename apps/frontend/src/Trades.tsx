@@ -11,6 +11,7 @@ import {
   GetUserAssets,
   PostCompleteTransaction,
 } from './network/requests';
+import { Requests } from './types';
 import { CreateTransaction } from './ui/CreateTransaction';
 import { Loading } from './ui/Loading';
 import { TradeCard } from './ui/TradeCard';
@@ -20,17 +21,17 @@ export const Trades: Component = () => {
   const query = useQueryClient();
 
   const assets = createQuery(
-    () => ['assets'],
+    () => [Requests.Assets],
     () => GetAssets(auth().access).then((res) => res.data),
   );
 
   const userAssets = createQuery(
-    () => ['userAssets'],
+    () => [Requests.UserAssets],
     () => GetUserAssets(auth().access).then((res) => res.data),
   );
 
   const allTrades = createQuery(
-    () => ['all-trades'],
+    () => [Requests.AllTrades],
     () => GetAllTrades(auth().access).then((res) => res.data),
   );
 
@@ -38,7 +39,8 @@ export const Trades: Component = () => {
     mutationFn: PostCompleteTransaction,
     onSuccess: (res) => {
       console.log(res);
-      query.invalidateQueries({ queryKey: ['all-trades'] });
+      query.invalidateQueries({ queryKey: [Requests.AllTrades] });
+      query.invalidateQueries({ queryKey: [Requests.UserAssets] });
     },
   });
 

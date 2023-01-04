@@ -4,6 +4,7 @@ import { Component, Show } from 'solid-js';
 import { AssetChart } from './AssetChart';
 import { useAuth } from './auth/AuthProvider';
 import { GetAllTrades } from './network/requests';
+import { Requests } from './types';
 import { Loading } from './ui/Loading';
 
 export const ChartPage: Component = () => {
@@ -11,7 +12,7 @@ export const ChartPage: Component = () => {
   const params = useParams();
 
   const allTrades = createQuery(
-    () => ['all-trades'],
+    () => [Requests.AllTrades],
     () => GetAllTrades(auth().access).then((res) => res.data),
   );
 
