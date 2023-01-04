@@ -6,6 +6,7 @@ import (
 	"hub/rabbitmq"
 	"net/http"
 	sharedtypes "sharedTypes"
+	"utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -41,8 +42,44 @@ func GetUserAssets() gin.HandlerFunc {
 	}
 }
 
+func GetUser() gin.HandlerFunc {
+  return func(c *gin.Context) {
+		accessToken := c.GetHeader("access")
+		claims, err := utils.DecodeJwt(accessToken, "access")
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorised access token",
+			})
+			return
+		}
+
+    bodyReq := sharedtypes.BrainReq{
+      Url: "get-user",
+      Access: uuid.MustParse(claims.Uuid),
+    }
+
+    msg := rabbitmq.SendRPC(bodyReq)
+
+    var user sharedtypes.User
+		err = json.Unmarshal(msg, &user)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "This service has encountered an issue",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"user": user,
+		})
+
+  }
+}
+
 func UserRoutes(r *gin.Engine) {
 	userGroup := r.Group(USER_ROUTE)
 	userGroup.Use(middleware.Auth())
 	userGroup.GET(ASSET_ROUTE, GetUserAssets())
+  userGroup.GET("/", GetUser())
 }

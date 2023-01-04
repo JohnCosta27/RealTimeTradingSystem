@@ -31,3 +31,7 @@ CREATE TABLE user_session_logs (
 );
 
 INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715ba', 'johncosta027@gmail.com', 'John', 'Costa', '8e0eaa40b46a74f68b75ed68716ae11cdbae260a78419cbe9b2f412018695e6f02b9d4980c1a4014fe7864b75d92551eab4effae2035e74230a1dff06b744a67', '');
+
+INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715bb', 'testing1@email.com', 'Test', 'Account1', '8e0eaa40b46a74f68b75ed68716ae11cdbae260a78419cbe9b2f412018695e6f02b9d4980c1a4014fe7864b75d92551eab4effae2035e74230a1dff06b744a67', '');
+
+INSERT INTO users VALUES ('f2e6a94f-b50b-4b7d-9c32-f444104715bc', 'testing2@email.com', 'Test', 'Account2', '8e0eaa40b46a74f68b75ed68716ae11cdbae260a78419cbe9b2f412018695e6f02b9d4980c1a4014fe7864b75d92551eab4effae2035e74230a1dff06b744a67', '');

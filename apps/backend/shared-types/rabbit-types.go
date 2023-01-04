@@ -1,6 +1,8 @@
 package sharedtypes
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 // TODO: Use enums for route selection
 type BrainReq struct {
@@ -8,6 +10,15 @@ type BrainReq struct {
 	Access uuid.UUID         `json:"access"`
 	Params map[string]string `json:"params"`
 	Body   map[string]string `json:"body"`
+}
+
+type BrainResError struct {
+  ErrorCode any `json:"ErrorCode"`
+}
+
+type BrainRes struct {
+  ErrorCode int
+  Response any
 }
 
 type ReqBody interface {

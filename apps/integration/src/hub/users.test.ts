@@ -1,4 +1,4 @@
-import { AuthUrl, HubUrl, l, testData, userAssets } from "config";
+import { AuthUrl, HubUrl, l, testData, userAssets, user } from "config";
 import request from "supertest";
 
 describe("User Asset routes testing", () => {
@@ -45,12 +45,38 @@ describe("User Asset routes testing", () => {
           expect.arrayContaining([
             expect.objectContaining({
               Amount: expect.any(Number),
-              Asset:  expect.objectContaining({
+              Asset: expect.objectContaining({
                 Id: expect.any(String),
                 Name: expect.any(String),
-              })
+              }),
             }),
           ])
+        );
+        done();
+      });
+  });
+
+  it("Should return the user object", (done: jest.DoneCallback) => {
+    request(HubUrl)
+      .get(user)
+      .set("access", access)
+      .expect(200)
+      .end((err, res) => {
+        expect(err).toBeNull();
+        expect(res.body["user"]).toEqual(
+          expect.objectContaining({
+            Id: expect.any(String),
+            Balance: expect.any(Number),
+            UserAssets: expect.arrayContaining([
+              expect.objectContaining({
+                Amount: expect.any(Number),
+                Asset: expect.objectContaining({
+                  Id: expect.any(String),
+                  Name: expect.any(String),
+                }),
+              }),
+            ]),
+          })
         );
         done();
       });

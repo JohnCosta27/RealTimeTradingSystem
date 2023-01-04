@@ -16,8 +16,6 @@ type Base struct {
 type Asset struct {
 	Base
 	Name         string        `json:"Name"`
-	UserAssets   []UserAsset   `json:"UserAssets"`
-	Transactions []Transaction `json:"Transactions"`
 }
 
 // Transaction State:
@@ -55,5 +53,5 @@ type UserAsset struct {
 	UserId  string  `json:"UserId"`
 	AssetId string  `json:"AssetId"`
 	Amount  float64 `json:"Amount"`
-	Asset   Asset   `json:"Asset" gorm:"embedded"`
+  Asset   Asset   `json:"Asset" gorm:"embedded"`
 }

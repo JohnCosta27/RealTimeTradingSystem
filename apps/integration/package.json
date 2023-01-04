@@ -4,8 +4,11 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "test:setup": "npx ts-node src/setup.ts",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:clean": "npm run test:setup && npm run test",
+    "prisma:gen": "npx prisma generate --schema src/prisma/auth.prisma && npx prisma generate --schema src/prisma/brain.prisma"
   },
   "keywords": [],
   "author": "",

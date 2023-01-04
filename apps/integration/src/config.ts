@@ -10,10 +10,12 @@ export const r = '/register';
 export const l = '/login';
 export const re = '/refresh';
 export const userAssets = '/users/assets';
+export const user = '/users/';
 export const assets = '/assets';
 export const trade = '/trade/';
 export const createTrade = '/trade/create';
 export const completeTrade = '/trade/complete';
+export const assetTrades = '/trade/asset';
 
 if (!HubUrl) {
   throw new Error("HUB_URL must be present in .env file");
