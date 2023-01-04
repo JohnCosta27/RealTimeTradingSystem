@@ -12,6 +12,7 @@ import { FrontLayout } from "./pages/FrontLayout";
 import { Assets } from "./Assets";
 import { Trades } from "./Trades";
 import { UserAssets } from "./UserAssets";
+import { ChartPage } from "./Chart";
 
 export const Main: Component = () => {
   return (
@@ -24,6 +25,7 @@ export const Main: Component = () => {
                 <Route path="/" component={Assets} />
                 <Route path="/assets" component={UserAssets} />
                 <Route path="/trades" component={Trades} />
+                <Route path="/chart" component={ChartPage} />
               </Route>
             </Route>
             <Route path="/auth" component={AuthLayout}>
