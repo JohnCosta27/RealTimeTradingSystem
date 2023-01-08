@@ -5,6 +5,7 @@ import (
 	"brain/model"
 	"brain/rabbitmq"
 	"encoding/json"
+  "fmt"
 	"log"
 	"net/http"
 	sharedtypes "sharedTypes"
@@ -26,7 +27,7 @@ func main() {
 	msgs, err := rabbitmq.GlobalChannel.Consume(
 		"TestQueue",
 		"",
-		true, //Auto-Ack
+		false, //Auto-Ack
 		false,
 		false,
 		false,
@@ -39,6 +40,17 @@ func main() {
 
 	go func() {
 		for d := range msgs {
+
+      fmt.Println(d.CorrelationId)
+      to := d.CorrelationId[len(d.CorrelationId) - 4:]
+      // Not meant for the Brain service
+      if (to != "0002") {
+        d.Ack(false)
+        continue 
+      }
+
+      d.Ack(true)
+
 			var req sharedtypes.BrainReq
       err := json.Unmarshal(d.Body, &req)
 
