@@ -8,4 +8,5 @@ export const Requests = {
   AllTrades: 'all-trades',
   Assets: 'assets',
   UserAssets: 'user-assets',
+  User: 'user',
 } as const;

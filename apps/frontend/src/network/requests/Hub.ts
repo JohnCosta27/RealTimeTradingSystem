@@ -23,6 +23,13 @@ export interface GetTransaction extends BaseType {
   State: "in-market" | "complete";
 }
 
+export interface GetUserType extends BaseType {
+  Balance: number;
+  BuyTransactions: GetTransaction[];
+  SellTransactions: GetTransaction[];
+  UserAssets: GetUserAssets[];
+}
+
 export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
   return axios.get(`${HubUrl}/assets`, {
     headers: {
@@ -50,6 +57,14 @@ export const GetAllTrades: GetRequestType<{ trades: GetTransaction[] }> = (
     },
   });
 };
+
+export const GetUser: GetRequestType<{user: GetUserType }> = (auth) => {
+  return axios.get(`${HubUrl}/users/`, {
+    headers: {
+      access: auth,
+    }
+  })
+}
 
 export interface PostCreateTransactionType {
   access: string;
@@ -93,3 +108,4 @@ export const PostCompleteTransaction: PostRequestType<
     },
   });
 };
+
