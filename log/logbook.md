@@ -81,3 +81,11 @@ Finished integration testing app, it tests the authentication system and most of
 Final draft of the interim report completed
 ## 02/12/2022
 Integration testing setup.
+
+--------------------------------------------------
+Christmas and New year break.
+Work was done but I did not log it in the book.
+--------------------------------------------------
+
+## 10/01/2023
+JMeter testing plan for stress testing the backend APIs.
