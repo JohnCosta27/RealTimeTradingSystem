@@ -7,7 +7,7 @@ import (
 )
 
 type EnvConf struct {
-	AuthDbHost     string `env:"AUTH_DB_HOST" envDefault:"localhost:`
+	AuthDbHost     string `env:"AUTH_DB_HOST" envDefault:"localhost"`
 	AuthDbPort     string `env:"AUTH_DB_PORT" envDefault:"5442"`
 	AuthDbName     string `env:"AUTH_DB_NAME" envDefault:"postgres"`
 	AuthDbUser     string `env:"AUTH_DB_USER" envDefault:"postgres"`

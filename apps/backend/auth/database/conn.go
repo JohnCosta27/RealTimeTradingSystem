@@ -14,7 +14,9 @@ var BrainDb *gorm.DB
 
 func InitDatabase(AuthConfig *sharedtypes.DbConf, BrainConfig *sharedtypes.DbConf) {
 	DatabaseCon := "host=%s user=%s password=%s dbname=%s port=%s sslmode=disable"
+	BruhDatabaseCon := "host=%s user=%s password=%s dbname=%s port=%s sslmode=disable"
   authDb := fmt.Sprintf(DatabaseCon, AuthConfig.Host, AuthConfig.User, AuthConfig.Password, AuthConfig.DbName, AuthConfig.Port)
+  fmt.Println(authDb)
 	db, err := gorm.Open(postgres.Open(authDb), &gorm.Config{})
   Db = db
 
@@ -22,7 +24,8 @@ func InitDatabase(AuthConfig *sharedtypes.DbConf, BrainConfig *sharedtypes.DbCon
     panic(err)
   }
 
-  brainDb := fmt.Sprintf(DatabaseCon, BrainConfig.Host, BrainConfig.User, BrainConfig.Password, BrainConfig.DbName, BrainConfig.Port)
+  brainDb := fmt.Sprintf(BruhDatabaseCon, BrainConfig.Host, BrainConfig.User, BrainConfig.Password, BrainConfig.DbName, BrainConfig.Port)
+  fmt.Println(brainDb)
   BrainDb, err = gorm.Open(postgres.Open(brainDb), &gorm.Config{})
 
   if err != nil {

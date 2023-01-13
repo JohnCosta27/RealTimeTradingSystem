@@ -28,6 +28,8 @@ func main() {
 		panic("Cannot get environment variables, check your .env file")
 	}
 
+  fmt.Println(EnvConf)
+
 	database.InitDatabase(&sharedtypes.DbConf{
 		Host:     EnvConf.BrainDbHost,
 		Port:     EnvConf.BrainDbPort,

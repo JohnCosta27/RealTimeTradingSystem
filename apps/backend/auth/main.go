@@ -21,15 +21,15 @@ func main() {
 	if err := env.Parse(&EnvConf); err != nil {
 		panic("Cannot get environment variables, check your env file")
 	}
-
+  
 	rabbitmq.InitRabbit()
 
 	database.InitDatabase(&sharedtypes.DbConf{
 		Host:     EnvConf.AuthDbHost,
 		Port:     EnvConf.AuthDbPort,
 		DbName:   EnvConf.AuthDbName,
-		User:     EnvConf.AuthDbHost,
-		Password: EnvConf.AuthDbHost,
+		User:     EnvConf.AuthDbUser,
+		Password: EnvConf.AuthDbPassword,
 	}, &sharedtypes.DbConf{
 		Host:     EnvConf.BrainDbHost,
 		Port:     EnvConf.BrainDbPort,
