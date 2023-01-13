@@ -1,11 +1,13 @@
-# This service is used to run development environment, when the developer needs to run
-# the hub and the brain individually
+# Production file.
+# Not for local development
+# The big difference is that the images are pulled from the docker hub
+# and not from local images, allowing for easy replacement as needed.
 
 version: "3"
 
 services:
   rabbitmq:
-    build: ./rabbitmq
+    image: rabbitmq:3.11.2-management
     ports:
       - 15672:15672 #Management console
       - 5672:5672 #Actual exchange
@@ -13,7 +15,7 @@ services:
     restart: on-failure
 
   brain_postgres:
-    build: ./brain_postgres
+    image: postgres:15
     volumes:
       - ./brain_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./brain_postgres/db:/var/lib/postgresql/data

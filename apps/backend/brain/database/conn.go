@@ -1,8 +1,10 @@
 package database
 
 import (
+	"fmt"
 	"log"
 	"os"
+	sharedtypes "sharedTypes"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -12,23 +14,24 @@ import (
 
 var Db *gorm.DB
 
-func InitDatabase() {
+func InitDatabase(BrainConfig *sharedtypes.DbConf) {
+	DatabaseCon := "host=%s user=%s password=%s dbname=%s port=%s sslmode=disable"
 
 	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), 
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
-			SlowThreshold:             time.Second,   
-			LogLevel:                  logger.Info, 
-			IgnoreRecordNotFoundError: false,         
-			Colorful:                  true,       
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Info,
+			IgnoreRecordNotFoundError: false,
+			Colorful:                  true,
 		},
 	)
 
-	dsn := "host=localhost user=postgres password=postgres dbname=postgres port=5443 sslmode=disable"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-    Logger: newLogger,
-  })
-	Db = db
+	brainDb := fmt.Sprintf(DatabaseCon, BrainConfig.Host, BrainConfig.User, BrainConfig.Password, BrainConfig.DbName, BrainConfig.Port)
+	BrainDb, err := gorm.Open(postgres.Open(brainDb), &gorm.Config{
+		Logger: newLogger,
+	})
+	Db = BrainDb
 
 	if err != nil {
 		panic(err)

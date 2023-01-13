@@ -37,3 +37,6 @@ apps/backend/brain/brain
 apps/backend/hub/hub
 
 InterimSubmission.zip
+
+## Docker container secrets and sensitive information
+secrets.yml

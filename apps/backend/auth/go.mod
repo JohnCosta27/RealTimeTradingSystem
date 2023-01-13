@@ -8,12 +8,17 @@ require (
 	github.com/google/uuid v1.3.0
 	gorm.io/driver/postgres v1.4.5
 	gorm.io/gorm v1.24.1
+	sharedTypes v1.0.0
 	utils v1.0.0
 )
 
-replace utils v1.0.0 => ../utils
+replace (
+	sharedTypes v1.0.0 => ../shared-types
+	utils v1.0.0 => ../utils
+)
 
 require (
+	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

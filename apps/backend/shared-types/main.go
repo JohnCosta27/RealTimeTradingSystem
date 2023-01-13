@@ -6,6 +6,28 @@ import (
 	"github.com/google/uuid"
 )
 
+type EnvConf struct {
+	AuthDbHost     string `env:"AUTH_DB_HOST" envDefault:"localhost:`
+	AuthDbPort     string `env:"AUTH_DB_PORT" envDefault:"5442"`
+	AuthDbName     string `env:"AUTH_DB_NAME" envDefault:"postgres"`
+	AuthDbUser     string `env:"AUTH_DB_USER" envDefault:"postgres"`
+	AuthDbPassword string `env:"AUTH_DB_PASSWORD" envDefault:"postgres"`
+
+	BrainDbHost     string `env:"BRAIN_DB_HOST" envDefault:"localhost"`
+	BrainDbPort     string `env:"BRAIN_DB_PORT" envDefault:"5443"`
+	BrainDbName     string `env:"BRAIN_DB_NAME" envDefault:"postgres"`
+	BrainDbUser     string `env:"BRAIN_DB_USER" envDefault:"postgres"`
+	BrainDbPassword string `env:"BRAIN_DB_PASSWORD" envDefault:"postgres"`
+}
+
+type DbConf struct {
+	Host     string
+	User     string
+	Password string
+	DbName   string
+	Port     string
+}
+
 type Base struct {
 	ID        uuid.UUID  `gorm:"type:uuid;primary_key;" json:"Id"`
 	CreatedAt time.Time  `json:"CreatedAt"`
@@ -15,7 +37,7 @@ type Base struct {
 
 type Asset struct {
 	Base
-	Name         string        `json:"Name"`
+	Name string `json:"Name"`
 }
 
 // Transaction State:
@@ -53,5 +75,5 @@ type UserAsset struct {
 	UserId  string  `json:"UserId"`
 	AssetId string  `json:"AssetId"`
 	Amount  float64 `json:"Amount"`
-  Asset   Asset   `json:"Asset" gorm:"embedded"`
+	Asset   Asset   `json:"Asset" gorm:"embedded"`
 }
