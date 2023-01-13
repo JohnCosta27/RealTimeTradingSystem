@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	sharedtypes "sharedTypes"
 
@@ -63,7 +64,7 @@ func InitRabbit() {
   msgs, err := GlobalChannel.Consume(
     "CallbackQueue",
 		"",
-		true, //Auto-Ack
+		false, //Auto-Ack
 		false,
 		false,
 		false,
@@ -75,6 +76,8 @@ func InitRabbit() {
 
   go func() {
     for m := range msgs {
+      fmt.Println(m)
+      m.Ack(true)
       rpcMessages[m.CorrelationId] = m.Body
       newMessage <- true
     }
@@ -84,13 +87,17 @@ func InitRabbit() {
 }
 
 func SendRPC(msg sharedtypes.BrainReq) []byte {
-  messageId := uuid.New().String()
+  messageId := "0001-" + uuid.New().String() + "-0002"
+  testId := "0001-" + uuid.New().String() + "-0003"
 
   // TODO: Better error handling
   data, _ := json.Marshal(msg)
 
 	GlobalChannel.Publish("", "TestQueue", false, false,
 		amqp.Publishing{ContentType: "text/plain", Body: data, CorrelationId: messageId})
+
+	GlobalChannel.Publish("", "TestQueue", false, false,
+		amqp.Publishing{ContentType: "text/plain", Body: data, CorrelationId: testId})
 
   // Iteration goes on until channel is closed (should be never),
   // only returns when we find the correct message
