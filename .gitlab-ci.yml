@@ -10,8 +10,7 @@ docker_build:
     - if: $CI_COMMIT_BRANCH == "main"
   script:
     - cd apps/backend
-    - docker login -u johncosta27
-    - $DOCKER_TOKEN
+    - docker login -u johncosta27 -p $DOCKER_TOKEN
     - docker build -f Auth.Dockerfile -t johncosta27/fyp-auth .
     - docker push johncosta27/fyp-auth
     - docker build -f Brain.Dockerfile -t johncosta27/fyp-brain .
