@@ -1,0 +1,16 @@
+stages:
+  - build
+
+docker_build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  script:
+    - cd apps/backend
+    - docker login -u johncosta27 -p $DOCKER_TOKEN
+    - docker build -f Auth.Dockerfile -t johncosta27/fyp-auth .
+    - docker push johncosta27/fyp-auth
+    - docker build -f Brain.Dockerfile -t johncosta27/fyp-brain .
+    - docker push johncosta27/fyp-brain
+    - docker build -f Hub.Dockerfile -t johncosta27/fyp-hub .
+    - docker push johncosta27/fyp-hub
