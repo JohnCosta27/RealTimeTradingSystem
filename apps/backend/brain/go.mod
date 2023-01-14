@@ -3,15 +3,14 @@ module brain
 go 1.19
 
 require (
-  github.com/rabbitmq/amqp091-go v1.5.0
-  sharedTypes v1.0.0
+	github.com/rabbitmq/amqp091-go v1.5.0
+	sharedTypes v1.0.0
 )
 
-replace (
-  sharedTypes v1.0.0 => ../shared-types
-)
+replace sharedTypes v1.0.0 => ../shared-types
 
 require (
+	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect

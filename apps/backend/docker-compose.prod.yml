@@ -1,11 +1,13 @@
-# This service is used to run development environment, when the developer needs to run
-# the hub and the brain individually
+# Production file.
+# Not for local development
+# The big difference is that the images are pulled from the docker hub
+# and not from local images, allowing for easy replacement as needed.
 
 version: "3"
 
 services:
   rabbitmq:
-    build: ./rabbitmq
+    image: rabbitmq:3.11.2-management
     ports:
       - 15672:15672 #Management console
       - 5672:5672 #Actual exchange
@@ -13,7 +15,7 @@ services:
     restart: on-failure
 
   brain_postgres:
-    build: ./brain_postgres
+    image: postgres:15
     volumes:
       - ./brain_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./brain_postgres/db:/var/lib/postgresql/data
@@ -27,9 +29,7 @@ services:
       - 5443:5432
 
   auth:
-    build: 
-      context: .
-      dockerfile: ./Auth.Dockerfile
+    image: johncosta27/fyp-auth
     ports:
       - 4546:4546
     depends_on: 
@@ -39,7 +39,7 @@ services:
     network_mode: host
 
   auth_postgres:
-    build: ./auth_postgres
+    image: postgres:15
     volumes:
       - ./auth_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./auth_postgres/db:/var/lib/postgresql/data
@@ -51,3 +51,24 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
     ports:
       - 5442:5432
+
+  # Hub service is the entry point for all thing (except authentication)
+  hub:
+    image: johncosta27/fyp-hub
+    ports:
+      - 4545:4545
+    depends_on:
+      - rabbitmq
+    restart: on-failure
+    network_mode: host
+  
+    # Brain service consumes RabbitMQ request and deals with permanent storage
+  brain:
+    image: johncosta27/fyp-brain
+    ports:
+      - 5672:5672
+    depends_on: 
+      - brain_postgres
+      - rabbitmq
+    restart: on-failure
+    network_mode: host
