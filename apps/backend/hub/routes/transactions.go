@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
+	"hub/cache"
 	"hub/middleware"
 	"hub/rabbitmq"
 	"net/http"
@@ -97,6 +98,12 @@ func PostCompleteTrade() gin.HandlerFunc {
 	}
 }
 
+func GetAllTradesBody(data []sharedtypes.Transaction) any {
+	return gin.H{
+		"trades": data,
+	}
+}
+
 func GetAllTrades() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		bodyReq := sharedtypes.BrainReq{
@@ -114,9 +121,14 @@ func GetAllTrades() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"trades": trades,
-		})
+		c.Set(cache.CACHE, string(msg))
+		c.JSON(http.StatusOK, GetAllTradesBody(trades))
+	}
+}
+
+func GetAllTradesAssetsBody(data []sharedtypes.Transaction) any {
+	return gin.H{
+		"trades": data,
 	}
 }
 
@@ -134,7 +146,6 @@ func GetAllTradesAssets() gin.HandlerFunc {
 
 		var res sharedtypes.BrainRes
 		err := json.Unmarshal(msg, &res)
-    fmt.Println(res)
 
 		if res.ErrorCode != 0 || err != nil {
 			if res.ErrorCode == http.StatusNotFound {
@@ -150,10 +161,7 @@ func GetAllTradesAssets() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"trades": res.Response,
-		})
-
+		c.JSON(http.StatusOK, GetAllTradesAssetsBody(res.Response.([]sharedtypes.Transaction)))
 	}
 }
 
@@ -162,6 +170,9 @@ func TradeRoutes(r *gin.Engine) {
 	tradeGroup.Use(middleware.Auth())
 	tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
 	tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
-	tradeGroup.GET(ASSET_TRADES_ROUTE, GetAllTradesAssets())
-	tradeGroup.GET("/", GetAllTrades())
+	tradeGroup.GET(ASSET_TRADES_ROUTE,
+    middleware.CacheReq(true, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
+    GetAllTradesAssets(),
+  )
+	tradeGroup.GET("/", middleware.CacheReq(true, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
 }
