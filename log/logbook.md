@@ -92,3 +92,7 @@ JMeter testing plan for stress testing the backend APIs.
 
 ## 14/01/2023
 Developer experience improvements, now we load .env variables and secrets from files instead of hard coding them, which will make deployment of the application a lot easier.
+
+## 19/01/2023
+- Had the meeting with Julien, he seems happy with my progress and gave me some pointers in testing the performance of the system.
+- Added a redis server to store cache from the system. I haven't yet invalidated the various cached items, that's the next step.
