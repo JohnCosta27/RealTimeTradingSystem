@@ -26,7 +26,6 @@ func GetAssets(r *gin.Engine) {
 			}
 
 			msg := rabbitmq.SendRPC(req)
-			cache.Set(c.Request.URL.Path, string(msg))
 
 			assets := []sharedtypes.Asset{}
 			err := json.Unmarshal(msg, &assets)
@@ -37,7 +36,7 @@ func GetAssets(r *gin.Engine) {
 				})
 				return
 			}
-
+      c.Set(cache.CACHE, string(msg))
 			c.JSON(http.StatusOK, GetAssetBody(assets))
 		})
 }

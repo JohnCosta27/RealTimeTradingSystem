@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"hub/cache"
 	"hub/middleware"
 	"hub/rabbitmq"
 	"net/http"
@@ -11,6 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
+func GetUserAssetsBody(data []sharedtypes.UserAsset) any {
+	return gin.H{
+		"assets": data,
+	}
+}
 
 func GetUserAssets() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -36,14 +43,19 @@ func GetUserAssets() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"assets": assets,
-		})
+    c.Set(cache.CACHE, string(msg))
+		c.JSON(http.StatusOK, GetUserAssetsBody(assets))
+	}
+}
+
+func GetUserBody(data sharedtypes.User) any {
+	return gin.H{
+		"user": data,
 	}
 }
 
 func GetUser() gin.HandlerFunc {
-  return func(c *gin.Context) {
+	return func(c *gin.Context) {
 		accessToken := c.GetHeader("access")
 		claims, err := utils.DecodeJwt(accessToken, "access")
 		if err != nil {
@@ -53,14 +65,14 @@ func GetUser() gin.HandlerFunc {
 			return
 		}
 
-    bodyReq := sharedtypes.BrainReq{
-      Url: "get-user",
-      Access: uuid.MustParse(claims.Uuid),
-    }
+		bodyReq := sharedtypes.BrainReq{
+			Url:    "get-user",
+			Access: uuid.MustParse(claims.Uuid),
+		}
 
-    msg := rabbitmq.SendRPC(bodyReq)
+		msg := rabbitmq.SendRPC(bodyReq)
 
-    var user sharedtypes.User
+		var user sharedtypes.User
 		err = json.Unmarshal(msg, &user)
 
 		if err != nil {
@@ -70,16 +82,14 @@ func GetUser() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"user": user,
-		})
-
-  }
+    c.Set(cache.CACHE, string(msg))
+		c.JSON(http.StatusOK, GetUserBody(user))
+	}
 }
 
 func UserRoutes(r *gin.Engine) {
 	userGroup := r.Group(USER_ROUTE)
 	userGroup.Use(middleware.Auth())
-	userGroup.GET(ASSET_ROUTE, GetUserAssets())
-  userGroup.GET("/", GetUser())
+	userGroup.GET(ASSET_ROUTE, middleware.CacheReq(true, []sharedtypes.UserAsset{}, GetUserAssetsBody), GetUserAssets())
+	userGroup.GET("/", GetUser())
 }

@@ -11,6 +11,8 @@ import (
 var Redis *redis.Client
 var RedisContext = context.Background()
 
+const CACHE = "cache"
+
 func InitRedisCache() {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",

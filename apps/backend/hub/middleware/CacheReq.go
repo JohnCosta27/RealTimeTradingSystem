@@ -31,5 +31,15 @@ func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, returnStruct T, ge
         return
       }
     }
+
+    // Allows the request to processed, and when it's finished
+    // We come back here, pull the return value from context,
+    // and then store it in our cache.
+    c.Next()
+    retValue, exists := c.Get(cache.CACHE)
+    if (exists) {
+      cache.Set(keyUrl, retValue.(string))
+    }
+
   } 
 }
