@@ -35,6 +35,10 @@ type Base struct {
 	DeletedAt *time.Time `sql:"index" json:"DeletedAt"`
 }
 
+type ReturnTypes interface {
+	Asset | []Asset | Transaction | []Transaction | User | []User | UserAsset | []UserAsset
+}
+
 type Asset struct {
 	Base
 	Name string `json:"Name"`

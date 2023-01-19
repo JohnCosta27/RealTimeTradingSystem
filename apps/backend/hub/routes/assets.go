@@ -11,28 +11,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetAssetBody(data []sharedtypes.Asset) any {
+	return gin.H{
+		"assets": data,
+	}
+}
+
 // Get all assets route
 func GetAssets(r *gin.Engine) {
-  r.GET(ASSET_ROUTE, middleware.CacheReq(false), func(c *gin.Context) {
-    req := sharedtypes.BrainReq{
-      Url: "get-assets",
-    }
+	r.GET(ASSET_ROUTE, middleware.CacheReq(false, []sharedtypes.Asset{}, GetAssetBody),
+		func(c *gin.Context) {
+			req := sharedtypes.BrainReq{
+				Url: "get-assets",
+			}
 
-    msg := rabbitmq.SendRPC(req)
-    cache.Set(c.Request.URL.Path, string(msg))
+			msg := rabbitmq.SendRPC(req)
+			cache.Set(c.Request.URL.Path, string(msg))
 
-    assets := []sharedtypes.Asset{}
-		err := json.Unmarshal(msg, &assets)
+			assets := []sharedtypes.Asset{}
+			err := json.Unmarshal(msg, &assets)
 
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "This service has encountered an issue",
-			})
-			return
-		}
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "This service has encountered an issue",
+				})
+				return
+			}
 
-    c.JSON(http.StatusOK, gin.H{
-      "assets": assets,
-    }) 
-  })
+			c.JSON(http.StatusOK, GetAssetBody(assets))
+		})
 }

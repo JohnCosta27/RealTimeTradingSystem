@@ -2,7 +2,6 @@ package rabbitmq
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	sharedtypes "sharedTypes"
 
@@ -76,7 +75,6 @@ func InitRabbit() {
 
   go func() {
     for m := range msgs {
-      fmt.Println(m)
       m.Ack(true)
       rpcMessages[m.CorrelationId] = m.Body
       newMessage <- true
