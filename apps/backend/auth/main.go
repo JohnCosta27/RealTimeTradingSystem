@@ -5,7 +5,6 @@ import (
 	"auth/middleware"
 	"auth/rabbitmq"
 	"auth/routes"
-	"fmt"
 	sharedtypes "sharedTypes"
 	"sync"
 
@@ -54,7 +53,6 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			fmt.Println(d.CorrelationId)
 			to := d.CorrelationId[len(d.CorrelationId)-4:]
 			// Not meant for the Brain service
 			if to != "0003" {

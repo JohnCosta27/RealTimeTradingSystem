@@ -9,6 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const USER_ID_HEADER = "userId"
+
 func Auth() gin.HandlerFunc {
   return func (c *gin.Context) {
     accessToken := c.GetHeader("access")
@@ -34,6 +36,6 @@ func Auth() gin.HandlerFunc {
     }
 
     c.Set("claims", claims)
-    c.Set("userId", userId)
+    c.Set(USER_ID_HEADER, userId)
   }
 }

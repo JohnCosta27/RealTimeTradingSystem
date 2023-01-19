@@ -1,6 +1,7 @@
 package main
 
 import (
+	"hub/cache"
 	"hub/rabbitmq"
 
 	"sync"
@@ -11,7 +12,7 @@ func main() {
 
 	wg.Add(1)
 
-  InitRedisCache()
+  cache.InitRedisCache()
 	rabbitmq.InitRabbit()
 	InitGin()
 
