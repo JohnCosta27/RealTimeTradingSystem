@@ -11,6 +11,7 @@ func main() {
 
 	wg.Add(1)
 
+  InitRedisCache()
 	rabbitmq.InitRabbit()
 	InitGin()
 

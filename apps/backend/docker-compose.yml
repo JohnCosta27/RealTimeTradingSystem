@@ -72,3 +72,13 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
     ports:
       - 5442:5432
+
+  # Redis cache server
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ./redis/redis.conf:/opt/bitnami/redis/mounted-etc/redis.conf
+    environment:
+      - REDIS_PASSWORD=redis
+    ports:
+      - 6379:6379
