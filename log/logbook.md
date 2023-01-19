@@ -89,3 +89,6 @@ Work was done but I did not log it in the book.
 
 ## 10/01/2023
 JMeter testing plan for stress testing the backend APIs.
+
+## 14/01/2023
+Developer experience improvements, now we load .env variables and secrets from files instead of hard coding them, which will make deployment of the application a lot easier.
