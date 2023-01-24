@@ -12,6 +12,7 @@ import (
 
 func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, returnStruct T, getBody func(data T) any) gin.HandlerFunc {
   return func (c *gin.Context) {
+    return
     keyUrl := c.Request.URL.Path
     if (isUserIdNeeded) {
       keyUrl += "/userId=" + c.GetHeader(USER_ID_HEADER)

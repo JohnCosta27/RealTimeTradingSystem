@@ -1,11 +1,9 @@
 package rabbitmq
 
 import (
-	"encoding/json"
-	"log"
 	sharedtypes "sharedTypes"
+	"utils"
 
-	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -19,106 +17,19 @@ var newMessage chan bool
 // Map from CorrelationId and actual message
 var rpcMessages map[string][]byte
 
+var RabbitClient *utils.EventStreamClient
+
 func InitRabbit() {
-	localConn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	if err != nil {
-		log.Println(err)
-		panic(err)
-	}
-	log.Println("Successfully connected to RabbitMQ using AMQP")
-	conn = localConn
-
-	localCh, err := conn.Channel()
-	if err != nil {
-		log.Println(err)
-		panic(err)
-	}
-	log.Println("Successfully created a RabbitMQ channel")
-	GlobalChannel = localCh
-
-	_, err = GlobalChannel.QueueDeclare(
-		"TestQueue",
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-
-  GlobalChannel.QueueDeclare(
-		"CallbackQueue",
-		false,
-		false,
-		false,
-		false,
-		nil,
-  )
-
-	if err != nil {
-		log.Println(err)
-		panic(err)
-	}
-
-  // Listen to incoming messages
-  msgs, err := GlobalChannel.Consume(
-    "CallbackQueue",
-		"",
-		false, //Auto-Ack
-		false,
-		false,
-		false,
-		nil,
-  )
-
-  rpcMessages = make(map[string][]byte)
-  newMessage = make(chan bool)
-
-  go func() {
-    for m := range msgs {
-      m.Ack(true)
-      rpcMessages[m.CorrelationId] = m.Body
-      newMessage <- true
-    }
-  }()
-  
-
+	RabbitClient = utils.CreateEventClient("0001", func(msg []byte) []byte {
+		return []byte("")
+	})
 }
 
 func SendRPC(msg sharedtypes.BrainReq) []byte {
-  messageId := "0001-" + uuid.New().String() + "-0002"
-  testId := "0001-" + uuid.New().String() + "-0003"
-
-  // TODO: Better error handling
-  data, _ := json.Marshal(msg)
-
-	GlobalChannel.Publish("", "TestQueue", false, false,
-		amqp.Publishing{ContentType: "text/plain", Body: data, CorrelationId: messageId})
-
-	GlobalChannel.Publish("", "TestQueue", false, false,
-		amqp.Publishing{ContentType: "text/plain", Body: data, CorrelationId: testId})
-
-  // Iteration goes on until channel is closed (should be never),
-  // only returns when we find the correct message
-  for range newMessage {
-    for id, msg := range rpcMessages {
-      if id == messageId {
-        // Free up the memory, not needed anymore
-        delete(rpcMessages, id)
-        return msg
-      }
-    } 
-  }
-  return []byte("")
+	msg.To = "0002"
+	return RabbitClient.Send(msg)
 }
 
 func CloseRabbit() {
-  err := GlobalChannel.Close()
-  if err != nil {
-    log.Println(err)
-  }
-
-  err = conn.Close()
-  if err != nil {
-    log.Println(err)
-  }
+  utils.Close()
 }

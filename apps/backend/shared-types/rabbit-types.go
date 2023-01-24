@@ -10,6 +10,8 @@ type BrainReq struct {
 	Access uuid.UUID         `json:"access"`
 	Params map[string]string `json:"params"`
 	Body   map[string]string `json:"body"`
+  To     string
+  From   string
 }
 
 type BrainResError struct {

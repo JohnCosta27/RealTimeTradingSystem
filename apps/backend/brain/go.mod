@@ -3,16 +3,21 @@ module brain
 go 1.19
 
 require (
+	github.com/caarlos0/env/v6 v6.10.1
+	github.com/google/uuid v1.3.0
 	github.com/rabbitmq/amqp091-go v1.5.0
+	gorm.io/driver/postgres v1.4.5
+	gorm.io/gorm v1.24.2
 	sharedTypes v1.0.0
 )
 
-replace sharedTypes v1.0.0 => ../shared-types
+replace (
+	sharedTypes v1.0.0 => ../shared-types
+	utils v1.0.0 => ../utils
+)
 
 require (
-	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.13.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -25,6 +30,5 @@ require (
 	github.com/jinzhu/now v1.1.4 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gorm.io/driver/postgres v1.4.5 // indirect
-	gorm.io/gorm v1.24.2 // indirect
+	utils v1.0.0 // indirect
 )

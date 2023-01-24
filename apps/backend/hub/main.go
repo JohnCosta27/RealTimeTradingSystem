@@ -17,4 +17,5 @@ func main() {
 	InitGin()
 
 	wg.Wait()
+  rabbitmq.CloseRabbit()
 }
