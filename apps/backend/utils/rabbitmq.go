@@ -81,6 +81,10 @@ func CreateEventClient(id string, listen ByteFunc, action ByteFuncNoRet) *EventS
 	StreamMessages = make(map[string][]byte)
 	NewMessages = make(chan bool)
 
+  client := &EventStreamClient{
+    Id: id,
+  }
+
 	// Listen to incoming messages on a loop in a seperate thread.
 	// This will stop when the main function exists.
 	// Send a notification through the `NewMessages` channel so we can
@@ -116,9 +120,7 @@ func CreateEventClient(id string, listen ByteFunc, action ByteFuncNoRet) *EventS
 		}
 	}()
 
-	return &EventStreamClient{
-		Id: id,
-	}
+	return client
 }
 
 func (client *EventStreamClient) Send(msg sharedtypes.BrainReq) []byte {
@@ -128,7 +130,7 @@ func (client *EventStreamClient) Send(msg sharedtypes.BrainReq) []byte {
 	data, _ := json.Marshal(msg)
 
 	Channel.Publish("", msg.To, false, false,
-		amqp.Publishing{ContentType: "text/plain", Type: "request", Body: data, CorrelationId: messageId})
+		amqp.Publishing{ContentType: "text/plain", Type: sharedtypes.REQUEST, Body: data, CorrelationId: messageId})
 
 	// Iteration goes on until channel is closed (should be never),
 	// only returns when we find the correct message
@@ -142,6 +144,15 @@ func (client *EventStreamClient) Send(msg sharedtypes.BrainReq) []byte {
 		}
 	}
 	return []byte("")
+}
+
+func (client *EventStreamClient) SendNoRes(msg sharedtypes.BrainReq) {
+  msg.From = client.Id
+	messageId := client.Id + uuid.New().String() + msg.To
+  data, _ := json.Marshal(msg)
+
+	Channel.Publish("", msg.To, false, false,
+		amqp.Publishing{ContentType: "text/plain", Type: sharedtypes.INFO, Body: data, CorrelationId: messageId})
 }
 
 func Close() {

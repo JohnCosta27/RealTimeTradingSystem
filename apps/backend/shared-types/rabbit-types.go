@@ -8,19 +8,19 @@ import (
 // To have getters that never change value and then comparing them later
 
 const (
-  REQUEST string = "request"
-  RESPONSE string = "response"
-  INFO string = "info"
+	REQUEST  string = "request"
+	RESPONSE string = "response"
+	INFO     string = "info"
 )
 
 const (
-  GET_USER string = "get-user"
-  GET_ASSETS string = "get-assets"
-  GET_USER_ASSETS string = "get-user-assets"
-  GET_TRADES string = "get-trades"
-  GET_ASSET_TRADES string = "get-asset-trades"
-  CREATE_TRADE string = "create-trade"
-  COMPLETE_TRADE string = "complete-trade"
+	GET_USER         string = "get-user"
+	GET_ASSETS       string = "get-assets"
+	GET_USER_ASSETS  string = "get-user-assets"
+	GET_TRADES       string = "get-trades"
+	GET_ASSET_TRADES string = "get-asset-trades"
+	CREATE_TRADE     string = "create-trade"
+	COMPLETE_TRADE   string = "complete-trade"
 )
 
 // TODO: Use enums for route selection
@@ -29,9 +29,9 @@ type BrainReq struct {
 	Access uuid.UUID         `json:"access"`
 	Params map[string]string `json:"params"`
 	Body   map[string]string `json:"body"`
-	To     string
-	From   string
-	Type   string
+	To     string            `json:"to"`
+	From   string            `json:"from"`
+	Type   string            `json:"type"`
 }
 
 type BrainResError struct {

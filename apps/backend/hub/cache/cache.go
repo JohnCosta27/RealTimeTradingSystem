@@ -39,3 +39,10 @@ func Set(key string, val string) *redis.StatusCmd {
   err := Redis.Set(RedisContext, key, val, 5 * time.Minute)
   return err
 }
+
+func Invalidate(key string) {
+  log.Println("INVALIDATING CACHE")
+  val, exists := Get(key)
+  log.Println(val, exists)
+  Redis.Del(RedisContext, key)
+}

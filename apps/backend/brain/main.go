@@ -4,6 +4,7 @@ import (
 	"brain/database"
 	"brain/model"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	sharedtypes "sharedTypes"
@@ -16,12 +17,15 @@ import (
 	"github.com/google/uuid"
 )
 
+var EventClient *utils.EventStreamClient
+
 func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
+  
+  actions := make(chan sharedtypes.BrainReq)
 
-	// rabbitmq.InitRabbit()
-	utils.CreateEventClient("0002", func(msg []byte) []byte {
+  EventClient = utils.CreateEventClient("0002", func(msg []byte) []byte {
 		var req sharedtypes.BrainReq
 		err := json.Unmarshal(msg, &req)
 
@@ -50,6 +54,13 @@ func main() {
 				log.Println(err)
 			}
 			returnValue, _ = json.Marshal(&transaction)
+      req := sharedtypes.BrainReq{
+        Url: sharedtypes.GET_TRADES,
+        From: "0002",
+        To: "0001",
+        Type: sharedtypes.INFO,
+      }
+      actions <- req
 
 		case sharedtypes.COMPLETE_TRADE:
 			transaction, err := model.CompleteTradeAsset(uuid.MustParse(req.Body["TransactionId"]), req.Access)
@@ -78,6 +89,13 @@ func main() {
 	}, func(msg []byte) {
     // No need
 	})
+
+  go func() {
+    for a := range actions {
+      fmt.Println(a)
+      EventClient.SendNoRes(a)
+    }
+  }()
 
 	EnvConf := sharedtypes.EnvConf{}
 	if err := env.Parse(&EnvConf); err != nil {
