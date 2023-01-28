@@ -99,3 +99,6 @@ Developer experience improvements, now we load .env variables and secrets from f
 
 ## 23/01/2023
 Very significant change with the way that events are handled with RabbitMQ. Previously I was going something pretty wrong, so now I readjusted this and it is working great! (Each service has its own queue, acting as an Inbox).
+
+## 28/01/2023
+Finished caching invalidation.
