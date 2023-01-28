@@ -21,26 +21,27 @@ func main() {
 	wg.Add(1)
 
 	// rabbitmq.InitRabbit()
-  utils.CreateEventClient("0002", func(msg []byte) []byte {
+	utils.CreateEventClient("0002", func(msg []byte) []byte {
 		var req sharedtypes.BrainReq
 		err := json.Unmarshal(msg, &req)
 
 		var returnValue []byte
 
 		switch req.Url {
-		case "get-user":
+		case sharedtypes.GET_USER:
 			user := model.GetUser(req.Access)
 			returnValue, _ = json.Marshal(&user)
 
-		case "get-assets":
+		case sharedtypes.GET_ASSETS:
 			assets := model.GetAllAssets()
 			returnValue, _ = json.Marshal(&assets)
 
-		case "get-user-assets":
+		case sharedtypes.GET_USER_ASSETS:
 			assets := model.GetUserAssets(req.Access)
 			returnValue, _ = json.Marshal(&assets)
 
-		case "create-trade":
+    // Create trade and complete trades need to let hub know to invalidate certain cache
+		case sharedtypes.CREATE_TRADE:
 			var transaction sharedtypes.Transaction
 			price, errPrice := strconv.ParseFloat(req.Body["Price"], 64)
 			amount, errAmount := strconv.ParseFloat(req.Body["Amount"], 64)
@@ -50,18 +51,18 @@ func main() {
 			}
 			returnValue, _ = json.Marshal(&transaction)
 
-		case "complete-trade":
+		case sharedtypes.COMPLETE_TRADE:
 			transaction, err := model.CompleteTradeAsset(uuid.MustParse(req.Body["TransactionId"]), req.Access)
 			if err != nil {
 				log.Println(err)
 			}
 			returnValue, _ = json.Marshal(&transaction)
 
-		case "get-trades":
+		case sharedtypes.GET_TRADES:
 			transactions := model.GetAllTransactions()
 			returnValue, _ = json.Marshal(&transactions)
 
-		case "get-asset-trades":
+		case sharedtypes.GET_ASSET_TRADES:
 			transactions, err := model.GetAllAssetTrades(req.Body["AssetId"])
 			if err != nil {
 				returnValue, _ = json.Marshal(&sharedtypes.BrainRes{
@@ -74,6 +75,8 @@ func main() {
 			}
 		}
 		return returnValue
+	}, func(msg []byte) {
+    // No need
 	})
 
 	EnvConf := sharedtypes.EnvConf{}
@@ -89,7 +92,6 @@ func main() {
 		Password: EnvConf.BrainDbPassword,
 	})
 
-
 	wg.Wait()
-  utils.Close()
+	utils.Close()
 }

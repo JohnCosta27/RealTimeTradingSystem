@@ -4,23 +4,43 @@ import (
 	"github.com/google/uuid"
 )
 
+// The following is the best way I found to do immutable, namespaced enums in go.
+// To have getters that never change value and then comparing them later
+
+const (
+  REQUEST string = "request"
+  RESPONSE string = "response"
+  INFO string = "info"
+)
+
+const (
+  GET_USER string = "get-user"
+  GET_ASSETS string = "get-assets"
+  GET_USER_ASSETS string = "get-user-assets"
+  GET_TRADES string = "get-trades"
+  GET_ASSET_TRADES string = "get-asset-trades"
+  CREATE_TRADE string = "create-trade"
+  COMPLETE_TRADE string = "complete-trade"
+)
+
 // TODO: Use enums for route selection
 type BrainReq struct {
 	Url    string            `json:"url"`
 	Access uuid.UUID         `json:"access"`
 	Params map[string]string `json:"params"`
 	Body   map[string]string `json:"body"`
-  To     string
-  From   string
+	To     string
+	From   string
+	Type   string
 }
 
 type BrainResError struct {
-  ErrorCode any `json:"ErrorCode"`
+	ErrorCode any `json:"ErrorCode"`
 }
 
 type BrainRes struct {
-  ErrorCode int
-  Response any
+	ErrorCode int
+	Response  any
 }
 
 type ReqBody interface {

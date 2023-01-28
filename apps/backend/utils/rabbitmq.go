@@ -26,7 +26,10 @@ type EventStreamClient struct {
 	Id string
 }
 
-func CreateEventClient(id string, listen func(msg []byte) []byte) *EventStreamClient {
+type ByteFunc func(msg []byte) []byte
+type ByteFuncNoRet func(msg []byte)
+
+func CreateEventClient(id string, listen ByteFunc, action ByteFuncNoRet) *EventStreamClient {
 	localConn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
 		log.Println(err)
@@ -85,7 +88,7 @@ func CreateEventClient(id string, listen func(msg []byte) []byte) *EventStreamCl
 	go func() {
 		for message := range InboundMessages {
 			// Message is a response from an RPC call
-			if message.Type == "response" {
+			if message.Type == sharedtypes.RESPONSE {
 				message.Ack(true)
 				StreamMessages[message.CorrelationId] = message.Body
 				NewMessages <- true
@@ -93,14 +96,22 @@ func CreateEventClient(id string, listen func(msg []byte) []byte) *EventStreamCl
 			}
 
 			// Message is RPC waiting for response
-			if message.Type == "request" {
+			if message.Type == sharedtypes.REQUEST {
 				message.Ack(true)
 				response := listen(message.Body)
 				to := message.CorrelationId[0:4]
 				Channel.Publish("", to, false, false,
-					amqp091.Publishing{ContentType: "text/plain", Type: "response", Body: response, CorrelationId: message.CorrelationId})
+					amqp091.Publishing{ContentType: "text/plain", Type: sharedtypes.RESPONSE, Body: response, CorrelationId: message.CorrelationId})
 				continue
 			}
+
+      // Info does not need to be responded to, but we call a callback function
+      // And let the service handle it
+      if message.Type == sharedtypes.INFO {
+        message.Ack(true)
+        action(message.Body)
+        continue
+      }
 
 		}
 	}()

@@ -22,7 +22,7 @@ func GetAssets(r *gin.Engine) {
 	r.GET(ASSET_ROUTE, middleware.CacheReq(false, []sharedtypes.Asset{}, GetAssetBody),
 		func(c *gin.Context) {
 			req := sharedtypes.BrainReq{
-				Url: "get-assets",
+				Url: sharedtypes.GET_ASSETS,
 			}
 
 			msg := rabbitmq.SendRPC(req)

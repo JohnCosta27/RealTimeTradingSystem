@@ -35,7 +35,7 @@ func PostTrade() gin.HandlerFunc {
 		bodyReqBody["Amount"] = fmt.Sprintf("%f", body.Amount)
 
 		bodyReq := sharedtypes.BrainReq{
-			Url:    "create-trade",
+			Url:    sharedtypes.CREATE_TRADE,
 			Body:   bodyReqBody,
 			Access: uuid.MustParse(claims.Uuid),
 		}
@@ -75,7 +75,7 @@ func PostCompleteTrade() gin.HandlerFunc {
 		bodyReqBody["TransactionId"] = body.TransactionId
 
 		bodyReq := sharedtypes.BrainReq{
-			Url:    "complete-trade",
+			Url:    sharedtypes.COMPLETE_TRADE,
 			Body:   bodyReqBody,
 			Access: uuid.MustParse(claims.Uuid),
 		}
@@ -107,7 +107,7 @@ func GetAllTradesBody(data []sharedtypes.Transaction) any {
 func GetAllTrades() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		bodyReq := sharedtypes.BrainReq{
-			Url: "get-trades",
+			Url: sharedtypes.GET_TRADES,
 		}
 		msg := rabbitmq.SendRPC(bodyReq)
 
@@ -138,7 +138,7 @@ func GetAllTradesAssets() gin.HandlerFunc {
 		bodyReqBody["AssetId"] = c.GetHeader("AssetId")
 
 		bodyReq := sharedtypes.BrainReq{
-			Url:  "get-asset-trades",
+			Url:  sharedtypes.GET_ASSET_TRADES,
 			Body: bodyReqBody,
 		}
 
@@ -171,8 +171,8 @@ func TradeRoutes(r *gin.Engine) {
 	tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
 	tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
 	tradeGroup.GET(ASSET_TRADES_ROUTE,
-    middleware.CacheReq(true, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
-    GetAllTradesAssets(),
-  )
+		middleware.CacheReq(true, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
+		GetAllTradesAssets(),
+	)
 	tradeGroup.GET("/", middleware.CacheReq(true, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
 }

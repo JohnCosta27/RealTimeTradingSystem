@@ -1,6 +1,8 @@
 package rabbitmq
 
 import (
+	"encoding/json"
+	"fmt"
 	sharedtypes "sharedTypes"
 	"utils"
 
@@ -22,7 +24,12 @@ var RabbitClient *utils.EventStreamClient
 func InitRabbit() {
 	RabbitClient = utils.CreateEventClient("0001", func(msg []byte) []byte {
 		return []byte("")
-	})
+	},
+  func (msg []byte) {
+    var info sharedtypes.BrainReq
+    json.Unmarshal(msg, &info)
+    fmt.Println(info)
+  })
 }
 
 func SendRPC(msg sharedtypes.BrainReq) []byte {

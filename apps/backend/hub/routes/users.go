@@ -26,7 +26,7 @@ func GetUserAssets() gin.HandlerFunc {
 		userId, _ := c.Get("userId")
 
 		req := sharedtypes.BrainReq{
-			Url: "get-user-assets",
+			Url: sharedtypes.GET_USER_ASSETS,
 			// Safe casting because in the middleware we create a uuid object.
 			Access: userId.(uuid.UUID),
 		}
@@ -43,7 +43,7 @@ func GetUserAssets() gin.HandlerFunc {
 			return
 		}
 
-    c.Set(cache.CACHE, string(msg))
+		c.Set(cache.CACHE, string(msg))
 		c.JSON(http.StatusOK, GetUserAssetsBody(assets))
 	}
 }
@@ -66,7 +66,7 @@ func GetUser() gin.HandlerFunc {
 		}
 
 		bodyReq := sharedtypes.BrainReq{
-			Url:    "get-user",
+			Url:    sharedtypes.GET_USER,
 			Access: uuid.MustParse(claims.Uuid),
 		}
 
@@ -82,7 +82,7 @@ func GetUser() gin.HandlerFunc {
 			return
 		}
 
-    c.Set(cache.CACHE, string(msg))
+		c.Set(cache.CACHE, string(msg))
 		c.JSON(http.StatusOK, GetUserBody(user))
 	}
 }
