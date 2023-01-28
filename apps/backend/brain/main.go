@@ -68,6 +68,15 @@ func main() {
 				log.Println(err)
 			}
 			returnValue, _ = json.Marshal(&transaction)
+      req := sharedtypes.BrainReq{
+        Url: sharedtypes.GET_TRADES,
+        From: "0002",
+        To: "0001",
+        Type: sharedtypes.INFO,
+      }
+      actions <- req
+      req.Url = sharedtypes.GET_ASSET_TRADES
+      actions <- req
 
 		case sharedtypes.GET_TRADES:
 			transactions := model.GetAllTransactions()
