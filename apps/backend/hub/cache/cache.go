@@ -45,4 +45,7 @@ func Invalidate(key string) {
   val, exists := Get(key)
   log.Println(val, exists)
   Redis.Del(RedisContext, key)
+  val, exists = Get(key)
+  log.Println(val, exists)
+  log.Println("DONE INVALIDATING CACHE")
 }

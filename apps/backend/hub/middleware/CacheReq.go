@@ -11,12 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, returnStruct T, getBody func(data T) any) gin.HandlerFunc {
+func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, key string, returnStruct T, getBody func(data T) any) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		keyUrl := c.Request.URL.Path
-    log.Println(keyUrl)
+    keyUrl := key
 		if isUserIdNeeded {
-			keyUrl += "/userId=" + c.GetHeader(USER_ID_HEADER)
+      keyUrl += "/userId=" + c.GetHeader(USER_ID_HEADER)
 		}
 
 		val, exists := cache.Get(keyUrl)
@@ -26,7 +25,7 @@ func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, returnStruct T, ge
 			// Otherwise serve the cached value
 			if err == nil {
 				fmt.Println("------------------------------------")
-				fmt.Println("SERVING CACHE")
+        fmt.Println("SERVING CACHE: ", keyUrl)
 				fmt.Println("------------------------------------")
 				c.JSON(http.StatusOK, getBody(returnStruct))
 				c.Abort()

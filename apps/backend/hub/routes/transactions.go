@@ -171,8 +171,8 @@ func TradeRoutes(r *gin.Engine) {
 	tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
 	tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
 	tradeGroup.GET(ASSET_TRADES_ROUTE,
-		middleware.CacheReq(true, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
+		middleware.CacheReq(true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
 		GetAllTradesAssets(),
 	)
-	tradeGroup.GET("/", middleware.CacheReq(true, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
+	tradeGroup.GET("/", middleware.CacheReq(false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
 }

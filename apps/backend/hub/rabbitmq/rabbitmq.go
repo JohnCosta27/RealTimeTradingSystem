@@ -2,7 +2,6 @@ package rabbitmq
 
 import (
 	"encoding/json"
-	"fmt"
 	"hub/cache"
 	sharedtypes "sharedTypes"
 	"utils"
@@ -29,12 +28,7 @@ func InitRabbit() {
   func (msg []byte) {
     var info sharedtypes.BrainReq
     json.Unmarshal(msg, &info)
-    fmt.Println(info.Url)
-    switch info.Url {
-      case sharedtypes.GET_TRADES:
-        cache.Invalidate("/trade/")
-    }
-    fmt.Println(info)
+    cache.Invalidate(info.Url)
   })
 }
 
