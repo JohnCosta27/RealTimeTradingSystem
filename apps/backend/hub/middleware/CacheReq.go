@@ -18,15 +18,16 @@ func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, isParamsNeeed bool
       keyUrl += "/userId=" + c.GetHeader(USER_ID_HEADER)
 		}
 
-    fmt.Println(keyUrl)
     if isParamsNeeed {
       paramPairs := c.Request.URL.Query()
       for key, value := range paramPairs {
-        fmt.Println("-------------------")
-        fmt.Println(key, value)
-        fmt.Println("-------------------")
+        for _, v := range value {
+          keyUrl += "/" + key + "-" + v
+        }
       }
     }
+
+    fmt.Println("Cache key: ", keyUrl)
 
 		val, exists := cache.Get(keyUrl)
 		if false {
