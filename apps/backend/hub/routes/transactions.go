@@ -170,7 +170,9 @@ func TradeRoutes(r *gin.Engine) {
 	tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
 	tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
 	tradeGroup.GET(ASSET_TRADES_ROUTE,
-		middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
+    // Temporarily disabling cache in this endpoint.
+    // TODO: More sofisticated way of invalidating compelx cache keys. Cache key factory method of sorts
+		// middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
 		GetAllTradesAssets(),
 	)
 	tradeGroup.GET("/", middleware.CacheReq(false, false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
