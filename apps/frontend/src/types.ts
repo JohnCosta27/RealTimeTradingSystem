@@ -9,4 +9,5 @@ export const Requests = {
   Assets: 'assets',
   UserAssets: 'user-assets',
   User: 'user',
+  AssetTrades: 'asset-trades',
 } as const;
