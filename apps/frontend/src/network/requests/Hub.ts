@@ -30,6 +30,10 @@ export interface GetUserType extends BaseType {
   UserAssets: GetUserAssets[];
 }
 
+export interface GetAssetTrades extends BaseType {
+  trades: GetTransaction[];
+}
+
 export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
   return axios.get(`${HubUrl}/assets`, {
     headers: {
@@ -64,6 +68,22 @@ export const GetUser: GetRequestType<{user: GetUserType }> = (auth) => {
       access: auth,
     }
   })
+}
+
+export interface GetAssetTradesType {
+  access: string;
+  assetId: string;
+}
+
+export const GetAssetTrades: PostRequestType<GetAssetTradesType, {trades: GetTransaction[]}> = (req) => {
+  return axios.get(`${HubUrl}/trade/asset`, {
+    headers: {
+      access: req.access,
+    },
+    params: {
+      AssetId: req.assetId,
+    },
+  });
 }
 
 export interface PostCreateTransactionType {
@@ -108,4 +128,3 @@ export const PostCompleteTransaction: PostRequestType<
     },
   });
 };
-

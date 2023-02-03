@@ -90,6 +90,6 @@ func GetUser() gin.HandlerFunc {
 func UserRoutes(r *gin.Engine) {
 	userGroup := r.Group(USER_ROUTE)
 	userGroup.Use(middleware.Auth())
-	userGroup.GET(ASSET_ROUTE, middleware.CacheReq(true, sharedtypes.GET_USER_ASSETS, []sharedtypes.UserAsset{}, GetUserAssetsBody), GetUserAssets())
-	userGroup.GET("/", middleware.CacheReq(true, sharedtypes.GET_USER, sharedtypes.User{}, GetUserBody), GetUser())
+	userGroup.GET(ASSET_ROUTE, middleware.CacheReq(true, false, sharedtypes.GET_USER_ASSETS, []sharedtypes.UserAsset{}, GetUserAssetsBody), GetUserAssets())
+	userGroup.GET("/", middleware.CacheReq(true, false, sharedtypes.GET_USER, sharedtypes.User{}, GetUserBody), GetUser())
 }

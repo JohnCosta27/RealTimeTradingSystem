@@ -134,34 +134,33 @@ func GetAllTradesAssetsBody(data []sharedtypes.Transaction) any {
 
 func GetAllTradesAssets() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		bodyReqBody := make(map[string]string)
-		bodyReqBody["AssetId"] = c.GetHeader("AssetId")
+    AssetId, exists := c.GetQuery("AssetId")
 
+    if !exists {
+				c.JSON(http.StatusNotFound, gin.H{
+					"error": "This asset could not be found",
+				})
+      return
+    }
+
+		bodyReqBody := make(map[string]string)
+    bodyReqBody["AssetId"] = AssetId
 		bodyReq := sharedtypes.BrainReq{
 			Url:  sharedtypes.GET_ASSET_TRADES,
 			Body: bodyReqBody,
 		}
 
 		msg := rabbitmq.SendRPC(bodyReq)
+    var res []sharedtypes.Transaction
 
-		var res sharedtypes.BrainRes
-		err := json.Unmarshal(msg, &res)
-
-		if res.ErrorCode != 0 || err != nil {
-			if res.ErrorCode == http.StatusNotFound {
-				c.JSON(http.StatusNotFound, gin.H{
-					"error": "This asset could not be found",
-				})
-				return
-			}
-
+    err := json.Unmarshal(msg, &res)
+    if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "This service has encountered an issue",
 			})
-			return
-		}
+    }
 
-		c.JSON(http.StatusOK, GetAllTradesAssetsBody(res.Response.([]sharedtypes.Transaction)))
+		c.JSON(http.StatusOK, GetAllTradesAssetsBody(res))
 	}
 }
 
@@ -171,8 +170,8 @@ func TradeRoutes(r *gin.Engine) {
 	tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
 	tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
 	tradeGroup.GET(ASSET_TRADES_ROUTE,
-		middleware.CacheReq(true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
+		middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
 		GetAllTradesAssets(),
 	)
-	tradeGroup.GET("/", middleware.CacheReq(false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
+	tradeGroup.GET("/", middleware.CacheReq(false, false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
 }

@@ -42,10 +42,6 @@ func Set(key string, val string) *redis.StatusCmd {
 
 func Invalidate(key string) {
   log.Println("INVALIDATING CACHE")
-  val, exists := Get(key)
-  log.Println(val, exists)
   Redis.Del(RedisContext, key)
-  val, exists = Get(key)
-  log.Println(val, exists)
   log.Println("DONE INVALIDATING CACHE")
 }

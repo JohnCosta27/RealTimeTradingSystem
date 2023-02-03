@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	sharedtypes "sharedTypes"
 	"strconv"
 	"sync"
@@ -83,16 +82,8 @@ func main() {
 			returnValue, _ = json.Marshal(&transactions)
 
 		case sharedtypes.GET_ASSET_TRADES:
-			transactions, err := model.GetAllAssetTrades(req.Body["AssetId"])
-			if err != nil {
-				returnValue, _ = json.Marshal(&sharedtypes.BrainRes{
-					ErrorCode: http.StatusNotFound,
-				})
-			} else {
-				returnValue, _ = json.Marshal(&sharedtypes.BrainRes{
-					Response: transactions,
-				})
-			}
+			transactions := model.GetAllAssetTrades(req.Body["AssetId"])
+      returnValue, _ = json.Marshal(transactions)
 		}
 		return returnValue
 	}, func(msg []byte) {

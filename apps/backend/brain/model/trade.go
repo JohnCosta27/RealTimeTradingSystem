@@ -174,16 +174,8 @@ func GetAllTransactions() []sharedtypes.Transaction {
   return transactions
 }
 
-func GetAllAssetTrades(AssetId string) ([]sharedtypes.Transaction, error) {
+func GetAllAssetTrades(AssetId string) []sharedtypes.Transaction {
   var transactions []sharedtypes.Transaction
-  var asset sharedtypes.Asset
-
-  res := database.Db.Where("id = ?", AssetId).Find(&asset)
-
-  if res.RowsAffected == 0 {
-    return transactions, errors.New("This asset does not exist")
-  }
-
   database.Db.Where("asset_id = ?", AssetId).Find(&transactions)
-  return transactions, nil
+  return transactions
 }

@@ -19,7 +19,7 @@ func GetAssetBody(data []sharedtypes.Asset) any {
 
 // Get all assets route
 func GetAssets(r *gin.Engine) {
-	r.GET(ASSET_ROUTE, middleware.CacheReq(false, sharedtypes.GET_ASSETS, []sharedtypes.Asset{}, GetAssetBody),
+	r.GET(ASSET_ROUTE, middleware.CacheReq(false, false, sharedtypes.GET_ASSETS, []sharedtypes.Asset{}, GetAssetBody),
 		func(c *gin.Context) {
 			req := sharedtypes.BrainReq{
 				Url: sharedtypes.GET_ASSETS,
