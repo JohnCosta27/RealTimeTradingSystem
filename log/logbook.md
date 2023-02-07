@@ -102,3 +102,6 @@ Very significant change with the way that events are handled with RabbitMQ. Prev
 
 ## 28/01/2023
 Finished caching invalidation.
+
+## 07/02/2023
+More client side caching improvements, and some clean up of websockets code.
