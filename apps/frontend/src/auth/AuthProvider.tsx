@@ -112,6 +112,8 @@ export const AuthProvider: Component<{ children: JSX.Element }> = (props) => {
     })
   );
 
+  console.log(auth());
+
   return (
     <AuthContext.Provider value={auth}>{props.children}</AuthContext.Provider>
   );

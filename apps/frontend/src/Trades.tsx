@@ -39,8 +39,7 @@ export const Trades: Component = () => {
     mutationFn: PostCompleteTransaction,
     onSuccess: (res) => {
       console.log(res);
-      query.invalidateQueries({ queryKey: [Requests.AllTrades] });
-      query.invalidateQueries({ queryKey: [Requests.UserAssets] });
+      query.invalidateQueries({ queryKey: [Requests.AllTrades, Requests.UserAssets, Requests.User] });
     },
   });
 

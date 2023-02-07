@@ -6,6 +6,7 @@ import (
 	"hub/cache"
 	"hub/middleware"
 	"hub/rabbitmq"
+	"log"
 	"net/http"
 	sharedtypes "sharedTypes"
 	"utils"
@@ -155,9 +156,11 @@ func GetAllTradesAssets() gin.HandlerFunc {
 
     err := json.Unmarshal(msg, &res)
     if err != nil {
+      log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "This service has encountered an issue",
 			})
+      return
     }
 
 		c.JSON(http.StatusOK, GetAllTradesAssetsBody(res))

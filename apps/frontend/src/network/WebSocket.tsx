@@ -12,7 +12,10 @@ interface WebSocketComponentProps {
   children: JSX.Element;
 }
 
-const wsObject = new WebSocket(import.meta.env.VITE_HUB_WS_URL);
+
+export const WebsocketUrl = import.meta.env.VITE_HUB_WS_URL ?? "ws://localhost:4545/ws";
+
+const wsObject = new WebSocket(WebsocketUrl);
 const openSubject = new Subject<Event>();
 const messageSubject = new Subject<Event>();
 setTimeout(() => {
