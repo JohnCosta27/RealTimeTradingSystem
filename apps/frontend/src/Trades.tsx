@@ -39,7 +39,9 @@ export const Trades: Component = () => {
     mutationFn: PostCompleteTransaction,
     onSuccess: (res) => {
       console.log(res);
-      query.invalidateQueries({ queryKey: [Requests.AllTrades, Requests.UserAssets, Requests.User] });
+      query.invalidateQueries({ queryKey: [Requests.AllTrades] });
+      query.invalidateQueries({ queryKey: [Requests.UserAssets] });
+      query.invalidateQueries({ queryKey: [Requests.User] });
     },
   });
 
@@ -73,7 +75,7 @@ export const Trades: Component = () => {
       <div class="w-full col-span-2 row-span-2 bg-neutral-focus rounded shadow-lg flex flex-col p-4">
         <Show when={userAssets.data && assets.data} fallback={<Loading />}>
           <CreateTransaction
-            assets={userAssets.data!.assets }
+            assets={userAssets.data!.assets}
             allAssets={assets.data!.assets}
           />
         </Show>
