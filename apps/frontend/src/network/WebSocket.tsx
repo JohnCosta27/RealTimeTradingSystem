@@ -1,10 +1,11 @@
 import { Component, createContext, JSX, useContext } from "solid-js";
 import { Subject } from "rxjs";
+import { GetTransaction } from "./requests";
 
 interface WebSocketContextType {
   websocket: WebSocket;
   onOpen: Subject<Event>;
-  onMessage: Subject<object>;
+  onMessage: Subject<GetTransaction>;
   send: (data: string) => void;
 }
 
@@ -16,14 +17,18 @@ export const WebsocketUrl = import.meta.env.VITE_HUB_WS_URL ?? "ws://localhost:4
 
 const wsObject = new WebSocket(WebsocketUrl);
 const openSubject = new Subject<Event>();
-const messageSubject = new Subject<object>();
+const messageSubject = new Subject<GetTransaction>();
 
 wsObject.onopen = (e) => {
   openSubject.next(e);
 };
 wsObject.onmessage = (e) => {
   try {
-    const parsedMessage = JSON.parse(e.data);
+    // Type casting is necessary because this information comes from
+    // an external source. However I control the external source, so
+    // it is safe. Either way there is a try catch, in case parsing
+    // isn't successful.
+    const parsedMessage = JSON.parse(e.data) as GetTransaction;
     messageSubject.next(parsedMessage);
   } catch (e) {
     console.error("Websockets message recieved invalid JSON, likely a server issue.");

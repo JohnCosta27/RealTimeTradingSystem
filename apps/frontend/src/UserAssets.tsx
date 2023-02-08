@@ -22,7 +22,7 @@ export const UserAssets: Component = () => {
           <Loading />
         </Match>
         <Match when={userAssets.data !== undefined}>
-          <For each={userAssets.data!.assets.filter(a => a.Amount > 0)}>
+          <For each={userAssets.data!.assets}>
             {(asset) => (
               <Asset id={asset.Asset.Id} name={asset.Asset.Name} amount={asset.Amount} price={20} />
             )}

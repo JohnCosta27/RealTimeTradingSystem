@@ -3,7 +3,7 @@ import {
   createQuery,
   useQueryClient,
 } from '@tanstack/solid-query';
-import { Component, For, Show } from 'solid-js';
+import { Component, createEffect, For, Show } from 'solid-js';
 import { useAuth } from './auth/AuthProvider';
 import {
   GetAllTrades,
@@ -22,7 +22,14 @@ export const Trades: Component = () => {
   const query = useQueryClient();
   const ws = useWebsocket();
 
-  ws.onMessage.subscribe(m => console.log(m));
+  ws.onMessage.subscribe((m) => {
+    query.setQueryData([Requests.AllTrades], (oldData) => {
+      console.log(oldData);
+      return {
+        trades: [...(oldData as any).trades, m],
+      };
+    });
+  });
 
   const assets = createQuery(
     () => [Requests.Assets],
@@ -38,6 +45,10 @@ export const Trades: Component = () => {
     () => [Requests.AllTrades],
     () => GetAllTrades(auth().access).then((res) => res.data),
   );
+
+  createEffect(() => {
+    console.log(allTrades.data?.trades);
+  });
 
   const completeTrade = createMutation({
     mutationFn: PostCompleteTransaction,
