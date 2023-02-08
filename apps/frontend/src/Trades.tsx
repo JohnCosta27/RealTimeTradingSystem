@@ -11,6 +11,7 @@ import {
   GetUserAssets,
   PostCompleteTransaction,
 } from './network/requests';
+import { useWebsocket } from './network/WebSocket';
 import { Requests } from './types';
 import { CreateTransaction } from './ui/CreateTransaction';
 import { Loading } from './ui/Loading';
@@ -19,6 +20,9 @@ import { TradeCard } from './ui/TradeCard';
 export const Trades: Component = () => {
   const auth = useAuth();
   const query = useQueryClient();
+  const ws = useWebsocket();
+
+  ws.onMessage.subscribe(m => console.log(m));
 
   const assets = createQuery(
     () => [Requests.Assets],

@@ -4,7 +4,7 @@ import { Subject } from "rxjs";
 interface WebSocketContextType {
   websocket: WebSocket;
   onOpen: Subject<Event>;
-  onMessage: Subject<Event>;
+  onMessage: Subject<object>;
   send: (data: string) => void;
 }
 
@@ -16,13 +16,18 @@ export const WebsocketUrl = import.meta.env.VITE_HUB_WS_URL ?? "ws://localhost:4
 
 const wsObject = new WebSocket(WebsocketUrl);
 const openSubject = new Subject<Event>();
-const messageSubject = new Subject<Event>();
+const messageSubject = new Subject<object>();
 
 wsObject.onopen = (e) => {
   openSubject.next(e);
 };
 wsObject.onmessage = (e) => {
-  messageSubject.next(e);
+  try {
+    const parsedMessage = JSON.parse(e.data);
+    messageSubject.next(parsedMessage);
+  } catch (e) {
+    console.error("Websockets message recieved invalid JSON, likely a server issue.");
+  }
 }
 
 const ws: WebSocketContextType = {

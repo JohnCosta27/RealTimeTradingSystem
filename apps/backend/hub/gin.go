@@ -11,7 +11,9 @@ import (
 )
 
 var Router *gin.Engine
-var WsConnections []*websocket.Conn
+
+type WsHub map[*websocket.Conn]bool
+var WsConnections WsHub
 
 var upgrader = websocket.Upgrader{
 	// CORS, for now just allow all origins
@@ -22,14 +24,14 @@ var upgrader = websocket.Upgrader{
 
 func InitGin() {
 	Router = gin.Default()
-	WsConnections = make([]*websocket.Conn, 0)
+	WsConnections = make(WsHub)
 
   Router.Use(middleware.AllowCors())
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
   routes.GetAssets(Router)
-  routes.TradeRoutes(Router)
+  routes.TradeRoutes(Router, WsConnections)
   routes.UserRoutes(Router)
 
   // Websockets are used to send trade information BACK to the user,
@@ -44,7 +46,7 @@ func InitGin() {
 			return
 		}
 
-		WsConnections = append(WsConnections, ws)
+    WsConnections[ws] = true
 	})
 
 	// Run router and websockets in seperate threads

@@ -13,9 +13,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 )
 
-func PostTrade() gin.HandlerFunc {
+func BroadcastTrade(wsMap map[*websocket.Conn]bool, trade sharedtypes.Transaction) {
+  for ws := range wsMap {
+    ws.WriteJSON(trade)
+  }
+}
+
+func PostTrade(ws map[*websocket.Conn]bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		b, _ := c.Get("body")
 		body := b.(*sharedtypes.CreateTransaction)
@@ -52,13 +59,15 @@ func PostTrade() gin.HandlerFunc {
 			return
 		}
 
+    BroadcastTrade(ws, newTrade)
+
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
 		})
 	}
 }
 
-func PostCompleteTrade() gin.HandlerFunc {
+func PostCompleteTrade(ws map[*websocket.Conn]bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		b, _ := c.Get("body")
 		body := b.(*sharedtypes.CompleteTransaction)
@@ -92,6 +101,8 @@ func PostCompleteTrade() gin.HandlerFunc {
 			})
 			return
 		}
+
+    BroadcastTrade(ws, newTrade)
 
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
@@ -167,16 +178,29 @@ func GetAllTradesAssets() gin.HandlerFunc {
 	}
 }
 
-func TradeRoutes(r *gin.Engine) {
+func TradeRoutes(r *gin.Engine, ws map[*websocket.Conn]bool) {
 	tradeGroup := r.Group(TRADE_ROUTE)
 	tradeGroup.Use(middleware.Auth())
-	tradeGroup.POST(CREATE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody), PostTrade())
-	tradeGroup.POST(COMPLETE_TRADE_ROUTE, middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction), PostCompleteTrade())
+
+	tradeGroup.POST(CREATE_TRADE_ROUTE,
+    middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody),
+    PostTrade(ws),
+  )
+
+	tradeGroup.POST(COMPLETE_TRADE_ROUTE,
+    middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction),
+    PostCompleteTrade(ws),
+  )
+
 	tradeGroup.GET(ASSET_TRADES_ROUTE,
     // Temporarily disabling cache in this endpoint.
     // TODO: More sofisticated way of invalidating compelx cache keys. Cache key factory method of sorts
 		// middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
 		GetAllTradesAssets(),
 	)
-	tradeGroup.GET("/", middleware.CacheReq(false, false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody), GetAllTrades())
+
+	tradeGroup.GET("/",
+    middleware.CacheReq(false, false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody),
+    GetAllTrades(),
+  )
 }
