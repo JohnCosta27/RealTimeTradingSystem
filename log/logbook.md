@@ -105,3 +105,6 @@ Finished caching invalidation.
 
 ## 07/02/2023
 More client side caching improvements, and some clean up of websockets code.
+
+## 08/02/2023
+Websockets are now fully working with frontend. Notifying user of new trades.
