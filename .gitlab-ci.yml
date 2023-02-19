@@ -1,4 +1,5 @@
 stages:
+  - test
   - build
 
 docker_build:
@@ -17,3 +18,17 @@ docker_build:
     - docker push johncosta27/fyp-brain
     - docker build -f Hub.Dockerfile -t johncosta27/fyp-hub .
     - docker push johncosta27/fyp-hub
+
+integration_tests:
+  stage: test
+  image: docker:latest
+  services:
+    - docker:dind
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  script:
+    - cd apps/backend
+    - docker-compose up --build
+    - cd ../integration
+    - npm ci
+    - npm run test:clean
