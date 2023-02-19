@@ -8,6 +8,9 @@ import (
 	"github.com/go-redis/redis/v9"
 )
 
+// Constant to determine if we have cache fetching enabled.
+const isCacheEnabled = false
+
 var Redis *redis.Client
 var RedisContext = context.Background()
 
@@ -24,6 +27,10 @@ func InitRedisCache() {
 
 // Returns false if it doesn't exist
 func Get(key string) (string, bool) {
+  if !isCacheEnabled {
+    return "", false
+  }
+
   val, err := Redis.Get(RedisContext, key).Result()
   if err == redis.Nil {
     return "", false
