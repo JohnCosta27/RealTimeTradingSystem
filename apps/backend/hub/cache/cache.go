@@ -27,10 +27,6 @@ func InitRedisCache() {
 
 // Returns false if it doesn't exist
 func Get(key string) (string, bool) {
-  if !isCacheEnabled {
-    return "", false
-  }
-
   val, err := Redis.Get(RedisContext, key).Result()
   if err == redis.Nil {
     return "", false
