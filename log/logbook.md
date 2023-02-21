@@ -111,3 +111,6 @@ Websockets are now fully working with frontend. Notifying user of new trades.
 
 ## 19/02/2023
 Caching is causing some issues with integration tests which I didn't catch. From now on any change to the code base will be on a pull request (PR), and the CI tests will run.
+
+## 21/02/2023
+Various small bugs have started to creep through the project. Many of these would be solved if I had a stricter emphasis on testing. PErhaps it is time to look at unit testing, or do more rigurous integration tests.

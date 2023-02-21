@@ -48,6 +48,7 @@ func main() {
 			var transaction sharedtypes.Transaction
 			price, errPrice := strconv.ParseFloat(req.Body["Price"], 64)
 			amount, errAmount := strconv.ParseFloat(req.Body["Amount"], 64)
+
 			if errPrice == nil && errAmount == nil {
 				transaction, err = model.StartTradeAsset(req.Body["Type"], price, amount, req.Access, uuid.MustParse(req.Body["AssetId"]))
 				log.Println(err)
