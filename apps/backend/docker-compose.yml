@@ -75,7 +75,7 @@ services:
 
   # Redis cache server
   redis:
-    image: redis:7-alpine
+    image: redis:6.2.6-alpine
     volumes:
       - ./redis/redis.conf:/opt/bitnami/redis/mounted-etc/redis.conf
     environment:
