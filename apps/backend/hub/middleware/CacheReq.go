@@ -12,12 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var isCachingEnabled = os.Getenv("IS_CACHE_ENABLED")
+var isCachingDisabled = os.Getenv("IS_CACHE_DISABLED")
 
 func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, isParamsNeeed bool, key string, returnStruct T, getBody func(data T) any) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-    if len(isCachingEnabled) == 0 {
+    if len(isCachingDisabled) > 0 {
       c.Next()
       return
     }
@@ -37,7 +37,7 @@ func CacheReq[T sharedtypes.ReturnTypes](isUserIdNeeded bool, isParamsNeeed bool
     }
 
 		val, exists := cache.Get(keyUrl)
-		if false {
+		if exists {
 			err := json.Unmarshal([]byte(val), &returnStruct)
 			// If there is an error, we just processed with the request as normal
 			// Otherwise serve the cached value
