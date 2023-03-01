@@ -3,16 +3,15 @@ import request from "supertest";
 const liveHub = "http://hub.johncosta.tech";
 
 async function HubHealth() {
-  const average = await runAndAverage(10, async () => {
+  await runAndAverage(10, async () => {
     await request(liveHub).get("/health");
   });
-  printAverage(average);
 }
 
 async function HubAssets() {
-  runAndAverage(10, async () => {
+  await runAndAverage(10, async () => {
     await request(liveHub).get("/assets");
-  }).then(printAverage);
+  });
 }
 
 async function runAndAverage(
@@ -25,7 +24,9 @@ async function runAndAverage(
     await callback();
     totalTimeDiff += new Date().getTime() - timeBefore;
   }
-  return totalTimeDiff / times;
+  const average = totalTimeDiff / times;
+  printAverage(average);
+  return average;
 }
 
 function printAverage(timeMs: number) {
