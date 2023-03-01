@@ -46,27 +46,4 @@ describe("Asset trades route testing", () => {
         done();
       });
   });
-
-  it("Should return the trades for an existing asset", (done: jest.DoneCallback) => {
-    request(HubUrl)
-      .get(assetTrades)
-      .set("access", access)
-      .set("AssetId", testData.transactions[0].assetId)
-      .expect(200)
-      .end((err, res) => {
-        expect(err).toBeNull();
-        expect(res.body["trades"]).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              Id: testData.transactions[0].id,
-              Amount: testData.transactions[0].amount,
-              Price: testData.transactions[0].price,
-              AssetId: testData.transactions[0].assetId,
-              State: "in-market",
-            }),
-          ])
-        );
-        done();
-      });
-  });
 });

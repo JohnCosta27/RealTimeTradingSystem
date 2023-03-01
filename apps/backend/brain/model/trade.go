@@ -3,6 +3,7 @@ package model
 import (
 	"brain/database"
 	"errors"
+	"fmt"
 	"log"
 	sharedtypes "sharedTypes"
 
@@ -47,6 +48,10 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
     }
 
     database.Db.First(&userAsset)
+
+    fmt.Println("----- debugging brain -----")
+    fmt.Printf("%+v\n", userAsset)
+    fmt.Println("----- end debugging brain -----")
 
 		if userAsset.Amount < amount {
 			log.Println("The user does not have enough of this asset.")
@@ -115,8 +120,10 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     seller.Balance = seller.Balance + transaction.Price
 
     newUserAsset.UserId = userId.String()
+
     newUserAsset.Amount += transaction.Amount
-    oldUserAsset.Amount -= oldUserAsset.Amount 
+    oldUserAsset.Amount -= transaction.Amount 
+
     newUserAsset.AssetId = transaction.AssetId
 
     transaction.State = "completed"

@@ -8,6 +8,7 @@ import { useAuth } from './auth/AuthProvider';
 import {
   GetAllTrades,
   GetAssets,
+  GetTransaction,
   GetUserAssets,
   PostCompleteTransaction,
 } from './network/requests';
@@ -25,9 +26,19 @@ export const Trades: Component = () => {
   ws.onMessage.subscribe((m) => {
     query.setQueryData([Requests.AllTrades], (oldData) => {
       console.log(oldData);
+      const oldTrades = (oldData as { trades: GetTransaction[] }).trades;
+
+      const exists = oldTrades.findIndex(t => t.Id === m.Id);
+      if (exists !== -1) {
+       // Trade already exists, so we have to replace it. 
+        return {
+          trades: [m, ...oldTrades.slice(0, exists), ...oldTrades.slice(exists + 1)],
+        }
+      } else {
       return {
-        trades: [...(oldData as any).trades, m],
+        trades: [oldTrades, m],
       };
+      }
     });
   });
 

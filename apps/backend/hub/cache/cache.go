@@ -8,6 +8,9 @@ import (
 	"github.com/go-redis/redis/v9"
 )
 
+// Constant to determine if we have cache fetching enabled.
+const isCacheEnabled = false
+
 var Redis *redis.Client
 var RedisContext = context.Background()
 
