@@ -65,7 +65,7 @@ async function runPerfTests() {
   await AuthLogin();
   console.log(results);
 
-  fs.writeFile('./results.json', JSON.stringify(results), (err) => {
+  fs.writeFile('./no-cache-results.json', JSON.stringify(results), (err) => {
     if (err) {
       console.log(err);
       throw new Error("Unable to write test data to file");
