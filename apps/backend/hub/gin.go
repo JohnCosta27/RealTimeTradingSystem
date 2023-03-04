@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"hub/middleware"
 	"hub/routes"
+	"io"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -23,7 +26,12 @@ var upgrader = websocket.Upgrader{
 }
 
 func InitGin() {
-	Router = gin.Default()
+  myFile, _ := os.Create(time.Now().String())
+  doubleWriter := io.MultiWriter(myFile, os.Stdout)
+
+	Router = gin.New()
+  Router.Use(gin.Recovery())
+  Router.Use(gin.LoggerWithWriter(doubleWriter))
 	WsConnections = make(WsHub)
 
   Router.Use(middleware.AllowCors())
