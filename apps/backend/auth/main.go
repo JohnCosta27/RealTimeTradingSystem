@@ -5,8 +5,12 @@ import (
 	"auth/middleware"
 	"auth/rabbitmq"
 	"auth/routes"
+	"fmt"
+	"io"
+	"os"
 	sharedtypes "sharedTypes"
 	"sync"
+	"time"
 
 	"github.com/caarlos0/env/v6"
 	"github.com/gin-gonic/gin"
@@ -63,7 +67,14 @@ func main() {
 		}
 	}()
 
-	Router := gin.Default()
+  myFile, _ := os.Create(fmt.Sprintf("./logs/%s.hub.txt", time.Now().String()))
+  doubleWriter := io.MultiWriter(myFile, os.Stdout)
+
+  Router := gin.New()
+  Router.Use(gin.Recovery())
+  Router.Use(gin.LoggerWithWriter(doubleWriter))
+
+
 	Router.Use(middleware.AllowCors())
 	Router.Use(middleware.SetJson())
 	routes.RegisterRoute(Router)

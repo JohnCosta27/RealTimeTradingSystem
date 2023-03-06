@@ -26,7 +26,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func InitGin() {
-  myFile, _ := os.Create(time.Now().String())
+  myFile, _ := os.Create(fmt.Sprintf("./logs/%s.hub.txt", time.Now().String()))
   doubleWriter := io.MultiWriter(myFile, os.Stdout)
 
 	Router = gin.New()
