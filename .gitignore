@@ -36,6 +36,9 @@ apps/backend/auth/auth
 apps/backend/brain/brain
 apps/backend/hub/hub
 
+apps/backend/logs/*
+!apps/backend/logs/.gitkeep
+
 InterimSubmission.zip
 
 ## Docker container secrets and sensitive information

@@ -7,8 +7,7 @@
     "test:setup": "npx ts-node src/setup.ts",
     "test": "jest --testPathPattern=test",
     "test:watch": "jest --watch",
-    "test:perf": "jest --testPathPattern=src/performance",
-    "test:perf:watch": "jest --testPathPattern=src/performance --watch",
+    "test:perf": "npx ts-node src/performance/performance-tests.ts",
     "test:clean": "npm run test:setup && npm run test",
     "prisma:gen": "npx prisma generate --schema src/prisma/auth.prisma && npx prisma generate --schema src/prisma/brain.prisma"
   },
