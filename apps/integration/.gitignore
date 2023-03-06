@@ -4,3 +4,4 @@ node_modules
 src/generated
 
 results.json
+no-cache-results.json
