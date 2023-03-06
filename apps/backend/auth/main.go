@@ -11,6 +11,7 @@ import (
 	sharedtypes "sharedTypes"
 	"sync"
 	"time"
+	"utils"
 
 	"github.com/caarlos0/env/v6"
 	"github.com/gin-gonic/gin"
@@ -67,14 +68,11 @@ func main() {
 		}
 	}()
 
-  myFile, _ := os.Create(fmt.Sprintf("./logs/%s.hub.txt", time.Now().String()))
-  doubleWriter := io.MultiWriter(myFile, os.Stdout)
+  myFile, _ := os.Create(fmt.Sprintf("./logs/%s.auth.txt", time.Now().String()))
 
-  Router := gin.New()
-  Router.Use(gin.Recovery())
-  Router.Use(gin.LoggerWithWriter(doubleWriter))
+  Router := gin.Default()
 
-
+  Router.Use(utils.LoggerMiddleware(myFile))
 	Router.Use(middleware.AllowCors())
 	Router.Use(middleware.SetJson())
 	routes.RegisterRoute(Router)

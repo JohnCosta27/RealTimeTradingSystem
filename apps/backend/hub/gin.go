@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -27,13 +28,11 @@ var upgrader = websocket.Upgrader{
 
 func InitGin() {
   myFile, _ := os.Create(fmt.Sprintf("./logs/%s.hub.txt", time.Now().String()))
-  doubleWriter := io.MultiWriter(myFile, os.Stdout)
 
-	Router = gin.New()
-  Router.Use(gin.Recovery())
-  Router.Use(gin.LoggerWithWriter(doubleWriter))
+	Router = gin.Default()
 	WsConnections = make(WsHub)
 
+  Router.Use(utils.LoggerMiddleware(myFile))
   Router.Use(middleware.AllowCors())
 
 	// Inititalize the routes in the application
