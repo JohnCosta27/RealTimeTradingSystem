@@ -15,6 +15,6 @@ func LoggerMiddleware(writer io.Writer) gin.HandlerFunc {
     c.Next()
 
     timeTaken := time.Now().Sub(timeBefore)
-    io.WriteString(writer, fmt.Sprintf("%s - %d\n", c.Request.URL.Path, timeTaken.Nanoseconds()))
+    io.WriteString(writer, fmt.Sprintf("%s - %d\n", c.Request.URL.Path, timeTaken.Microseconds()))
   }
 }
