@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"hub/middleware"
 	"hub/routes"
-	"io"
 	"net/http"
 	"os"
 	"time"
