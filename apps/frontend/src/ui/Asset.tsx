@@ -11,7 +11,6 @@ export interface AssetProps {
 export const Asset: Component<AssetProps> = (props) => {
   const [price] = createSignal(`--value:${props.price}`);
   const nav = useNavigate();
-  console.log(props);
 
   return (
     <div class="w-full min-h-16 rounded shadow-lg bg-base-100 py-2 px-4 text-xl flex items-center gap-4 justify-between">

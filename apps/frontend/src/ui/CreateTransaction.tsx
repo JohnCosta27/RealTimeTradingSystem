@@ -24,7 +24,6 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
   const sell = createMutation({
     mutationFn: PostCreateTransaction,
     onSuccess: (res) => {
-      console.log(res);
       query.invalidateQueries();
     },
   });

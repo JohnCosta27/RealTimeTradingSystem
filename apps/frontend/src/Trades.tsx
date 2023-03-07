@@ -25,7 +25,6 @@ export const Trades: Component = () => {
 
   ws.onMessage.subscribe((m) => {
     query.setQueryData([Requests.AllTrades], (oldData) => {
-      console.log(oldData);
       const oldTrades = (oldData as { trades: GetTransaction[] }).trades;
 
       const exists = oldTrades.findIndex(t => t.Id === m.Id);
@@ -57,14 +56,9 @@ export const Trades: Component = () => {
     () => GetAllTrades(auth().access).then((res) => res.data),
   );
 
-  createEffect(() => {
-    console.log(allTrades.data?.trades);
-  });
-
   const completeTrade = createMutation({
     mutationFn: PostCompleteTransaction,
-    onSuccess: (res) => {
-      console.log(res);
+    onSuccess: () => {
       query.invalidateQueries({ queryKey: [Requests.AllTrades] });
       query.invalidateQueries({ queryKey: [Requests.UserAssets] });
       query.invalidateQueries({ queryKey: [Requests.User] });
