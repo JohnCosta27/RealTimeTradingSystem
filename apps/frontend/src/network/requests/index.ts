@@ -10,8 +10,21 @@ export const hubClient = axios.create({
   headers: {},
 });
 
+export const authClient = axios.create({
+  baseURL: AuthUrl,
+  timeout: 5000,
+  headers: {},
+});
+
+/**
+ * Gets the access token, even if it has to refetch it,
+ * or if the authentication is invalid it returns undefined
+  *
+ * @returns the access token or undefined is unauthorized.
+ */
 export async function getNewAccess(): Promise<string | undefined> {
   if (!isTokenValid('refresh')) return undefined;
+  if (isTokenValid('access')) return localStorage.getItem("access")!;
 
   const newToken = await authClient.post<{ access: string }>('/refresh', {
     refresh: localStorage.getItem('refresh'),
@@ -23,32 +36,18 @@ export async function getNewAccess(): Promise<string | undefined> {
 
 hubClient.interceptors.request.use(
   async (config) => {
-    // Check there is a valid token, otherwise we need to get a new one.
-    if (isTokenValid('access')) {
-      config.headers!['access'] = localStorage.getItem('access');
-    } else if (isTokenValid('refresh')) {
-      // If the refresh token is valid, we could just have an expired access token.
+    const newAccess = await getNewAccess();
 
-      const newAccess = await getNewAccess();
-
-      if (newAccess) {
-        config.headers!['access'] = newAccess;
-        localStorage.setItem('access', newAccess);
-      } else {
+    if (newAccess) {
+      config.headers!['access'] = newAccess;
+    } else {
         throw new axios.Cancel('User is not authenticated');
-      }
     }
 
     return config;
   },
   (e) => Promise.reject(e),
 );
-
-export const authClient = axios.create({
-  baseURL: AuthUrl,
-  timeout: 5000,
-  headers: {},
-});
 
 export type PostRequestType<T, V> = (body: T) => Promise<AxiosResponse<V>>;
 export type GetRequestType<T> = () => Promise<AxiosResponse<T>>;

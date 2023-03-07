@@ -1,8 +1,11 @@
+import { useNavigate } from "@solidjs/router";
 import { createMutation } from "@tanstack/solid-query";
 import { Component, createSignal } from "solid-js";
 import { PostLogin } from "../network/requests";
 
 export const Login: Component = () => {
+  const nav = useNavigate();
+
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
 
@@ -11,6 +14,7 @@ export const Login: Component = () => {
     onSuccess: (res) => {
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
+      nav('/');
     }
   })
 
