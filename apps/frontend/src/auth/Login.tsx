@@ -1,19 +1,18 @@
-import { useNavigate } from "@solidjs/router";
-import { Component, createEffect, createSignal } from "solid-js";
-import { useAuth } from "./AuthProvider";
+import { createMutation } from "@tanstack/solid-query";
+import { Component, createSignal } from "solid-js";
+import { PostLogin } from "../network/requests";
 
 export const Login: Component = () => {
-  const auth = useAuth();
-  const navigate = useNavigate();
-
-  createEffect(() => {
-    if (auth().isAuth) {
-      navigate("/");
-    }
-  });
-
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
+
+  const login = createMutation({
+    mutationFn: PostLogin,
+    onSuccess: (res) => {
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
+    }
+  })
 
   return (
     <>
@@ -44,12 +43,10 @@ export const Login: Component = () => {
 
       <button
         class="btn btn-primary w-full"
-        onClick={() =>
-          auth().methods.login({
-            email: email(),
-            password: password(),
-          })
-        }
+        onClick={() => login.mutate({
+          email: email(),
+          password: password(),
+        })}
       >
         Login
       </button>

@@ -27,6 +27,7 @@ hubClient.interceptors.request.use(
     if (isTokenValid('access')) {
       config.headers!['access'] = localStorage.getItem('access');
     } else if (isTokenValid('refresh')) {
+      // If the refresh token is valid, we could just have an expired access token.
 
       const newAccess = await getNewAccess();
 
