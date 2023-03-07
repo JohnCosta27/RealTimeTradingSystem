@@ -114,11 +114,10 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     user.Balance = user.Balance - transaction.Price
     seller.Balance = seller.Balance + transaction.Price
 
-    newUserAsset.UserId = userId.String()
-
     newUserAsset.Amount += transaction.Amount
     oldUserAsset.Amount -= transaction.Amount 
 
+    newUserAsset.UserId = userId.String()
     newUserAsset.AssetId = transaction.AssetId
 
     transaction.State = "completed"
@@ -156,6 +155,9 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     newUserAsset.UserId = userId.String()
     newUserAsset.Amount -= transaction.Amount
     newUserAsset.AssetId = transaction.AssetId
+
+    oldUserAsset.UserId = transaction.BuyerId
+    oldUserAsset.AssetId = transaction.AssetId
 
     transaction.State = "completed"
     transaction.SellerId = userId.String()
