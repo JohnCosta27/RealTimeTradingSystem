@@ -1,5 +1,4 @@
-import axios from "axios";
-import { BaseType, GetRequestType, HubUrl, PostRequestType } from ".";
+import { BaseType, GetRequestType, hubClient, PostRequestType } from ".";
 
 export interface Access {
   access: string;
@@ -35,7 +34,7 @@ export interface GetAssetTrades extends BaseType {
 }
 
 export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
-  return axios.get(`${HubUrl}/assets`, {
+  return hubClient.get(`/assets`, {
     headers: {
       access: auth,
     },
@@ -45,7 +44,7 @@ export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
 export const GetUserAssets: GetRequestType<{ assets: GetUserAssets[] }> = (
   auth
 ) => {
-  return axios.get(`${HubUrl}/users/assets`, {
+  return hubClient.get(`/users/assets`, {
     headers: {
       access: auth,
     },
@@ -55,7 +54,7 @@ export const GetUserAssets: GetRequestType<{ assets: GetUserAssets[] }> = (
 export const GetAllTrades: GetRequestType<{ trades: GetTransaction[] }> = (
   auth
 ) => {
-  return axios.get(`${HubUrl}/trade/`, {
+  return hubClient.get(`/trade/`, {
     headers: {
       access: auth,
     },
@@ -63,7 +62,7 @@ export const GetAllTrades: GetRequestType<{ trades: GetTransaction[] }> = (
 };
 
 export const GetUser: GetRequestType<{user: GetUserType }> = (auth) => {
-  return axios.get(`${HubUrl}/users/`, {
+  return hubClient.get(`/users/`, {
     headers: {
       access: auth,
     }
@@ -76,7 +75,7 @@ export interface GetAssetTradesType {
 }
 
 export const GetAssetTrades: PostRequestType<GetAssetTradesType, {trades: GetTransaction[]}> = (req) => {
-  return axios.get(`${HubUrl}/trade/asset`, {
+  return hubClient.get(`/trade/asset`, {
     headers: {
       access: req.access,
     },
@@ -107,8 +106,8 @@ export const PostCreateTransaction: PostRequestType<
   PostCreateTransactionType,
   GetTransaction
 > = (body) => {
-  return axios.post<GetTransaction>(
-    `${HubUrl}/trade/create`,
+  return hubClient.post<GetTransaction>(
+    `/trade/create`,
     body.transactionBody,
     {
       headers: {
@@ -122,7 +121,7 @@ export const PostCompleteTransaction: PostRequestType<
   PostCompleteTransactionType,
   GetTransaction
 > = (body) => {
-  return axios.post<GetTransaction>(`${HubUrl}/trade/complete`, body.body, {
+  return hubClient.post<GetTransaction>(`/trade/complete`, body.body, {
     headers: {
       access: body.access,
     },
