@@ -16,7 +16,7 @@
     "chart.js": "^4.1.1",
     "jwt-decode": "^3.1.2",
     "rxjs": "^7.5.7",
-    "solid-js": "^1.5.4"
+    "solid-js": "^1.6.12"
   },
   "devDependencies": {
     "@babel/core": "^7.19.1",

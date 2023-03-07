@@ -3,8 +3,7 @@ import {
   createQuery,
   useQueryClient,
 } from '@tanstack/solid-query';
-import { Component, createEffect, For, Show } from 'solid-js';
-import { useAuth } from './auth/AuthProvider';
+import { Component, For, Show } from 'solid-js';
 import {
   GetAllTrades,
   GetAssets,
@@ -19,7 +18,6 @@ import { Loading } from './ui/Loading';
 import { TradeCard } from './ui/TradeCard';
 
 export const Trades: Component = () => {
-  const auth = useAuth();
   const query = useQueryClient();
   const ws = useWebsocket();
 
@@ -27,33 +25,37 @@ export const Trades: Component = () => {
     query.setQueryData([Requests.AllTrades], (oldData) => {
       const oldTrades = (oldData as { trades: GetTransaction[] }).trades;
 
-      const exists = oldTrades.findIndex(t => t.Id === m.Id);
+      const exists = oldTrades.findIndex((t) => t.Id === m.Id);
       if (exists !== -1) {
-       // Trade already exists, so we have to replace it. 
+        // Trade already exists, so we have to replace it.
         return {
-          trades: [m, ...oldTrades.slice(0, exists), ...oldTrades.slice(exists + 1)],
-        }
+          trades: [
+            m,
+            ...oldTrades.slice(0, exists),
+            ...oldTrades.slice(exists + 1),
+          ],
+        };
       } else {
-      return {
-        trades: [oldTrades, m],
-      };
+        return {
+          trades: [oldTrades, m],
+        };
       }
     });
   });
 
   const assets = createQuery(
     () => [Requests.Assets],
-    () => GetAssets(auth().access).then((res) => res.data),
+    () => GetAssets().then((res) => res.data),
   );
 
   const userAssets = createQuery(
     () => [Requests.UserAssets],
-    () => GetUserAssets(auth().access).then((res) => res.data),
+    () => GetUserAssets().then((res) => res.data),
   );
 
   const allTrades = createQuery(
     () => [Requests.AllTrades],
-    () => GetAllTrades(auth().access).then((res) => res.data),
+    () => GetAllTrades().then((res) => res.data),
   );
 
   const completeTrade = createMutation({
@@ -67,10 +69,7 @@ export const Trades: Component = () => {
 
   const tradeCallback = (TransactionId: string) => {
     completeTrade.mutate({
-      access: auth().access || '',
-      body: {
-        TransactionId,
-      },
+      TransactionId,
     });
   };
 

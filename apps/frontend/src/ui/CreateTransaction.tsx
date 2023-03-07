@@ -1,6 +1,5 @@
 import { createMutation, useQueryClient } from '@tanstack/solid-query';
 import { Component, createSignal, For, Match, Show, Switch } from 'solid-js';
-import { useAuth } from '../auth/AuthProvider';
 import {
   GetAssets,
   GetUserAssets,
@@ -13,7 +12,6 @@ interface CreateTransactionProps {
 }
 
 export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
-  const auth = useAuth();
   const query = useQueryClient();
 
   const [sellAsset, setSellAsset] = createSignal<GetAssets>();
@@ -23,7 +21,7 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
 
   const sell = createMutation({
     mutationFn: PostCreateTransaction,
-    onSuccess: (res) => {
+    onSuccess: () => {
       query.invalidateQueries();
     },
   });
@@ -66,13 +64,10 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
             class="btn btn-secondary"
             onClick={() =>
               sell.mutate({
-                access: auth().access || '',
-                transactionBody: {
-                  assetId: sellAsset()!.Id,
-                  type: type(),
-                  Price: sellPrice(),
-                  Amount: sellAmount(),
-                },
+                assetId: sellAsset()!.Id,
+                type: type(),
+                Price: sellPrice(),
+                Amount: sellAmount(),
               })
             }
           >
