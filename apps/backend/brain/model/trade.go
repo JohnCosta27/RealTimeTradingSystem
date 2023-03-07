@@ -87,6 +87,10 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 		return transaction, errors.New("This transaction could not be found")
 	}
 
+  if transaction.SellerId == userId.String() || transaction.BuyerId == userId.String() {
+    return transaction, errors.New("You cannot trade with yourself")
+  }
+
 	// This means that the transaction is of someone selling the asset.
   // So our user is looking to buy.
 	// Therefore, we need to check the user has enough money to complete.
