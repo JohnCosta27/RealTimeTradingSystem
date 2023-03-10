@@ -8,14 +8,21 @@ const health = "/health";
 const assets = "/assets";
 const login = "/login";
 const createTrade = "/trade/create";
+const completeTrade = "/trade/complete";
 
-type Urls = typeof health | typeof assets | typeof login | typeof createTrade;
+type Urls =
+  | typeof health
+  | typeof assets
+  | typeof login
+  | typeof createTrade
+  | typeof completeTrade;
 
 const results: Record<Urls, Array<number>> = {
   "/health": [],
   "/assets": [],
   "/login": [],
   "/trade/create": [],
+  "/trade/complete": [],
 };
 
 async function HubHealth() {
@@ -56,6 +63,30 @@ async function HubCreateTrade() {
   });
 }
 
+async function HubCompleteTrade() {
+  const access = await request(liveAuth).post(login).send({
+    email: "testing2@email.com",
+    password: "SafePassword123.",
+  });
+  const accessToken = access.body["access"];
+
+  const trades = await request(liveHub).get("/trade/").set({
+    access: accessToken,
+  });
+  const tradeIds = trades.body.trades.map((t: any) => t.Id);
+
+  await runAndAverage(50, [], async () => {
+    let counter = 0;
+    const bruh = await request(liveHub).post(completeTrade).set({
+      access: accessToken,
+    }).send({
+      TransactionId: tradeIds[counter], 
+    });
+    console.log(bruh);
+    counter++;
+  });
+}
+
 async function AuthLogin() {
   await runAndAverage(50, results["/login"], async () => {
     await request(liveAuth).post(login).send({
@@ -91,7 +122,8 @@ async function runPerfTests() {
   // await HubHealth();
   // await HubAssets();
   // await AuthLogin();
-  await HubCreateTrade();
+  // await HubCreateTrade();
+  await HubCompleteTrade();
   console.log(results);
 
   return;
