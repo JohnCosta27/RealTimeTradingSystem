@@ -1,16 +1,17 @@
 import fs from "fs";
 import request from "supertest";
 
-// const liveHub = "http://hub.johncosta.tech";
-// const liveAuth = "http://auth.johncosta.tech";
-const liveHub = "http://localhost:4545";
-const liveAuth = "http://localhost:4546";
+const liveHub = "http://hub.johncosta.tech";
+const liveAuth = "http://auth.johncosta.tech";
+// const liveHub = "http://localhost:4545";
+// const liveAuth = "http://localhost:4546";
 
 const health = "/health";
 const assets = "/assets";
 const login = "/login";
 const createTrade = "/trade/create";
 const completeTrade = "/trade/complete";
+const getTrades = "/trade/";
 
 const silver = "f2e6a94f-b50b-4b7d-9c32-f444104715be";
 
@@ -19,7 +20,8 @@ type Urls =
   | typeof assets
   | typeof login
   | typeof createTrade
-  | typeof completeTrade;
+  | typeof completeTrade
+  | typeof getTrades;
 
 const results: Record<Urls, Array<number>> = {
   "/health": [],
@@ -27,6 +29,7 @@ const results: Record<Urls, Array<number>> = {
   "/login": [],
   "/trade/create": [],
   "/trade/complete": [],
+  "/trade/": [],
 };
 
 async function HubHealth() {
@@ -39,6 +42,14 @@ async function HubAssets() {
   await runAndAverage(50, results["/assets"], async () => {
     await request(liveHub).get(assets);
   });
+}
+
+async function GetAccessToken(email?: string): Promise<string> {
+  const access = await request(liveAuth).post(login).send({
+    email: email ?? "testing1@email.com",
+    password: "SafePassword123.",
+  });
+  return access.body["access"];
 }
 
 async function HubCreateTrade() {
@@ -90,6 +101,15 @@ async function HubCompleteTrade() {
         TransactionId: tradeIds[counter],
       });
     counter++;
+  });
+}
+
+async function HubGetTrades() {
+  const access = await GetAccessToken();
+  await runAndAverage(50, results['/trade/'], async () => {
+    await request(liveHub).get(getTrades).set({
+      access,
+    });
   });
 }
 
@@ -174,8 +194,8 @@ async function runPerfTests() {
   // await AuthLogin();
   // await HubCreateTrade();
   // await HubCompleteTrade();
-  await HubAllTradesInvalidateCache();
-  console.log(results);
+  // await HubAllTradesInvalidateCache();
+  await HubGetTrades();
 
   return;
   fs.writeFile("./results.json", JSON.stringify(results), (err) => {
