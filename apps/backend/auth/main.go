@@ -6,7 +6,6 @@ import (
 	"auth/rabbitmq"
 	"auth/routes"
 	"fmt"
-	"io"
 	"os"
 	sharedtypes "sharedTypes"
 	"sync"

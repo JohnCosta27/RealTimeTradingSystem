@@ -1,6 +1,5 @@
 import { Component } from 'solid-js';
 import { Route, Router, Routes } from '@solidjs/router';
-import { AuthProvider } from './auth/AuthProvider';
 import { ProtectedRoute } from './ProtectedRoute';
 import { render } from 'solid-js/web';
 import { QueryProvider } from './network/QueryProvider';
@@ -19,7 +18,6 @@ export const Main: Component = () => {
   return (
     <QueryProvider>
       <WebSocketComponent>
-        <AuthProvider>
           <Router>
             <Routes>
               <Route path="/" component={ProtectedRoute}>
@@ -36,7 +34,6 @@ export const Main: Component = () => {
               </Route>
             </Routes>
           </Router>
-        </AuthProvider>
       </WebSocketComponent>
     </QueryProvider>
   );

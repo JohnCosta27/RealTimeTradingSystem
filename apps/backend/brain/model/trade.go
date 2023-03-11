@@ -87,6 +87,13 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 		return transaction, errors.New("This transaction could not be found")
 	}
 
+  // At this point only the creator of the trade is present in the transaction object.
+  // Therefore, the user trying to complete the trade CANNOT be present, otherwise
+  // it means the user is trying to trade with themselves.
+  if transaction.SellerId == userId.String() || transaction.BuyerId == userId.String() {
+    return transaction, errors.New("You cannot trade with yourself")
+  }
+
 	// This means that the transaction is of someone selling the asset.
   // So our user is looking to buy.
 	// Therefore, we need to check the user has enough money to complete.
@@ -114,11 +121,10 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     user.Balance = user.Balance - transaction.Price
     seller.Balance = seller.Balance + transaction.Price
 
-    newUserAsset.UserId = userId.String()
-
     newUserAsset.Amount += transaction.Amount
     oldUserAsset.Amount -= transaction.Amount 
 
+    newUserAsset.UserId = userId.String()
     newUserAsset.AssetId = transaction.AssetId
 
     transaction.State = "completed"
@@ -156,6 +162,9 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
     newUserAsset.UserId = userId.String()
     newUserAsset.Amount -= transaction.Amount
     newUserAsset.AssetId = transaction.AssetId
+
+    oldUserAsset.UserId = transaction.BuyerId
+    oldUserAsset.AssetId = transaction.AssetId
 
     transaction.State = "completed"
     transaction.SellerId = userId.String()
