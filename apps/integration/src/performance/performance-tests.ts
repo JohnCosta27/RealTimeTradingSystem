@@ -1,14 +1,18 @@
 import fs from "fs";
 import request from "supertest";
 
-const liveHub = "http://hub.johncosta.tech";
-const liveAuth = "http://auth.johncosta.tech";
+// const liveHub = "http://hub.johncosta.tech";
+// const liveAuth = "http://auth.johncosta.tech";
+const liveHub = "http://localhost:4545";
+const liveAuth = "http://localhost:4546";
 
 const health = "/health";
 const assets = "/assets";
 const login = "/login";
 const createTrade = "/trade/create";
 const completeTrade = "/trade/complete";
+
+const silver = "f2e6a94f-b50b-4b7d-9c32-f444104715be";
 
 type Urls =
   | typeof health
@@ -47,19 +51,19 @@ async function HubCreateTrade() {
   /**
    * This test account has silver by default.
    */
-  await runAndAverage(200, results["/trade/create"], async () => {
+  await runAndAverage(100, results["/trade/create"], async () => {
     const bruh = await request(liveHub)
       .post(createTrade)
       .set({
         access: accessToken,
       })
       .send({
-        AssetId: "f2e6a94f-b50b-4b7d-9c32-f444104715be",
+        AssetId: silver,
         Type: "sell",
         Amount: 1,
         Price: 1,
       });
-    console.log(bruh);
+    console.log(bruh.body);
   });
 }
 
@@ -77,13 +81,59 @@ async function HubCompleteTrade() {
 
   await runAndAverage(50, [], async () => {
     let counter = 0;
-    const bruh = await request(liveHub).post(completeTrade).set({
-      access: accessToken,
-    }).send({
-      TransactionId: tradeIds[counter], 
-    });
-    console.log(bruh);
+    await request(liveHub)
+      .post(completeTrade)
+      .set({
+        access: accessToken,
+      })
+      .send({
+        TransactionId: tradeIds[counter],
+      });
     counter++;
+  });
+}
+
+/**
+ * To invalidate the cache, we will request all the trades twice.
+ * Then we will create a trade (Hence invalidating cache),
+ * and then we repeat to see the differences in response times.
+ */
+async function HubAllTradesInvalidateCache() {
+  const access = await request(liveAuth).post(login).send({
+    email: "testing2@email.com",
+    password: "SafePassword123.",
+  });
+  console.log(access.body);
+  const accessToken = access.body["access"];
+
+  await HubCreateTrade();
+  const trades = await request(liveHub).get("/trade/").set({
+    access: accessToken,
+  });
+  const tradeIds = trades.body.trades.map((t: any) => t.Id);
+
+  let counter = 0;
+  await runAndAverage(50, [], async () => {
+    await request(liveHub).get("/trade/").set({
+      access: accessToken,
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await request(liveHub).get("/trade/").set({
+      access: accessToken,
+    });
+
+    const cTrade = await request(liveHub)
+      .post(completeTrade)
+      .set({
+        access: accessToken,
+      })
+      .send({
+        TransactionId: tradeIds[counter],
+      });
+    counter++;
+    console.log(cTrade.body);
   });
 }
 
@@ -123,7 +173,8 @@ async function runPerfTests() {
   // await HubAssets();
   // await AuthLogin();
   // await HubCreateTrade();
-  await HubCompleteTrade();
+  // await HubCompleteTrade();
+  await HubAllTradesInvalidateCache();
   console.log(results);
 
   return;
