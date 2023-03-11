@@ -16,6 +16,13 @@ export const authClient = axios.create({
   headers: {},
 });
 
+export function setTokens(access: string, refresh?: string) {
+  localStorage.setItem("access", access);
+  if (refresh) {
+    localStorage.setItem("refresh", refresh);
+  }
+}
+
 /**
  * Gets the access token, even if it has to refetch it,
  * or if the authentication is invalid it returns undefined

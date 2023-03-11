@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { createMutation } from "@tanstack/solid-query";
 import { Component, createSignal } from "solid-js";
-import { PostLogin } from "../network/requests";
+import { PostLogin, setTokens } from "../network/requests";
 
 export const Login: Component = () => {
   const nav = useNavigate();
@@ -12,8 +12,7 @@ export const Login: Component = () => {
   const login = createMutation({
     mutationFn: PostLogin,
     onSuccess: (res) => {
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+      setTokens(res.data.access, res.data.refresh);
       nav('/');
     }
   })

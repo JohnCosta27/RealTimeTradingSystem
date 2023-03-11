@@ -1,7 +1,7 @@
 import { useNavigate } from '@solidjs/router';
 import { createMutation } from '@tanstack/solid-query';
 import { Component, createSignal } from 'solid-js';
-import { PostRegister } from '../network/requests';
+import { PostRegister, setTokens } from '../network/requests';
 
 export const Register: Component = () => {
   const nav = useNavigate();
@@ -14,8 +14,7 @@ export const Register: Component = () => {
   const register = createMutation({
     mutationFn: PostRegister,
     onSuccess: (res) => {
-      localStorage.setItem('access', res.data.access);
-      localStorage.setItem('refresh', res.data.refresh);
+      setTokens(res.data.access, res.data.refresh);
       nav('/');
     },
   });
