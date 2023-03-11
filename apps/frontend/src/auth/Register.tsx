@@ -1,21 +1,23 @@
-import { useNavigate } from "@solidjs/router";
-import { Component, createEffect, createSignal } from "solid-js";
-import { useAuth } from "./AuthProvider";
+import { useNavigate } from '@solidjs/router';
+import { createMutation } from '@tanstack/solid-query';
+import { Component, createSignal } from 'solid-js';
+import { PostRegister, setTokens } from '../network/requests';
 
 export const Register: Component = () => {
-  const auth = useAuth();
-  const navigate = useNavigate();
+  const nav = useNavigate();
 
-  createEffect(() => {
-    if (auth().isAuth) {
-      navigate("/");
-    }
+  const [firstname, setFirstname] = createSignal('');
+  const [surname, setSurname] = createSignal('');
+  const [email, setEmail] = createSignal('');
+  const [password, setPassword] = createSignal('');
+
+  const register = createMutation({
+    mutationFn: PostRegister,
+    onSuccess: (res) => {
+      setTokens(res.data.access, res.data.refresh);
+      nav('/');
+    },
   });
-
-  const [firstname, setFirstname] = createSignal("");
-  const [surname, setSurname] = createSignal("");
-  const [email, setEmail] = createSignal("");
-  const [password, setPassword] = createSignal("");
 
   return (
     <>
@@ -72,7 +74,7 @@ export const Register: Component = () => {
       <button
         class="btn btn-primary w-full"
         onClick={() =>
-          auth().methods.register({
+          register.mutate({
             firstname: firstname(),
             surname: surname(),
             email: email(),

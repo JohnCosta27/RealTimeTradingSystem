@@ -1,5 +1,4 @@
-import axios  from "axios"
-import { AuthUrl, PostRequestType } from './index';
+import { authClient, PostRequestType } from './index';
 
 export interface PostRegisterType {
   firstname: string;
@@ -28,13 +27,13 @@ export interface PostRefreshRes {
 }
 
 export const PostRegister: PostRequestType<PostRegisterType, PostAuthResponse> = (body) => {
-  return axios.post<PostAuthResponse>(`${AuthUrl}/register`, body)
+  return authClient.post<PostAuthResponse>(`/register`, body)
 }
 
 export const PostLogin: PostRequestType<PostLoginType, PostAuthResponse> = (body) => {
-  return axios.post<PostAuthResponse>(`${AuthUrl}/login`, body);
+  return authClient.post<PostAuthResponse>(`/login`, body);
 }
 
 export const PostRefresh: PostRequestType<PostRefreshType, PostRefreshRes> = (body) => {
-  return axios.post<PostRefreshRes>(`${AuthUrl}/refresh`, body);
+  return authClient.post<PostRefreshRes>(`/refresh`, body);
 }

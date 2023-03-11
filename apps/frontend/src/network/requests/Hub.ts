@@ -1,5 +1,4 @@
-import axios from "axios";
-import { BaseType, GetRequestType, HubUrl, PostRequestType } from ".";
+import { BaseType, GetRequestType, hubClient, PostRequestType } from '.';
 
 export interface Access {
   access: string;
@@ -20,7 +19,7 @@ export interface GetTransaction extends BaseType {
   SellerId: string;
   Price: number;
   Amount: number;
-  State: "in-market" | "complete";
+  State: 'in-market' | 'complete';
 }
 
 export interface GetUserType extends BaseType {
@@ -34,97 +33,62 @@ export interface GetAssetTrades extends BaseType {
   trades: GetTransaction[];
 }
 
-export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = (auth) => {
-  return axios.get(`${HubUrl}/assets`, {
-    headers: {
-      access: auth,
-    },
-  });
+export const GetAssets: GetRequestType<{ assets: GetAssets[] }> = () => {
+  return hubClient.get(`/assets`);
 };
 
-export const GetUserAssets: GetRequestType<{ assets: GetUserAssets[] }> = (
-  auth
-) => {
-  return axios.get(`${HubUrl}/users/assets`, {
-    headers: {
-      access: auth,
-    },
-  });
+export const GetUserAssets: GetRequestType<{
+  assets: GetUserAssets[];
+}> = () => {
+  return hubClient.get(`/users/assets`);
 };
 
-export const GetAllTrades: GetRequestType<{ trades: GetTransaction[] }> = (
-  auth
-) => {
-  return axios.get(`${HubUrl}/trade/`, {
-    headers: {
-      access: auth,
-    },
-  });
+export const GetAllTrades: GetRequestType<{
+  trades: GetTransaction[];
+}> = () => {
+  return hubClient.get(`/trade/`);
 };
 
-export const GetUser: GetRequestType<{user: GetUserType }> = (auth) => {
-  return axios.get(`${HubUrl}/users/`, {
-    headers: {
-      access: auth,
-    }
-  })
-}
+export const GetUser: GetRequestType<{ user: GetUserType }> = () => {
+  return hubClient.get(`/users/`);
+};
 
 export interface GetAssetTradesType {
-  access: string;
   assetId: string;
 }
 
-export const GetAssetTrades: PostRequestType<GetAssetTradesType, {trades: GetTransaction[]}> = (req) => {
-  return axios.get(`${HubUrl}/trade/asset`, {
-    headers: {
-      access: req.access,
-    },
+export const GetAssetTrades: PostRequestType<
+  GetAssetTradesType,
+  { trades: GetTransaction[] }
+> = (req) => {
+  return hubClient.get(`/trade/asset`, {
     params: {
       AssetId: req.assetId,
     },
   });
-}
+};
 
 export interface PostCreateTransactionType {
-  access: string;
-  transactionBody: {
-    assetId: string;
-    type: "buy" | "sell";
-    Amount: number;
-    Price: number;
-  };
+  assetId: string;
+  type: 'buy' | 'sell';
+  Amount: number;
+  Price: number;
 }
 
 export interface PostCompleteTransactionType {
-  access: string;
-  body: {
-    TransactionId: string;
-  };
+  TransactionId: string;
 }
 
 export const PostCreateTransaction: PostRequestType<
   PostCreateTransactionType,
   GetTransaction
 > = (body) => {
-  return axios.post<GetTransaction>(
-    `${HubUrl}/trade/create`,
-    body.transactionBody,
-    {
-      headers: {
-        access: body.access,
-      },
-    }
-  );
+  return hubClient.post<GetTransaction>(`/trade/create`, body);
 };
 
 export const PostCompleteTransaction: PostRequestType<
   PostCompleteTransactionType,
   GetTransaction
 > = (body) => {
-  return axios.post<GetTransaction>(`${HubUrl}/trade/complete`, body.body, {
-    headers: {
-      access: body.access,
-    },
-  });
+  return hubClient.post<GetTransaction>(`/trade/complete`, body);
 };

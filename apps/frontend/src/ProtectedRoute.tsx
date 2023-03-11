@@ -1,13 +1,18 @@
-import { Navigate, Outlet } from "@solidjs/router";
-import { Component, Show } from "solid-js";
-import { useAuth } from "./auth/AuthProvider";
+import { Navigate, Outlet } from '@solidjs/router';
+import { Component, createResource, Show, Suspense } from 'solid-js';
+import { getNewAccess } from './network/requests';
 
 export const ProtectedRoute: Component = () => {
-  const auth = useAuth();
+  const [isAuth] = createResource(getNewAccess);
 
   return (
-    <Show when={auth().isAuth} fallback={<Navigate href="/auth/login" />}>
-      <Outlet />
-    </Show>
+    <Suspense fallback={<p>Loading</p>}>
+      <Show
+        when={isAuth() !== undefined}
+        fallback={isAuth.state === 'ready' && <Navigate href="/auth/login" />}
+      >
+        <Outlet />
+      </Show>
+    </Suspense>
   );
 };

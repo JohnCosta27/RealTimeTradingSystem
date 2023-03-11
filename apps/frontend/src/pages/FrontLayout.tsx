@@ -1,16 +1,13 @@
 import { Outlet, Link } from "@solidjs/router";
 import { createQuery } from "@tanstack/solid-query";
 import { Component, createEffect, Show } from "solid-js";
-import { useAuth } from "../auth/AuthProvider";
 import { GetUser } from "../network/requests";
 import { Requests } from "../types";
 
 export const FrontLayout: Component = () => {
-  const auth = useAuth();
-
   const allTrades = createQuery(
     () => [Requests.User],
-    () => GetUser(auth().access).then((res) => res.data),
+    () => GetUser().then((res) => res.data),
   );
 
   return (
