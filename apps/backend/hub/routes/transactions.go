@@ -193,9 +193,7 @@ func TradeRoutes(r *gin.Engine, ws map[*websocket.Conn]bool) {
   )
 
 	tradeGroup.GET(ASSET_TRADES_ROUTE,
-    // Temporarily disabling cache in this endpoint.
-    // TODO: More sofisticated way of invalidating compelx cache keys. Cache key factory method of sorts
-		// middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
+		middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
 		GetAllTradesAssets(),
 	)
 
