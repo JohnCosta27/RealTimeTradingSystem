@@ -87,6 +87,9 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 		return transaction, errors.New("This transaction could not be found")
 	}
 
+  // At this point only the creator of the trade is present in the transaction object.
+  // Therefore, the user trying to complete the trade CANNOT be present, otherwise
+  // it means the user is trying to trade with themselves.
   if transaction.SellerId == userId.String() || transaction.BuyerId == userId.String() {
     return transaction, errors.New("You cannot trade with yourself")
   }
