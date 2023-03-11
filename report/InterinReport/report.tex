@@ -495,6 +495,32 @@ services:
 
 As you can see the docker compose file is quite extensively because it has to contain the various services used for my project, it runs the RabbitMq service, various databases and all the services which I have coded. It also configures ports and environment variables as well as docker volumes.
 
+
+\section{Performance Evaluation}
+It is important for me to access how my system performs both internally (how long does the server take to fullfil a request), and also end-to-end (how quickly does the user get their request back). Especially I will look at the differences between the user of caching in the Hub service, and not caching, to hopefully see that caching is significantly faster. \\
+
+When planning my end-to-end testing I recognized a problem that I am unable to fix with this type of testing. The server is not a particulatly fast machine, however it does have access to business grade internet (about 1GB internet), which is magnitudes faster than my residential internet (about 80 MB), therefore even with the entire bandwidth of my internet, I am unable to load the server enough to affect its performance beyond a basic point, so I can't completely reach the systems limit.
+
+\pagebreak
+\subsection{Whitebox Serverside Performance Testing}
+I use the term Whitebox to describe testing the performance os the system from within the request receiving services (Auth and Hub), this measures the complete turn around time (how long a request takes to fulfil), all the way from recieving it and returning a result. The results will be measured in microseconds, 1 seconds = 1000 milliseconds = 1 000 000 microseconds. \\
+
+All the requests are sent as fast as my home network can, all at the same time.
+
+\subsubsection{/login route}
+The /login method is a POST request, where the user sends over their email and password, and the server returns an access and refresh token. This involves hashing the user's password and doing a read from the PostgreSQL database from the auth service, in order to check the user's details are correct. It is a single service request (meaning it doesnt ask anything from any other services), which will make it fairly fast. The results are plotted below.
+
+\begin{figure}[h]
+  \caption{/login route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/login.png}
+\end{figure}
+
+This was very good to see, that my simplest service has a very consistent curve, sitting at around 700 microseconds, which is very fast. Most importantly it stayed fairly consistent throughout the testing with only 2 requests reaching over the 1000 microseconds barrier, I attribute these to system the system being under some load from other background processes.
+
+\subsection{End-to-End Performance}
+?
+
 \section{Bibliography}
 
 \bibliography{ref}
