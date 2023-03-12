@@ -495,28 +495,88 @@ services:
 
 As you can see the docker compose file is quite extensively because it has to contain the various services used for my project, it runs the RabbitMq service, various databases and all the services which I have coded. It also configures ports and environment variables as well as docker volumes.
 
+\pagebreak
 
 \section{Performance Evaluation}
 It is important for me to access how my system performs both internally (how long does the server take to fullfil a request), and also end-to-end (how quickly does the user get their request back). Especially I will look at the differences between the user of caching in the Hub service, and not caching, to hopefully see that caching is significantly faster. \\
 
 When planning my end-to-end testing I recognized a problem that I am unable to fix with this type of testing. The server is not a particulatly fast machine, however it does have access to business grade internet (about 1GB internet), which is magnitudes faster than my residential internet (about 80 MB), therefore even with the entire bandwidth of my internet, I am unable to load the server enough to affect its performance beyond a basic point, so I can't completely reach the systems limit.
 
-\pagebreak
 \subsection{Whitebox Serverside Performance Testing}
 I use the term Whitebox to describe testing the performance os the system from within the request receiving services (Auth and Hub), this measures the complete turn around time (how long a request takes to fulfil), all the way from recieving it and returning a result. The results will be measured in microseconds, 1 seconds = 1000 milliseconds = 1 000 000 microseconds. \\
 
 All the requests are sent as fast as my home network can, all at the same time.
 
+\pagebreak
 \subsubsection{/login route}
 The /login method is a POST request, where the user sends over their email and password, and the server returns an access and refresh token. This involves hashing the user's password and doing a read from the PostgreSQL database from the auth service, in order to check the user's details are correct. It is a single service request (meaning it doesnt ask anything from any other services), which will make it fairly fast. The results are plotted below.
 
-\begin{figure}[h]
+\begin{figure}[h!]
   \caption{/login route results}
 \hspace*{-3cm}
 \includegraphics[width=1.5\textwidth]{../results/login.png}
 \end{figure}
 
 This was very good to see, that my simplest service has a very consistent curve, sitting at around 700 microseconds, which is very fast. Most importantly it stayed fairly consistent throughout the testing with only 2 requests reaching over the 1000 microseconds barrier, I attribute these to system the system being under some load from other background processes.
+
+\pagebreak
+\subsubsection{/asset route}
+The /asset route is a GET request that goes to the Hub service first. The hub requests the brain service for all its persistent storage needs, except for the ones that are cached. I have implemented caching using a Redis database and a strategy of storing the endpoint with some metadata as a key for the Redis database, if the key is present then we can serve cache. This is described in further detail above. The results for this request, are plotted below.
+
+\begin{figure}[h!]
+  \caption{/asset route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/asset.png}
+\end{figure}
+
+Starting with the non-cached results in orange, we can see that because the service has to make a request to the brain service and the brain then needs to perform a read from permanent storage from the PostgreSQL database, we end up with a much slower (but still very fast) turn around time. Averaging at around 2000 micro seconds, or just about 2 milliseconds. Noticably there is a spike towards the end of the dataset, however this is an anomaly it seems and needs no further investigation, I attribute it to system noise. \\
+
+The cached results are the most interesting ones, as you can see the request time averages at around 500 micro seconds (0.5 milliseconds), with a few spikes towards the end of the dataset, but averaging back down towards the end. This is significantly faster than requesting the brain for the information, 4 times faster in fact. This is extremely good to see that all the effort that went into creating an effective caching sub-system in the hub service has paid off.
+
+\pagebreak
+\subsubsection{/trade route}
+This endpoint returns all the active trades in the system, a value that can be cached if the system is not under load and being used to actively trade, this would be especially useful when potential markets are closed or during periods of low activity. It is unlikely that I could achieve any sort of caching when the system is being used to constantly trade because the trades cache has to be constantly invalidated. The following test does however test caching requests as well, but take into account this is only realistic to achieve during these periods of low activity.
+
+\begin{figure}[h!]
+  \caption{/asset route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/get-trades.png}
+\end{figure}
+
+We see around the same improvement from cached results vs non-cached results when compared to the /asset endpoint results, an improvement of around 4 times. The average result for a cached request is around 600 microseconds, a number slightly higher than the assets because at any given point there are a lot more trades than there are assets, therefore the read from PostgreSQL naturally takes more time. \\
+
+The non-cached results average at around 2000 microseconds (2 milliseconds), which is what I expected after testing the /asset endpoint.
+
+\pagebreak
+\subsubsection{/trade/create route}
+This is a POST request to create a trade for a given asset, for a price. This can be a sell or buy transaction, but it is a fairly complicate endpoint because there is a lot of business logic that needs to happen. The system must check the user can trade this asset, or if they have enough money, as well as other general validation. It is also a request where basically no real caching is possible, and therefore the brain service takes almost all the load for this request. The results for the test are below.
+
+\begin{figure}[h!]
+  \caption{/trade/create route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/create-trade.png}
+\end{figure}
+
+These results are much more chaotic, and naturally so because of how much more complex this endpoint is compared to other ones. We see the average at around 8000 microseconds (8 milliseconds), with quite a few data points that jump in terms of response time. I believe this is because of the lack of available threads on the virtual machine the test was conducted on, with around 4 threads some requests have to wait for others to finish before starting to handle the next one, hence explaining the jumps. This could be solved by having a better virtual machine (after all the one I am using isn't anything special). And then these results would look much more plausable. \\
+
+To test this theory I retested this request on my local machine, who's specs I have mentioned above, but the point is that there is significantly more performance power than the virtual machine.
+
+TODO
+
+\pagebreak
+\subsubsection{/trade/complete route}
+This endpoint is also a POST request, and it is very similar to the create trade endpoint, slightly less complex but still has to do a fair amount of validation in order to make sure that the transaction is a valid one (making sure the user has enough money, or enough of that asset, etc...). Again, no real caching is possible on this one and therefore I expect some more chaotic results.
+
+\begin{figure}[h!]
+  \caption{/trade/create route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/complete-trade.png}
+\end{figure}
+
+These results are slightly less chaotic, due to the number of reads needed before being able to complete the transaction being less. Also the body is the request is significantly smaller than when you create a trade. We can see that the average is around 7000 microseconds (7 milliseconds), with only a few outliers where the system seems to have ran out of available threads. To test this hypothesis again I have retested this endpoint using my local machine.
+
+TODO
+
 
 \subsection{End-to-End Performance}
 ?
