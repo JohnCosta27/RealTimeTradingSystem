@@ -497,6 +497,16 @@ As you can see the docker compose file is quite extensively because it has to co
 
 \pagebreak
 
+\section{Solution Development}
+\subsection{Using Git and GitLab}
+\subsection{Integration Testing}
+\subsection{End to end frontend testing}
+\subsection{Backend technical decisions}
+\subsubsection{Caching}
+\subsubsection{Shared types and utilities}
+\subsubsection{Queue per service system}
+\subsection{Refactoring}
+
 \section{Performance Evaluation}
 It is important for me to access how my system performs both internally (how long does the server take to fullfil a request), and also end-to-end (how quickly does the user get their request back). Especially I will look at the differences between the user of caching in the Hub service, and not caching, to hopefully see that caching is significantly faster. \\
 
@@ -506,6 +516,9 @@ When planning my end-to-end testing I recognized a problem that I am unable to f
 I use the term Whitebox to describe testing the performance os the system from within the request receiving services (Auth and Hub), this measures the complete turn around time (how long a request takes to fulfil), all the way from recieving it and returning a result. The results will be measured in microseconds, 1 seconds = 1000 milliseconds = 1 000 000 microseconds. \\
 
 All the requests are sent as fast as my home network can, all at the same time.
+
+\subsubsection{Machine Specifications}
+TODO: Add VM specs and local machine specs.
 
 \pagebreak
 \subsubsection{/login route}
