@@ -495,6 +495,202 @@ services:
 
 As you can see the docker compose file is quite extensively because it has to contain the various services used for my project, it runs the RabbitMq service, various databases and all the services which I have coded. It also configures ports and environment variables as well as docker volumes.
 
+\pagebreak
+
+\section{Methodology}
+In this section I will discuss my uses of software engineering tools and techniques that I used in order to deliver on the project.
+
+\subsection{Using Git and GitLab}
+By far the most important tool that I used throughout my project was Git. CITE? Git is a distributed version control system that allows code to be stored in a way that it can be searched, checked out, branched and many other features. \\
+
+In my project I took liberal use of branching from a main branch, where all features were developed from. There are times when I pushed a commit straight into the main branch but mostly this was small configuration changes that did not require much in terms of features, which for a solo project is fine. Below I have entered a visualization of my git branching history, visualized using the following command: git log --graph --decorate --oneline.
+
+\begin{verbatim}
+* f1645ef (HEAD -> report-perf-evaluation, origin/report-perf-evaluation) 
+  REPORT: Adding heading that I plan on writing
+* fd1b155 REPORT: Finished the virtual machine white box testing evaluation
+* c954611 REPORT: Adding performance evaluation (login route)
+*   007612c (origin/main, origin/HEAD, main) 
+    Merge branch 'performance-testing' into 'main'
+|\
+| * b9e2feb FEAT: Adding get trades chart
+| * f06326c FEAT: Adding get trades testing
+| * f88d054 FEAT: Testing cache invalidation
+| *   8468f4f Merge branch 'main' into performance-testing
+| |\
+| * | 0124b80 FEAT: Complete trade testing
+| * | a723bcc FEAT: Login route and create trade testing complete
+* | | 9827468 FIX: There wasn't really an issue it seems
+| |/
+|/|
+* |   4b0dd8e Merge branch 'fix-buy-bug' into 'main'
+|\ \
+| * | ff7145e CHORE: Adding comment to unclear code
+| * | 8c7282e FIX: A user can no longer trade with themselves
+| * | dcc8606 FIX: When the user bought without already owning some,
+      db wouldn't save new asset
+* | |   bbb20e1 Merge branch 'frontend-requests-refactor' into 'main'
+|\ \ \
+| |/ /
+|/| |
+| * | 59f6e96 REFACTOR: Util function to set tokens
+| * | dbbe94e FEAT: Using suspense to wait for user authentication
+| * | 6a3bf7e REFACTOR: Login and register pages logic
+| * | 08dc5f6 WIP(auth): Refactoring the frontend authentication code
+| * | e9c6cae CHORE: Removing unnecessary console logs
+| * | 1b6a918 REFACTOR(requests): Using axios create client
+|/ /
+\end{verbatim}
+
+As you can see, the development occurs on seperate branches from main, and often take place in parallel because of the amount of different features throughout my project. As you can see, there are also places where the main branch is merged into my feature branch, this is because I would often merge features into the main code base and then it is good practice to always work with the most up to date version of the trunk, or in this case the main branch. \\
+
+Through the beginning of my project I simply used Git on its own to manage my project, however towards the end stages of developing the project I ran into the limitation that I was working on multiple features at the same time, and these can be managed just fine by Git, but it is difficult as an engineer to context switch between these features whilst maintaining a good level of code quality. To help solve this problem I looked at GitLab's own merge request environments. Instead of merging into main using regular terminal Git commands, I started a merge/pull request on GitLab, and would use that environment as a hub for the code, where I would often leave comments to myself and do some code review of my own code. An example of this is shown in this figure \ref{gitlab}. \\
+
+\begin{figure}[h!]
+  \caption{GitLab Code Review Example}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../Diagrams/GitLab.png}
+\label{gitlab}
+\end{figure}
+
+This might seem strange at first, afterall these features were designed with a team of engineers in mind and not just a single person, however I found that having a space to make myself accountable to myself was extremely useful, specially when doing refactoring work towards the end of the project, as often it was not technical decisions that I needed to review, but simply code quality, which is something the figure \ref{gitlab} demonstrates. \\
+
+Another important Git convention which I followed is the commit messages. We know that these must be descriptive to what the commit is doing, however I went a step further in starting all my commits (Bar a handful), with keywords such as: FIX, REFACTOR, FEAT, CHORE, which indicate very clearly to myself what I was working on on certain commits. This convention proved to be so useful to myself that I stopped using the log book which I had stuck to throughout term one because I found myself simply rewriting the commit messages that I had done for the day. 
+
+\pagebreak
+\subsubsection{GitLab Runners}
+Early on in my project, after setting up docker, I ran into the issue of constantly having to build docker images and upload them to Docker Hub (CITE HERE). This was not a lot of time, but it was mostly that I would often forget to do this, because it isn't work that a programmer should do it, the task should be automated. So I decided to spend some time and automate it. \\
+
+CITE HERE (https://docs.gitlab.com/runner/)
+The universities GitLab instance does not provide CI runners, therefore I had to setup my own runner on my own Virtual Machine (The same virtual machine I used for testing). The process wasn't easy but involved running the CI runner as a docker image which then mostly manages itself. The more complicated part came with the connecting this runner to the universities GitLab instance, and then writing a GitLab CI file to actually compile the images, this file is below.
+
+\begin{verbatim}
+stages:
+  - build
+
+docker_build:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  script:
+    - cd apps/backend
+    - docker login -u johncosta27 -p $DOCKER_TOKEN
+    - docker build -f Auth.Dockerfile -t johncosta27/fyp-auth .
+    - docker push johncosta27/fyp-auth
+    - docker build -f Brain.Dockerfile -t johncosta27/fyp-brain .
+    - docker push johncosta27/fyp-brain
+    - docker build -f Hub.Dockerfile -t johncosta27/fyp-hub .
+    - docker push johncosta27/fyp-hub
+\end{verbatim}
+
+The CI file itself only took a while to write because I wasn't familiar with the configuration and the only way to test it was to push into the main branch and see if it worked (this was one of the few instances where I pushed straight into the main branch). You can see environment variables scattered throughout the file like: DOCKER\_TOKEN. These were sensative secrets which wouldn't be appropriate to place inside a text file, instead GitLab provides its own secret management system, where I store these tokens, maintaining them away from my Git history. \\
+
+This file worked well, and the runner was very stable and never seemed to crash on the VM, therefore I was able to have an automatic docker image builder which pushed to my docker registery. \\
+
+I also attempted to use the same CI pipeline to run the integration tests. Unfortunately I was not able to do this, because of a lack of expertise in CI environments. The problem was that the runner itself is a docker image, and I was asking it to run a bunch of docker images (my project), and run the integration tests on it. The pipeline went as far as spinning up the images but I ended up with being unable to access the databases, which is obviously a big issue. This was taking up a lot of hours to try and solve and so I decided to abandom this prospect. 
+
+\begin{figure}[h!]
+  \caption{GitLab Code Review Example}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../Diagrams/GitLab.png}
+\label{gitlab}
+\end{figure}
+
+\pagebreak
+\subsection{Integration Testing}
+\subsection{End to end frontend testing}
+\subsection{Project management}
+
+\section{Technical Development}
+\subsection{Backend technical decisions}
+\subsubsection{Caching}
+\subsubsection{Shared types and utilities}
+\subsubsection{Queue per service system}
+\subsection{Refactoring}
+
+\section{Performance Evaluation}
+It is important for me to access how my system performs both internally (how long does the server take to fullfil a request), and also end-to-end (how quickly does the user get their request back). Especially I will look at the differences between the user of caching in the Hub service, and not caching, to hopefully see that caching is significantly faster. \\
+
+When planning my end-to-end testing I recognized a problem that I am unable to fix with this type of testing. The server is not a particulatly fast machine, however it does have access to business grade internet (about 1GB internet), which is magnitudes faster than my residential internet (about 80 MB), therefore even with the entire bandwidth of my internet, I am unable to load the server enough to affect its performance beyond a basic point, so I can't completely reach the systems limit.
+
+\subsection{Whitebox Serverside Performance Testing}
+I use the term Whitebox to describe testing the performance os the system from within the request receiving services (Auth and Hub), this measures the complete turn around time (how long a request takes to fulfil), all the way from recieving it and returning a result. The results will be measured in microseconds, 1 seconds = 1000 milliseconds = 1 000 000 microseconds. \\
+
+All the requests are sent as fast as my home network can, all at the same time.
+
+\subsubsection{Machine Specifications}
+TODO: Add VM specs and local machine specs.
+
+\pagebreak
+\subsubsection{/login route}
+The /login method is a POST request, where the user sends over their email and password, and the server returns an access and refresh token. This involves hashing the user's password and doing a read from the PostgreSQL database from the auth service, in order to check the user's details are correct. It is a single service request (meaning it doesnt ask anything from any other services), which will make it fairly fast. The results are plotted below.
+
+\begin{figure}[h!]
+  \caption{/login route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/login.png}
+\end{figure}
+
+This was very good to see, that my simplest service has a very consistent curve, sitting at around 700 microseconds, which is very fast. Most importantly it stayed fairly consistent throughout the testing with only 2 requests reaching over the 1000 microseconds barrier, I attribute these to system the system being under some load from other background processes.
+
+\pagebreak
+\subsubsection{/asset route}
+The /asset route is a GET request that goes to the Hub service first. The hub requests the brain service for all its persistent storage needs, except for the ones that are cached. I have implemented caching using a Redis database and a strategy of storing the endpoint with some metadata as a key for the Redis database, if the key is present then we can serve cache. This is described in further detail above. The results for this request, are plotted below.
+
+\begin{figure}[h!]
+  \caption{/asset route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/asset.png}
+\end{figure}
+
+Starting with the non-cached results in orange, we can see that because the service has to make a request to the brain service and the brain then needs to perform a read from permanent storage from the PostgreSQL database, we end up with a much slower (but still very fast) turn around time. Averaging at around 2000 micro seconds, or just about 2 milliseconds. Noticably there is a spike towards the end of the dataset, however this is an anomaly it seems and needs no further investigation, I attribute it to system noise. \\
+
+The cached results are the most interesting ones, as you can see the request time averages at around 500 micro seconds (0.5 milliseconds), with a few spikes towards the end of the dataset, but averaging back down towards the end. This is significantly faster than requesting the brain for the information, 4 times faster in fact. This is extremely good to see that all the effort that went into creating an effective caching sub-system in the hub service has paid off.
+
+\pagebreak
+\subsubsection{/trade route}
+This endpoint returns all the active trades in the system, a value that can be cached if the system is not under load and being used to actively trade, this would be especially useful when potential markets are closed or during periods of low activity. It is unlikely that I could achieve any sort of caching when the system is being used to constantly trade because the trades cache has to be constantly invalidated. The following test does however test caching requests as well, but take into account this is only realistic to achieve during these periods of low activity.
+
+\begin{figure}[h!]
+  \caption{/asset route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/get-trades.png}
+\end{figure}
+
+We see around the same improvement from cached results vs non-cached results when compared to the /asset endpoint results, an improvement of around 4 times. The average result for a cached request is around 600 microseconds, a number slightly higher than the assets because at any given point there are a lot more trades than there are assets, therefore the read from PostgreSQL naturally takes more time. \\
+
+The non-cached results average at around 2000 microseconds (2 milliseconds), which is what I expected after testing the /asset endpoint.
+
+\pagebreak
+\subsubsection{/trade/create route}
+This is a POST request to create a trade for a given asset, for a price. This can be a sell or buy transaction, but it is a fairly complicate endpoint because there is a lot of business logic that needs to happen. The system must check the user can trade this asset, or if they have enough money, as well as other general validation. It is also a request where basically no real caching is possible, and therefore the brain service takes almost all the load for this request. The results for the test are below.
+
+\begin{figure}[h!]
+  \caption{/trade/create route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/create-trade.png}
+\end{figure}
+
+These results are much more chaotic, and naturally so because of how much more complex this endpoint is compared to other ones. We see the average at around 8000 microseconds (8 milliseconds), with quite a few data points that jump in terms of response time. I believe this is because of the lack of available threads on the virtual machine the test was conducted on, with around 4 threads some requests have to wait for others to finish before starting to handle the next one, hence explaining the jumps. This could be solved by having a better virtual machine (after all the one I am using isn't anything special). And then these results would look much more plausable. \\
+
+\pagebreak
+\subsubsection{/trade/complete route}
+This endpoint is also a POST request, and it is very similar to the create trade endpoint, slightly less complex but still has to do a fair amount of validation in order to make sure that the transaction is a valid one (making sure the user has enough money, or enough of that asset, etc...). Again, no real caching is possible on this one and therefore I expect some more chaotic results.
+
+\begin{figure}[h!]
+  \caption{/trade/create route results}
+\hspace*{-3cm}
+\includegraphics[width=1.5\textwidth]{../results/complete-trade.png}
+\end{figure}
+
+These results are slightly less chaotic, due to the number of reads needed before being able to complete the transaction being less. Also the body is the request is significantly smaller than when you create a trade. We can see that the average is around 7000 microseconds (7 milliseconds), with only a few outliers where the system seems to have ran out of available threads. 
+
+\subsection{End-to-End Performance}
+?
+
 \section{Bibliography}
 
 \bibliography{ref}
