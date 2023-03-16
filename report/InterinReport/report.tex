@@ -600,8 +600,53 @@ I also attempted to use the same CI pipeline to run the integration tests. Unfor
 \end{figure}
 
 \pagebreak
-\subsection{Integration Testing}
-\subsection{End to end frontend testing}
+\subsection{Testing}
+Testing in my project was mostly carried out through the testing of API requests instead of unit testing in each function. This decision was made because often services rely on other services in order to run, for example the Hub needs the Brain to read data. If I was to unit test the Hub I would need to create a 'dummy' Brain which I would then need to keep updated with the real brain. This is not ideal because; firstly it is not a realistic test; secondly I would need to constantly change this dummy API every time the real brain is changed, making this unrealistic. \\
+
+\subsubsection{Integration Testing}
+Integration tests are the primary tests in my project, these involve running all the backend together, including all the databases, and testing the system by sending HTTP Requests and checking the responses are adequate, this tests access rights, the shape of data, and various other things. \\ 
+My integration tests also have a mechanism to clear the databases clean and add testing data so that the tests can stay determanistic. \\
+
+The tests are written using Node.js CITE HERE, this is purely because it is much faster to write and use from a developers perspective, at the cost of performance. However during tests that are not touched by the user, performance is not a concern. The testing libraries I use are:
+
+\begin{itemize}
+  \item Jest - Testing framework CITE HERE
+  \item supertest - Builder pattern request builder CITE HERE
+  \item prisma - Typesafe ORM, to create dummy data and clear the databases.
+\end{itemize}
+
+I have added an example of the tests in the report before, but in this figure \ref{integration} you can see what the results of the tests look like.
+
+\begin{figure}[h]
+  \caption{Integration Tests Results}
+  \label{integration}
+  \begin{verbatim}
+PASS  src/auth/refresh.test.ts
+PASS  src/auth/register.test.ts
+PASS  src/auth/login.test.ts
+PASS  src/hub/assets.test.ts
+PASS  src/hub/asset-trades.test.ts
+PASS  src/hub/users.test.ts
+PASS  src/hub/trade.test.ts
+
+Test Suites: 7 passed, 7 total
+Tests:       22 passed, 22 total
+Snapshots:   12 passed, 12 total
+Time:        3.867 s, estimated 5 s
+Ran all test suites matching /test/i.
+  \end{verbatim}
+\end{figure}
+
+Each Node.js project also has a package.json file where you can define scripts to make the running of the project easier, I utilized this to create scripts that make it 1 command to run tests.
+
+\begin{itemize}
+  \item npm run test:clean -> Cleans the database, creates new test data and runs the tests.
+  \item npm run test:run -> Just runs the test with the same test data.
+  \item npm run prisma:gen -> Generates the types from the database to allow prisma to access db.
+\end{itemize}
+
+\subsubsection{End to end frontend testing}
+
 \subsection{Project management}
 
 \section{Technical Development}
