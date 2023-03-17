@@ -1,6 +1,7 @@
 \documentclass[titlepage]{article}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{listings}
 \graphicspath{ {../Diagrams/} }
 
 % Title Page
@@ -684,6 +685,7 @@ Every node on my system has an attached RabbitMQ queue. So the Hub service has a
 
 This decision comes at the cost of having to manage multiple queues in the system and manage IDs for these given queues. I talk more about how I managed this in the "shared types and utilities" section of the report.
 
+\pagebreak
 \subsubsection{Caching}
 The Hub service doesn't always have to go to the brain service in order to reply to the client, the reason for this is that I have implemented a caching system using a Redis database that allows me to reduce the response time for request, and generally reduce the load on the system for commonly fetches, but uncommonly changed data. The results for this mechanics are below in the evaluation section. \\
 
@@ -691,10 +693,115 @@ The hard part of caching was cache invalidation. This is the way of taking cache
 
 The hard problem to solve here has nothing to do with the actual caching itself, but how to decouple the request handling logic, from the caching logic. To achieve this I used a middleware, which is a function that runs when the user sends an HTTP request, but importantly runs BEFORE the request is handled (I use a similar middleware to validate that the user is authenticated). The code for the request is in the following figure \ref{cachereq}.
 
-\subsubsection{Shared types and utilities}
-\subsection{Authentication}
-\subsection{Refactoring}
+\begin{figure}
+  \caption{Cache Request Middleware}
+  \label{cachereq}
+  \hspace*{-3cm}
+  \includegraphics[width=1.5\textwidth]{../Diagrams/cachereq.png}
+\end{figure}
 
+\pagebreak
+\subsubsection{Shared types and utilities}
+Because my entire backend systems were written in Go (CITE HERE), and they all involve similar problem, it is only natural that I was going to run into code repeatition whilst working on this project. I began tackling this by not tackling it at all within the first few weeks of development, I would often copy various parts of the code into different folders so that I could use it in all the services. This worked because it allowed me to move fast and actually get the work of getting the project started done. However, it came a time where this was a liability. \\
+
+As you are now aware, the Hub service and the Brain service communicate constantly. However, how can I ensure that the format of the data is preserved on either end? Because if I try to parse some data into a certain memory allocation and I get it wrong, the program is going to have a run time error. This is a big problem even in the industry, with many tools to help prevent these. Some of the tools are. \\
+
+CITE HERE
+\begin{itemize}
+  \item GraphQL - A schema for transmitting and request data across different services.
+  \item WebRPC - Code-generation driven approach to writing schemas for web services.
+  \item gRPC - Multi-language RPC framework.
+\end{itemize}
+
+Some of the listed solutions are more opinionated than others, but they all had the drawback of having a significant learning curve, and if I was to use any of them I would be simply over-engineering my project. As the project stands now, there is a much simpler solution to the problem of achieving end-to-end type safety, so long as the project remains small. If the project was to be used by more than 2 or 3 engineers, and be seriously developed, I would definetly invest the time and effort into looking into a more robust solution. \\
+
+For now I am simply using a shared types library, which is copied into each of the service's docker images when they are build. This ensures that I have consistent type definitions on every service that requires them, and as long as I stay consistent on type casting into these structs, there cannot be any run-time errors. The figure \ref{sharedtype} shows an example of such type definition. This figure shows the type Transaction, which the Hub requests from the Brain using simple RPC. Because the services communicate using JSON that is turned into bytes, there must be a way of converting the JSON back into a struct, to be used by either side of the events. This solution ensures the consistent typing of data on both ends. \\
+
+You can also the the json type annotation, to know how to Marshall and Unmarshall the JSON data and what keys to use.
+
+\begin{figure}
+  \caption{Example of a shared type}
+  \label{sharedtype}
+  \begin{verbatim}
+type Base struct {
+	ID        uuid.UUID  `gorm:"type:uuid;primary_key;" json:"Id"`
+	CreatedAt time.Time  `json:"CreatedAt"`
+	UpdatedAt time.Time  `json:"UpdatedAt"`
+	DeletedAt *time.Time `sql:"index" json:"DeletedAt"`
+}
+
+type Transaction struct {
+	Base
+	AssetId  string  `json:"AssetId"`
+	BuyerId  string  `json:"BuyerId"`
+	SellerId string  `json:"SellerId"`
+	State    string  `json:"State"`
+	Price    float64 `json:"Price"`
+	Amount   float64 `json:"Amount"`
+}
+  \end{verbatim}
+\end{figure}
+
+Another part of my project that is shared is a few utility functions, and even the RabbitMQ client which I designed to work specifically for my system. I won't add code snippets here because it is quite extensive, but in my projects 'apps/backend/utils', you will find various pieces of code that are shared throughout my 3 services, the most important one being the RabbitMQ client, which enables the services to send and recieve messages through my RabbitMQ system without needing to implement this logic everytime.
+
+\pagebreak
+
+\subsection{Authentication}
+Authentication in my system is done using JWTs (CITE HERE), which allows users to authenticate themselves with a cryptographically safe token. This token is sent between the client and either the Hub or the Auth system, it is not required between the Hub and the Brain as this communication is controlled only through the Hub, and the Brain cannot be accessed from the outside world. To validate this token I have create another middleware, that simply checks that the JWT is correct. The figure \ref{authmiddleware} shows an example
+
+\begin{figure}
+  \caption{Authentication Middleware}
+  \label{authmiddleware}
+  \begin{verbatim}
+const USER_ID_HEADER = "userId"
+
+/** Middleware to check the authentication of the user.
+  * If the user is not authenticated, their request will be returned,
+  * with an unauthorized message, and will not processed.
+  *
+  * If the JWT is safe, then the request will processed as normal.
+  */
+func Auth() gin.HandlerFunc {
+  return func (c *gin.Context) {
+
+    // Fetches the access token from the header of the request
+    accessToken := c.GetHeader("access")
+
+    // Calls the util function to decode the token
+    claims, err := utils.DecodeJwt(accessToken, "access")
+
+    // Reject the request, it is unauthorized.
+    if err != nil {
+      log.Println(err)
+      c.JSON(http.StatusUnauthorized, gin.H{
+        "error": "unauthorized",
+      })
+      c.Abort()
+      return
+    }
+
+    // Parse the UUID stored in the JWT, if it isn't valid,
+    // Return an unauthorized error.
+    userId, err := uuid.Parse(claims.Uuid)
+    if err != nil {
+      log.Println(err)
+      c.JSON(http.StatusUnauthorized, gin.H{
+        "error": "unauthorized",
+      })
+      c.Abort()
+      return
+    }
+
+    // Set claims to the context of the request, so following handlers
+    // can access this common information.
+    c.Set("claims", claims)
+    c.Set(USER_ID_HEADER, userId)
+  }
+}
+  \end{verbatim}
+\end{figure}
+
+\pagebreak
 \section{Performance Evaluation}
 It is important for me to access how my system performs both internally (how long does the server take to fullfil a request), and also end-to-end (how quickly does the user get their request back). Especially I will look at the differences between the user of caching in the Hub service, and not caching, to hopefully see that caching is significantly faster. \\
 
