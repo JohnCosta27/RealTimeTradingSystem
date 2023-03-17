@@ -647,6 +647,23 @@ Each Node.js project also has a package.json file where you can define scripts t
 \end{itemize}
 
 \subsubsection{End to end frontend testing}
+To test the frontend application I have used an open-source framework called Cypress CITE HERE. It provides a framework for testing an application from the perspective of the user without having to know about the underlying code, you write tests in a way that describes a user navigating through the website. This is the most real type of testing you can do because of it having 0 knowledge of the working system, it simply clicks buttons just like a regular user would. \\
+
+Here is an example of what a cypress testing file would look like:
+
+\begin{verbatim}
+  it('Allows user to see email but not password', () => {
+    cy.fixture('users').then(users => {
+      cy.get('input').eq(0).type(users[0].email);
+      cy.get('input[type="password"]').type(users[0].password);
+
+      cy.get('input').eq(0).should('have.value', users[0].email);
+      cy.get('input[type=password]').should('have.value', users[0].password);
+    });
+  });
+\end{verbatim}
+
+The code above is extremely descriptive and uses DOM selectors (Statements that fetch data directly from the HTML of the website), and perform certain assertions on them. Cypress also provides fixtures, which are externally written JSON files that allow you to easily drop in testing data, in this case I am using this feature for getting testing users emails and passwords.
 
 \subsection{Project management}
 I started off using Todoist CITE HERE for my project management, however I found that it become quite restricted specially when I had to jump between features, bug fixes and report writing, and I tend to prefer a lot of organisation over the lack of it, therefore I found a project management application which has basic cards, issues, backlogs and most other features that scrum teams use for software development. The tool I choose is Linear CITE HERE. In this figure you can see what the current state of the project is as I write this report (most development done, mostly bug fixes and report writing). \ref{linear}
