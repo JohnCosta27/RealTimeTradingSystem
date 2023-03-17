@@ -17,4 +17,14 @@ describe('Login testing', () => {
       cy.get('input[type=password]').should('have.value', users[0].password);
     });
   });
+
+  it('Allows user to login', () => {
+    cy.fixture('users').then(users => {
+      cy.get('input').eq(0).type(users[0].email);
+      cy.get('input[type="password"]').type(users[0].password);
+
+      cy.get('button').click();
+      cy.location('pathname').should('equal', '/');
+    });
+  });
 })
