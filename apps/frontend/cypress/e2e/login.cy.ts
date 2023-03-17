@@ -18,6 +18,14 @@ describe('Login testing', () => {
     });
   });
 
+  it('Shows error with incorrect details', () => {
+    cy.get('input').eq(0).type('not');
+    cy.get('input[type="password"]').type('correct');
+
+    cy.get('button').click();
+    cy.contains('Email or password are incorrect').should('be.visible');
+  });
+
   it('Allows user to login', () => {
     cy.fixture('users').then(users => {
       cy.get('input').eq(0).type(users[0].email);
