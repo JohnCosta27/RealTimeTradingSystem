@@ -6,14 +6,16 @@ import { Asset } from './ui/Asset';
 import { Loading } from './ui/Loading';
 
 export const Assets: Component = () => {
-
   const assets = createQuery(
     () => [Requests.Assets],
     () => GetAssets().then((res) => res.data),
   );
 
   return (
-    <div class="w-full h-full p-4 flex flex-col gap-4 bg-neutral-focus rounded shadow-lg">
+    <div
+      class="w-full h-full p-4 flex flex-col gap-4 bg-neutral-focus rounded shadow-lg"
+      data-testid="asset-page"
+    >
       <h2 class="text-4xl">Assets</h2>
       <Switch>
         <Match when={assets.isLoading}>
