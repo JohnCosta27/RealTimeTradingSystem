@@ -899,6 +899,61 @@ These results are slightly less chaotic, due to the number of reads needed befor
 \subsection{End-to-End Performance}
 ?
 
+\pagebreak
+\section{Professional Issues}
+There were a variety of professional issues that deal with topics that stretch beyond Computer Science. I discuss these below.
+
+\subsection{Open Source}
+I believe that any project must be extremely careful to use reputable tools to achieve their goals in the project, and I also believe that these tools should (in general), be open sourced. There are a few reasons for this, but the most important one is transparency. If you use a propriatery database system for example, you are at the mercy of the corporation, you are also restricted with how far you can extend the functionality of such software. Furtheremore you tend to be a victim to Vendor Lock-in, discussed below. \\ 
+
+There is a downside to using open source tools, and that is the fact that they don't have a warranty. If you make a mistake whilst using the open source tool there is no one obligated to help you solve the problem, nor is there anyone responsible except the engineer, if anything goes wrong.  \\
+
+However, the open source community is very big and from what I found very helpful. The sheer quality of documentation of software I have used has helped me achieve my goals in this project tremendously. Furthermore, as soon as you use an open source tool, you also become a small part of this community, and can raise issues on the software, or even submit a pull request to fix these issues. I actually ran into a small issue with SolidJS (CITE HERE), and I have created an issue on their Git Repository. FINISH THIS PART. \\
+
+\subsubsection{Licensing}
+The license of open source software changes. Some open source projects cannot be used by individuals to create a product that is closed source, other projects do. The most flexible licenses, and therefore the only ones I have used are the following.
+
+\begin{itemize}
+  \item MIT - https://opensource.org/license/mit/
+  \item Apache
+  \item BSD
+\end{itemize}
+
+All these licenses allow the use or software, free of charge, and to modify it freely and freely charge or use it in a propriatery product, the only restriction to some is that you cannot sell the exact software you are using from a license (You cant take an open source project and rebrand it and sell it), but obviously this isn't a problem in my project.
+
+\subsection{Vendor Lock-in}
+I mentioned above that you might become locked-in to a certain vendor when using propriatery software, the most common case for this comes with the hosting of your product. Typically engineers do not own big servers to host their products on and this was the case with me, so I had to resort to using some cloud service which is owned and managed by a big corporation. \\
+
+I could have made this project a lot easier for me if I used technologies such as AWS Container Engine, or even AWS Lambdas, however these technologies lock you into only using the services of that certain cloud provider, and once you are in, it becomes very difficult to change your code so that it works somewhere else. Hence my decision to use only open source software in my project. \\
+
+I happen to have had a friend with Azure credits and so I used a virtual machine in Azure. The reason for using a simple Linux virtual machine was because I wanted to avoid vendor lock in as much as possible, I could leave Azure whenever I want as long as I have another virtual machine on some other platform. The reason for this ease is because my entire system only needs a machine with docker engine running, which is also open source software that can run on any computer, this can be found on any major cloud provider.
+
+\subsection{Data Safety}
+My project uses only dummy data, however it is still important to consider the safety of the data that my system stores. This goal has to be thought of throughout the project, right from my decision to use PostgreSQL, the most popular relation database software in the world, which also happens to be open source (It also out performs all the competition by quite some margin). It was developed many decades ago and has some of the most reliable data storage mechanism of any database developed. This means that my data is safe, so long as I use transaction to store the data. \\
+
+This also become an issue when developing my caching mechanism, because if you keep things in cache they are volatile and prone to being lost, therefore I made the decision to not cache any POST requests, and instead only cache the fetching of data, as this guarantees that the date will end up in the PostgreSQL database before any other place.
+
+\section{Final Evaluation}
+
+And so my project concludes. I have learnt a lot from doing this project, specially how do develop distributed systems which is something I had never quite done before, I have also never really focused on performance in a backend project like I have in this one, and there was a lot of learning to do. \\
+
+\subsection{Things that I planned correctly}
+Generally, my planned risks were very correct. The platform performance and scalability being highlighted in my plan as the two main risks, and there were. However because of my well designed system with loosely coupled modules, I was able to make sure that each node was able to scale and work independently of the others, the seperate database design also made this much easier. Furthermore the performance of the system is something I am very proud of, achieving sub 10 millisecond processing time for most requests, and some requests - through the use of chaching going below the 1 millisecond mark is a much better result than I could have hoped for. I attribute this great performance to my ability to choose the correct tools for the job, it is clear to me now that Goland was the perfect language of choice, for dealing with distributed, networked systems such as the ones I developed, due to its very easy to use concurrency model, and effective garbage collection. \\
+
+\subsection{Things that I didn't plan correct}
+
+\subsubsection{BOTs}
+In my plan I put a lot of emphasis on having BOTs trading across the network, when I realise now that this is was not going to help me massively improve the performance or stability of the system, it would have been interesting to see how the system would behave, and in some senses I have tested this, but the time it would have taken to create intelligent enough BOTs would have far outweighted the benefit to be gained, and would have bled over into an intelligents agent project, therefore during the development I choose to simply do basic API stress testing, using preset trades and assets without the need for intelligent agents. \\
+
+\subsubsection{Development Time}
+Furthermore, I severely underestimated the development time needed for the project. I mostly estimated the MVP development time correctly, and I did finish most of the development within Term 1, but I didn't account for the last 20\% of the project taking so long, this I should have been more aware of and could have made my timeline more realistic by giving myself more time for development. It is very common in the industry for the last 20\% to take longer than the first 80\% of the project.
+
+
+\subsection{Conclusion}
+My systems allows users to trade assets with other users. It seems innocent on the surface and could have been developed very quickly if I had no regard for performance and scalability. But with these conserns in mind I was able to make correct decisions in increasing the complexity of my project overall by splitting it into multiple parts (Microservices), and therefore allow for the indivual scaling of each system. \\
+
+The web interface for the project works seemlessly and is very responsive, and also has great UX (User experience) and UI (User interface) patterns that users are already familiar with.
+
 \section{Bibliography}
 
 \bibliography{ref}
