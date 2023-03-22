@@ -2,11 +2,11 @@ package routes
 
 import (
 	"auth/database"
-	"auth/structs"
 	"crypto/sha512"
 	"encoding/hex"
 	"log"
 	"net/http"
+	sharedtypes "sharedTypes"
 	"utils"
 
 	"github.com/gin-gonic/gin"
@@ -20,9 +20,9 @@ import (
  * Body: GetRegisterBody functions returns a struct of the required information
  */
 func RegisterRoute(r *gin.Engine) {
-	r.POST(REGISTER, utils.ParsePostMiddleware(structs.GetRegisterBody), func(c *gin.Context) {
+	r.POST(REGISTER, utils.ParsePostMiddleware(sharedtypes.GetRegisterBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
-		registerBody := b.(*structs.RegisterBody)
+		registerBody := b.(*sharedtypes.RegisterBody)
 
 		salt := utils.GenSalt()
 		hashBytes := sha512.Sum512([]byte(registerBody.Password + salt))
@@ -80,9 +80,9 @@ func RegisterRoute(r *gin.Engine) {
  * Body: GetLoginBody functions returns a struct of the required information
  */
 func LoginRoute(r *gin.Engine) {
-	r.POST(LOGIN, utils.ParsePostMiddleware(structs.GetLoginBody), func(c *gin.Context) {
+	r.POST(LOGIN, utils.ParsePostMiddleware(sharedtypes.GetLoginBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
-		loginBody := b.(*structs.LoginBody)
+		loginBody := b.(*sharedtypes.LoginBody)
 
 		user := &database.User{}
 		db := database.Db.Where("email = ?", loginBody.Email).Find(user)
@@ -129,9 +129,9 @@ func LoginRoute(r *gin.Engine) {
  * Body: GetRefreshBody functions returns a struct of the required information
  */
 func RefreshRoute(r *gin.Engine) {
-	r.POST(REFRESH, utils.ParsePostMiddleware(structs.GetRefreshBody), func(c *gin.Context) {
+	r.POST(REFRESH, utils.ParsePostMiddleware(sharedtypes.GetRefreshBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
-		refreshBody := b.(*structs.RefreshBody)
+		refreshBody := b.(*sharedtypes.RefreshBody)
 
 		claims, err := utils.DecodeJwt(refreshBody.Refresh, "refresh")
 		if err != nil || claims.Type != "refresh" {

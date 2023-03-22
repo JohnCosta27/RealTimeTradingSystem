@@ -1,6 +1,6 @@
-package structs
+package sharedtypes
 
-//TODO: Migrate to common lib package.
+// TODO: Migrate to common lib package.
 
 type RequestBody interface {
 	*RegisterBody | *LoginBody | *RefreshBody
