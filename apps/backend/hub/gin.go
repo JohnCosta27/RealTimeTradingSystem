@@ -55,5 +55,5 @@ func InitGin() *gin.Engine {
 		WsConnections[ws] = true
 	})
 
-  return Router
+	return Router
 }

@@ -15,7 +15,7 @@ func main() {
 	cache.InitRedisCache()
 	rabbitmq.InitRabbit()
 
-  Router := InitGin()
+	Router := InitGin()
 	go Router.Run("0.0.0.0:4545")
 
 	wg.Wait()
