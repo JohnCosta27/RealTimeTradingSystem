@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	sharedtypes "sharedTypes"
+	ServicesIds "sharedTypes/services"
 	"strconv"
 	"sync"
 
@@ -55,8 +56,8 @@ func main() {
 			returnValue, _ = json.Marshal(&transaction)
 			req := sharedtypes.BrainReq{
 				Url:  sharedtypes.GET_TRADES,
-				From: "0002",
-				To:   "0001",
+				From: ServicesIds.BRAIN,
+				To:   ServicesIds.HUB,
 				Type: sharedtypes.INFO,
 			}
 			actions <- req
@@ -69,8 +70,8 @@ func main() {
 			returnValue, _ = json.Marshal(&transaction)
 			req := sharedtypes.BrainReq{
 				Url:  sharedtypes.GET_TRADES,
-				From: "0002",
-				To:   "0001",
+				From: ServicesIds.BRAIN,
+				To:   ServicesIds.HUB,
 				Type: sharedtypes.INFO,
 			}
 			actions <- req
