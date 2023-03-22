@@ -4,7 +4,6 @@ import (
 	"brain/database"
 	"brain/model"
 	"encoding/json"
-	"fmt"
 	"log"
 	sharedtypes "sharedTypes"
 	"strconv"
@@ -93,7 +92,6 @@ func main() {
 
   go func() {
     for a := range actions {
-      fmt.Println(a)
       EventClient.SendNoRes(a)
     }
   }()
