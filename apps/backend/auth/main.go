@@ -2,7 +2,6 @@ package main
 
 import (
 	"auth/database"
-	"auth/rabbitmq"
 	sharedtypes "sharedTypes"
 	"sync"
 
@@ -29,8 +28,6 @@ func main() {
 		panic("Cannot get environment variables, check your env file")
 	}
   
-	rabbitmq.InitRabbit()
-
 	database.InitDatabase(&sharedtypes.DbConf{
 		Host:     EnvConf.AuthDbHost,
 		Port:     EnvConf.AuthDbPort,
