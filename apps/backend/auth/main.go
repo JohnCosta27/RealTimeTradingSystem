@@ -2,20 +2,24 @@ package main
 
 import (
 	"auth/database"
-	"auth/middleware"
 	"auth/rabbitmq"
-	"auth/routes"
-	"fmt"
-	"os"
 	sharedtypes "sharedTypes"
 	"sync"
-	"time"
-	"utils"
 
 	"github.com/caarlos0/env/v6"
-	"github.com/gin-gonic/gin"
 )
 
+/**
+  * Entry point for the Auth application.
+  * It tries to parse various environment variables first, otherwise errors.
+  *
+  * The function also initializes
+  * - Database connection
+  * - Gin HTTP Server
+  *
+  * It then runs the router in a go routine (Another thread), and halts until user
+  * manually stops the process. 
+  */
 func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -41,44 +45,10 @@ func main() {
 		Password: EnvConf.BrainDbPassword,
 	})
 
-	msgs, err := rabbitmq.GlobalChannel.Consume(
-		"TestQueue",
-		"",
-		false, //Auto-Ack
-		false,
-		false,
-		false,
-		nil,
-	)
-
-	if err != nil {
-		panic(err)
-	}
-
-	go func() {
-		for d := range msgs {
-			to := d.CorrelationId[len(d.CorrelationId)-4:]
-			// Not meant for the Brain service
-			if to != "0003" {
-				d.Ack(false)
-				continue
-			}
-			d.Ack(true)
-		}
-	}()
-
-  myFile, _ := os.Create(fmt.Sprintf("./logs/%s.auth.txt", time.Now().String()))
-
-  Router := gin.Default()
-
-  Router.Use(utils.LoggerMiddleware(myFile))
-	Router.Use(middleware.AllowCors())
-	Router.Use(middleware.SetJson())
-	routes.RegisterRoute(Router)
-	routes.LoginRoute(Router)
-	routes.RefreshRoute(Router)
-
+  Router := InitGin()
 	go Router.Run("0.0.0.0:4546")
 
+  // Blocking call, the program will never exit unless it panics
+  // or the user closes it.
 	wg.Wait()
 }
