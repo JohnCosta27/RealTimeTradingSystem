@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"hub/middleware"
 	"hub/routes"
 	"net/http"
 	"os"
@@ -26,14 +25,14 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func InitGin() {
+func InitGin() *gin.Engine {
 	myFile, _ := os.Create(fmt.Sprintf("./logs/%s.hub.txt", time.Now().String()))
 
 	Router = gin.Default()
 	WsConnections = make(WsHub)
 
 	Router.Use(utils.LoggerMiddleware(myFile))
-	Router.Use(middleware.AllowCors())
+	Router.Use(utils.AllowCors())
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
@@ -56,6 +55,5 @@ func InitGin() {
 		WsConnections[ws] = true
 	})
 
-	// Run router and websockets in seperate threads
-	go Router.Run("0.0.0.0:4545")
+  return Router
 }

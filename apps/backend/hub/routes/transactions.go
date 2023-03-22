@@ -183,12 +183,12 @@ func TradeRoutes(r *gin.Engine, ws map[*websocket.Conn]bool) {
 	tradeGroup.Use(middleware.Auth())
 
 	tradeGroup.POST(CREATE_TRADE_ROUTE,
-		middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody),
+		utils.ParsePostMiddleware(sharedtypes.GetTransactionBody),
 		PostTrade(ws),
 	)
 
 	tradeGroup.POST(COMPLETE_TRADE_ROUTE,
-		middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction),
+		utils.ParsePostMiddleware(sharedtypes.GetCompleteTransaction),
 		PostCompleteTrade(ws),
 	)
 
