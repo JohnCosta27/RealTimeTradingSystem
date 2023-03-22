@@ -9,16 +9,16 @@ import (
 )
 
 /**
-  * Entry point for the Auth application.
-  * It tries to parse various environment variables first, otherwise errors.
-  *
-  * The function also initializes
-  * - Database connection
-  * - Gin HTTP Server
-  *
-  * It then runs the router in a go routine (Another thread), and halts until user
-  * manually stops the process. 
-  */
+ * Entry point for the Auth application.
+ * It tries to parse various environment variables first, otherwise errors.
+ *
+ * The function also initializes
+ * - Database connection
+ * - Gin HTTP Server
+ *
+ * It then runs the router in a go routine (Another thread), and halts until user
+ * manually stops the process.
+ */
 func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -27,7 +27,7 @@ func main() {
 	if err := env.Parse(&EnvConf); err != nil {
 		panic("Cannot get environment variables, check your env file")
 	}
-  
+
 	database.InitDatabase(&sharedtypes.DbConf{
 		Host:     EnvConf.AuthDbHost,
 		Port:     EnvConf.AuthDbPort,
@@ -42,10 +42,10 @@ func main() {
 		Password: EnvConf.BrainDbPassword,
 	})
 
-  Router := InitGin()
+	Router := InitGin()
 	go Router.Run("0.0.0.0:4546")
 
-  // Blocking call, the program will never exit unless it panics
-  // or the user closes it.
+	// Blocking call, the program will never exit unless it panics
+	// or the user closes it.
 	wg.Wait()
 }

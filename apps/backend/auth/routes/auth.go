@@ -28,32 +28,32 @@ func RegisterRoute(r *gin.Engine) {
 		hashBytes := sha512.Sum512([]byte(registerBody.Password + salt))
 		hashedPassword := hex.EncodeToString(hashBytes[:])
 
-    id := uuid.New()
+		id := uuid.New()
 
-    userBase := database.Base {
-      ID: id,
-    }
+		userBase := database.Base{
+			ID: id,
+		}
 
 		user := database.User{
-      Base: userBase,
+			Base:          userBase,
 			Email:         registerBody.Email,
 			Firstname:     registerBody.Firstname,
 			Surname:       registerBody.Surname,
 			Password:      hashedPassword,
 			Password_salt: salt,
 		}
-    res := database.Db.Create(&user)
+		res := database.Db.Create(&user)
 
-    // TODO: Make this transaction safe. Across databases...
-    database.BrainDb.Exec("INSERT INTO users (id, balance) VALUES (?, 0)", id.String())
+		// TODO: Make this transaction safe. Across databases...
+		database.BrainDb.Exec("INSERT INTO users (id, balance) VALUES (?, 0)", id.String())
 
-    if res.Error != nil {
-      log.Println(res.Error)
-      c.JSON(http.StatusBadRequest, gin.H{
-        "Error": "Duplicate email found",
-      })
-      return
-    } 
+		if res.Error != nil {
+			log.Println(res.Error)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"Error": "Duplicate email found",
+			})
+			return
+		}
 
 		refresh, rErr := utils.GenRefreshToken(user.ID.String())
 		access, aErr := utils.GenAccessToken(user.ID.String())

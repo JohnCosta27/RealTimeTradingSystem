@@ -12,10 +12,10 @@ func main() {
 
 	wg.Add(1)
 
-  cache.InitRedisCache()
+	cache.InitRedisCache()
 	rabbitmq.InitRabbit()
 	InitGin()
 
 	wg.Wait()
-  rabbitmq.CloseRabbit()
+	rabbitmq.CloseRabbit()
 }

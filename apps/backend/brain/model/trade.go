@@ -36,17 +36,15 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
-    transaction.BuyerId = userId.String()
-    database.Db.Omit("seller_id, balance").Create(&transaction)
+		transaction.BuyerId = userId.String()
+		database.Db.Omit("seller_id, balance").Create(&transaction)
 	} else {
-		// Selling the asset, we must check the user has enough of this asset.
-		// TODO: Add a LOCKED asset table
-    userAsset := sharedtypes.UserAsset {
-      UserId: userId.String(),
-      AssetId: assetId.String(),
-    }
+		userAsset := sharedtypes.UserAsset{
+			UserId:  userId.String(),
+			AssetId: assetId.String(),
+		}
 
-    database.Db.First(&userAsset)
+		database.Db.First(&userAsset)
 
 		if userAsset.Amount < amount {
 			log.Println("The user does not have enough of this asset.")
@@ -57,8 +55,8 @@ func StartTradeAsset(tradeType string, price float64, amount float64, userId uui
 		transaction.State = "in-market"
 		transaction.Price = price
 		transaction.Amount = amount
-    transaction.SellerId = userId.String()
-    database.Db.Omit("buyer_id, balance").Create(&transaction)
+		transaction.SellerId = userId.String()
+		database.Db.Omit("buyer_id, balance").Create(&transaction)
 	}
 
 	return transaction, nil
@@ -74,119 +72,119 @@ func CompleteTradeAsset(transactionId uuid.UUID, userId uuid.UUID) (sharedtypes.
 		},
 	}
 
-  user := sharedtypes.User {
-    Base: sharedtypes.Base {
-      ID: userId,
-    },
-  }
+	user := sharedtypes.User{
+		Base: sharedtypes.Base{
+			ID: userId,
+		},
+	}
 
-  database.Db.First(&user)
+	database.Db.First(&user)
 	res := database.Db.First(&transaction)
 
 	if res.RowsAffected == 0 {
 		return transaction, errors.New("This transaction could not be found")
 	}
 
-  // At this point only the creator of the trade is present in the transaction object.
-  // Therefore, the user trying to complete the trade CANNOT be present, otherwise
-  // it means the user is trying to trade with themselves.
-  if transaction.SellerId == userId.String() || transaction.BuyerId == userId.String() {
-    return transaction, errors.New("You cannot trade with yourself")
-  }
+	// At this point only the creator of the trade is present in the transaction object.
+	// Therefore, the user trying to complete the trade CANNOT be present, otherwise
+	// it means the user is trying to trade with themselves.
+	if transaction.SellerId == userId.String() || transaction.BuyerId == userId.String() {
+		return transaction, errors.New("You cannot trade with yourself")
+	}
 
 	// This means that the transaction is of someone selling the asset.
-  // So our user is looking to buy.
+	// So our user is looking to buy.
 	// Therefore, we need to check the user has enough money to complete.
 	if transaction.BuyerId == "" {
-    // Deduce money, add user assets to the buyer.
-    // Do the reverse for seller.
-    seller := sharedtypes.User {
-      Base: sharedtypes.Base {
-        ID: uuid.MustParse(transaction.SellerId),
-      },
-    }
-    database.Db.First(&seller)
+		// Deduce money, add user assets to the buyer.
+		// Do the reverse for seller.
+		seller := sharedtypes.User{
+			Base: sharedtypes.Base{
+				ID: uuid.MustParse(transaction.SellerId),
+			},
+		}
+		database.Db.First(&seller)
 
-    var oldUserAsset sharedtypes.UserAsset
-    var newUserAsset sharedtypes.UserAsset
+		var oldUserAsset sharedtypes.UserAsset
+		var newUserAsset sharedtypes.UserAsset
 
-    // Get the user asset of the seller.
+		// Get the user asset of the seller.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.SellerId, transaction.AssetId).First(&oldUserAsset)
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
 
-    if (user.Balance < transaction.Price) {
-      return transaction, errors.New("The buyer does not have enough money")
-    }
+		if user.Balance < transaction.Price {
+			return transaction, errors.New("The buyer does not have enough money")
+		}
 
-    user.Balance = user.Balance - transaction.Price
-    seller.Balance = seller.Balance + transaction.Price
+		user.Balance = user.Balance - transaction.Price
+		seller.Balance = seller.Balance + transaction.Price
 
-    newUserAsset.Amount += transaction.Amount
-    oldUserAsset.Amount -= transaction.Amount 
+		newUserAsset.Amount += transaction.Amount
+		oldUserAsset.Amount -= transaction.Amount
 
-    newUserAsset.UserId = userId.String()
-    newUserAsset.AssetId = transaction.AssetId
+		newUserAsset.UserId = userId.String()
+		newUserAsset.AssetId = transaction.AssetId
 
-    transaction.State = "completed"
-    transaction.BuyerId = userId.String()
-    
-    database.Db.Omit("name").Save(&newUserAsset)
-    database.Db.Omit("name").Save(&oldUserAsset)
+		transaction.State = "completed"
+		transaction.BuyerId = userId.String()
 
-    database.Db.Save(&user)
-    database.Db.Save(&seller)
-    database.Db.Save(&transaction)
+		database.Db.Omit("name").Save(&newUserAsset)
+		database.Db.Omit("name").Save(&oldUserAsset)
+
+		database.Db.Save(&user)
+		database.Db.Save(&seller)
+		database.Db.Save(&transaction)
 	} else {
-    buyer := sharedtypes.User {
-      Base: sharedtypes.Base {
-        ID: uuid.MustParse(transaction.BuyerId),
-      },
-    }
-    database.Db.First(&buyer)
+		buyer := sharedtypes.User{
+			Base: sharedtypes.Base{
+				ID: uuid.MustParse(transaction.BuyerId),
+			},
+		}
+		database.Db.First(&buyer)
 
-    var oldUserAsset sharedtypes.UserAsset
-    var newUserAsset sharedtypes.UserAsset
+		var oldUserAsset sharedtypes.UserAsset
+		var newUserAsset sharedtypes.UserAsset
 
-    // Get the user asset of the seller.
+		// Get the user asset of the seller.
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", transaction.BuyerId, transaction.AssetId).First(&oldUserAsset)
 		database.Db.Table("user_assets").Select("*").Where("user_id = ? AND asset_id = ?", userId.String(), transaction.AssetId).First(&newUserAsset)
 
-    if (newUserAsset.Amount < transaction.Amount) {
-      return transaction, errors.New("The seller does not have enough of the asset")
-    }
+		if newUserAsset.Amount < transaction.Amount {
+			return transaction, errors.New("The seller does not have enough of the asset")
+		}
 
-    user.Balance = user.Balance + transaction.Price
-    buyer.Balance = buyer.Balance - transaction.Price
-    
-    oldUserAsset.Amount += oldUserAsset.Amount + transaction.Amount
-    newUserAsset.UserId = userId.String()
-    newUserAsset.Amount -= transaction.Amount
-    newUserAsset.AssetId = transaction.AssetId
+		user.Balance = user.Balance + transaction.Price
+		buyer.Balance = buyer.Balance - transaction.Price
 
-    oldUserAsset.UserId = transaction.BuyerId
-    oldUserAsset.AssetId = transaction.AssetId
+		oldUserAsset.Amount += oldUserAsset.Amount + transaction.Amount
+		newUserAsset.UserId = userId.String()
+		newUserAsset.Amount -= transaction.Amount
+		newUserAsset.AssetId = transaction.AssetId
 
-    transaction.State = "completed"
-    transaction.SellerId = userId.String()
-    
-    database.Db.Omit("name").Save(&newUserAsset)
-    database.Db.Omit("name").Save(&oldUserAsset)
-    database.Db.Save(&user)
-    database.Db.Save(&buyer)
-    database.Db.Save(&transaction)
-  }
+		oldUserAsset.UserId = transaction.BuyerId
+		oldUserAsset.AssetId = transaction.AssetId
 
-  return transaction, nil
+		transaction.State = "completed"
+		transaction.SellerId = userId.String()
+
+		database.Db.Omit("name").Save(&newUserAsset)
+		database.Db.Omit("name").Save(&oldUserAsset)
+		database.Db.Save(&user)
+		database.Db.Save(&buyer)
+		database.Db.Save(&transaction)
+	}
+
+	return transaction, nil
 }
 
 func GetAllTransactions() []sharedtypes.Transaction {
-  var transactions []sharedtypes.Transaction
-  database.Db.Find(&transactions)
-  return transactions
+	var transactions []sharedtypes.Transaction
+	database.Db.Find(&transactions)
+	return transactions
 }
 
 func GetAllAssetTrades(AssetId string) []sharedtypes.Transaction {
-  var transactions []sharedtypes.Transaction
-  database.Db.Where("asset_id = ?", AssetId).Find(&transactions)
-  return transactions
+	var transactions []sharedtypes.Transaction
+	database.Db.Where("asset_id = ?", AssetId).Find(&transactions)
+	return transactions
 }

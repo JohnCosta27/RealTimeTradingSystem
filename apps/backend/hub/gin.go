@@ -16,6 +16,7 @@ import (
 var Router *gin.Engine
 
 type WsHub map[*websocket.Conn]bool
+
 var WsConnections WsHub
 
 var upgrader = websocket.Upgrader{
@@ -26,22 +27,22 @@ var upgrader = websocket.Upgrader{
 }
 
 func InitGin() {
-  myFile, _ := os.Create(fmt.Sprintf("./logs/%s.hub.txt", time.Now().String()))
+	myFile, _ := os.Create(fmt.Sprintf("./logs/%s.hub.txt", time.Now().String()))
 
 	Router = gin.Default()
 	WsConnections = make(WsHub)
 
-  Router.Use(utils.LoggerMiddleware(myFile))
-  Router.Use(middleware.AllowCors())
+	Router.Use(utils.LoggerMiddleware(myFile))
+	Router.Use(middleware.AllowCors())
 
 	// Inititalize the routes in the application
 	routes.HealthRoute(Router)
-  routes.GetAssets(Router)
-  routes.TradeRoutes(Router, WsConnections)
-  routes.UserRoutes(Router)
+	routes.GetAssets(Router)
+	routes.TradeRoutes(Router, WsConnections)
+	routes.UserRoutes(Router)
 
-  // Websockets are used to send trade information BACK to the user,
-  // So they are a read-only type thing.
+	// Websockets are used to send trade information BACK to the user,
+	// So they are a read-only type thing.
 	Router.GET("/ws", func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -52,7 +53,7 @@ func InitGin() {
 			return
 		}
 
-    WsConnections[ws] = true
+		WsConnections[ws] = true
 	})
 
 	// Run router and websockets in seperate threads
