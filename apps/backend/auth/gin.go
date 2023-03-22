@@ -1,7 +1,6 @@
 package main
 
 import (
-	"auth/middleware"
 	"auth/routes"
 	"fmt"
 	"os"
@@ -22,8 +21,9 @@ func InitGin() *gin.Engine {
   Router := gin.Default()
 
   Router.Use(utils.LoggerMiddleware(myFile))
-	Router.Use(middleware.AllowCors())
-	Router.Use(middleware.SetJson())
+	Router.Use(utils.AllowCors())
+	Router.Use(utils.SetJson())
+
 	routes.RegisterRoute(Router)
 	routes.LoginRoute(Router)
 	routes.RefreshRoute(Router)

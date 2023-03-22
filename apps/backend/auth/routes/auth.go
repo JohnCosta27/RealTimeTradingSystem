@@ -2,7 +2,6 @@ package routes
 
 import (
 	"auth/database"
-	"auth/middleware"
 	"auth/structs"
 	"crypto/sha512"
 	"encoding/hex"
@@ -21,7 +20,7 @@ import (
  * Body: GetRegisterBody functions returns a struct of the required information
  */
 func RegisterRoute(r *gin.Engine) {
-	r.POST(REGISTER, middleware.ParsePostMiddleware(structs.GetRegisterBody), func(c *gin.Context) {
+	r.POST(REGISTER, utils.ParsePostMiddleware(structs.GetRegisterBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
 		registerBody := b.(*structs.RegisterBody)
 
@@ -81,7 +80,7 @@ func RegisterRoute(r *gin.Engine) {
  * Body: GetLoginBody functions returns a struct of the required information
  */
 func LoginRoute(r *gin.Engine) {
-	r.POST(LOGIN, middleware.ParsePostMiddleware(structs.GetLoginBody), func(c *gin.Context) {
+	r.POST(LOGIN, utils.ParsePostMiddleware(structs.GetLoginBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
 		loginBody := b.(*structs.LoginBody)
 
@@ -130,7 +129,7 @@ func LoginRoute(r *gin.Engine) {
  * Body: GetRefreshBody functions returns a struct of the required information
  */
 func RefreshRoute(r *gin.Engine) {
-	r.POST(REFRESH, middleware.ParsePostMiddleware(structs.GetRefreshBody), func(c *gin.Context) {
+	r.POST(REFRESH, utils.ParsePostMiddleware(structs.GetRefreshBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
 		refreshBody := b.(*structs.RefreshBody)
 
