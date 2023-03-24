@@ -6,6 +6,7 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	sharedtypes "sharedTypes"
@@ -51,6 +52,7 @@ func RegisterRoute(r *gin.Engine) {
     brainReq := sharedtypes.BrainReq{
       Url: sharedtypes.SYNC_REGISTER,
       Params: paramMap,
+      To: ServiceIds.BRAIN,
     }
 
     // To create a user we must sync the IDs across databases,

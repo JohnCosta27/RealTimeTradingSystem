@@ -21,10 +21,11 @@ func CreateUser(id string, balance float64) bool {
   newUser.ID = newUserId
   newUser.Balance = balance
 
-  database.Db.Create(&newUser)
+  res := database.Db.Create(&newUser)
 
-  // If no rows were affected, this means the user could not be created
-  return database.Db.RowsAffected > 0
+  // If error is null, then the user was created sucessfully,
+  // and we can return true, otherwise false.
+  return res.Error == nil
 }
 
 func FindAsset(assets []sharedtypes.Asset, assetId string) *sharedtypes.Asset {
