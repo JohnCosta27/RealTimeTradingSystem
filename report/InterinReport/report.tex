@@ -27,14 +27,18 @@ I will also document my approach when it comes to software engineering, the use 
 
 And finally I will evaluate the performance of the system, how it behaves with some stress testing and how the frontend advanced web interface allows the user to easily interact with the system as a whole.
 
-\subsection{Accoronims}
-I will use a variaty of accronims throughout the project, so I will define them here.
+\subsection{Acronyms}
+I will use a variety of acronyms throughout the project, so I will define them here.
 
 \begin{itemize}
   \item MVP - Minimal Viable Product
   \item BOT - Software Robot
   \item ORM - Object Relational Mapping
   \item SQL - Structured Query Language
+  \item WASM - Web Assembly
+  \item HTTP - Hyper text transfer protocol
+  \item WS - Web sockets
+  \item JSON - Javascript Object Notation
 \end{itemize}
 
 \subsection{The Problem}
@@ -46,7 +50,7 @@ For my final year project, I am creating a Real-time Trading platform, with a we
 Latency~\cite{latency} is described as '[the] time delay between the cause and the effect of some physical change in the system being observed'. This means that when the user tries to buy an asset, there should be very little time until they actually own that asset, the same is true for selling. Latency will have to be something I think about through the entire system, on one hand the UI must be responsive and active, even if it is waiting for some data, but the backend must also process requests very quickly.
 
 \subsubsection{Advanced Web Interface}
-My system will only be as good as the front facing application, that lets users interact with the complex system. The web interface must be featureful, and allow the complete access of the backend system to the correct users, whilst also providing a user friendly way to navigate.
+My system will only be as good as the front facing application, that lets users interact with the complex system. The web interface must be feature full, and allow the complete access of the backend system to the correct users, whilst also providing a user friendly way to navigate.
 
 \subsubsection{Resilient, Performant, Distributed System}
 Lastly, my system must be performant for reasons mentioned above. Everything must be snappy and even very high loads should be dealt with with scaling. Furthermore the nature of the system being distributed helps with the fact that there is no single point of failure, therefore making the system resilient.
@@ -56,7 +60,7 @@ Lastly, my system must be performant for reasons mentioned above. Everything mus
 In my plan I have outlined 4 objects, I will now review and summarise how these can be achieved.
 
 \subsubsection{Scalable Backend}
-At the very core of my project, is a service which can scale to an arbitrary number of users without problem, therefore every decision I make has to have some architectural rational behind it as well as thoughts about performance to make sure that there are very few bottlenecks in the entire system. Because of this I will build with a microservices architecture, which I have outlined the research for below.
+At the very core of my project, is a service which can scale to an arbitrary number of users without problem, therefore every decision I make has to have some architectural rational behind it as well as thoughts about performance to make sure that there are very few bottlenecks in the entire system. Because of this I will build with a micro services architecture, which I have outlined the research for below.
 
 \subsubsection{Resilient system with little downtime}
 Not only does the system need to have good error handling, so that even complete noise as input does not crash the system, it must also be able to load balance and spin up more systems as demand increases, furthermore it must be able to hot-swap~\cite{hot_swap} whenever there is an update that needs to go into production. 
@@ -73,25 +77,25 @@ My primary source of information is the book \textit{Designing Data Intensive Ap
 \subsection{Architecture}
 Modern systems tend to lean into a distributed architecture, meaning we have multiple services which communicate with each other, but are free to scale as load increases. It is unrealistic in the modern world to assume that all services will have the same amount of load and therefore could be packaged together, it is much more likely specific systems need to be scaled more, and perhaps other systems need to be scaled only at specific times of increased load. This means I need a more individual control over the multiple services that I wish to run. In my case, it is much more likely that looking at the top traded assets will be most of the load, therefore I need to scale the services which provides users with this information and have the information readily available on a cache, instead of fetching from permanent storage all time. 
 
-\subsubsection{Microservices}
-Microservices are small, autonomous services that work together to form a complete system~\cite{newman_2016}. Instead of creating a single application which has a single executable and database (Often referred to as a monolith), we break the system apart into services which all perform one thing, and do it well. These system then communicate with each other via a network (Most often the internet). \\
+\subsubsection{Micro services}
+Micro services are small, autonomous services that work together to form a complete system~\cite{newman_2016}. Instead of creating a single application which has a single executable and database (Often referred to as a monolith), we break the system apart into services which all perform one thing, and do it well. These system then communicate with each other via a network (Most often the internet). \\
 
-There are several advantages to using microservices:
+There are several advantages to using micro services:
 \begin{itemize}
   \item Scalability: Each service can decide how many instances of it self it wants, this ties is really well with Docker which I talk about below.
   \item Technological independence: We are not bound by technologies from other services, if we decide a service is better of with a certain database instead of another, we can make that decision. This also goes for programming languages.
-  \item Resilience: If our system contains a singular monolith, there is a clear single point of failure. With microservices, if a system goes down - we lose functionality yes, but we do not lose the entire system as other services may still perform they functions.
+  \item Resilience: If our system contains a singular monolith, there is a clear single point of failure. With micro services, if a system goes down - we lose functionality yes, but we do not lose the entire system as other services may still perform they functions.
 \end{itemize} \\
 
 (The information above came from this book by Sam Newman~\cite{newman_2016}) \\
 
 However, this does make the entire development process more complex. We are no longer talking about a single application, but instead about developing multiple, smaller application that must all talk to each other flawlessly, with low latency and must allow for errors to occur in other services without the service itself going down. \\
 
-Furthermore, it is much more important to keep logs in microservices because bugs are often very difficult to track down because they are rarely localised to a single service, and often happen across multiple services, making it harder to track down. \\
+Furthermore, it is much more important to keep logs in micro services because bugs are often very difficult to track down because they are rarely localised to a single service, and often happen across multiple services, making it harder to track down. \\
 
-Microservices architectures also create a big dependency on standards throughout the application. Every API should have the same routing convention, for example. There must also be a language independent way in which we can define how our APIs are going to work, and how we can communicate with them. The emphasis on standards and how to achieve them can be found here~\cite{microservices_talk} \\
+Micro services architectures also create a big dependency on standards throughout the application. Every API should have the same routing convention, for example. There must also be a language independent way in which we can define how our APIs are going to work, and how we can communicate with them. The emphasis on standards and how to achieve them can be found here~\cite{microservices_talk} \\
 
-One of the techniques we can use to better standardise our microservices is by definition how are APIs look like (routes, body required data, etc...), outside of the service we are building. This way we can know how to communicate with our range of services, without having to have some pre-existing knowledge about the code itself. Furthermore this makes refactoring a lot easier, because we no longer need to change code, but instead we need to change some configuration file which defined what the route was going to look like in the first place.
+One of the techniques we can use to better standardise our micro services is by definition how are APIs look like (routes, body required data, etc...), outside of the service we are building. This way we can know how to communicate with our range of services, without having to have some pre-existing knowledge about the code itself. Furthermore this makes refactoring a lot easier, because we no longer need to change code, but instead we need to change some configuration file which defined what the route was going to look like in the first place.
 
 \subsubsection{Scaling}
 Scaling is the ability a system has to increase or decrease resources depending on demand placed on the system. Scaling is essential for a modern system which could at any time see a spike in demand, or fall completely flat at certain points throughout the day. Scaling allows us to be sure our system not only meets user demands, but also scales down when there isn't as much demand, saving money and energy on infrastructure. There are two main ways of scaling an application.
@@ -104,18 +108,18 @@ Vertical scaling is useful for applications which cannot be broken up into multi
 \subsubsection{Horizontal Scaling}
 Horizontal scaling is the process of creating more instances of your running application/service. This could mean starting up another computer with the same program running in another region or it could be as simple as spinning up another docker container (more on that below). \\
 
-Although horizontal scaling is limited when the application is all contained within one package (often referred to as a monolith), we do not have the same problem when our application has been broken up into microservices. With microservices we can take the part of our application that is experiencing increased load and spin up more instances, often these instances could be in another physical location or on the same machine. \\
+Although horizontal scaling is limited when the application is all contained within one package (often referred to as a monolith), we do not have the same problem when our application has been broken up into micro services. With micro services we can take the part of our application that is experiencing increased load and spin up more instances, often these instances could be in another physical location or on the same machine. \\
 
 Throughout my project I will mostly focus on horizontal scaling, because the technologies I use facilitate them and it tends to be the most flexible with modern architectures.
 
 \subsubsection{Docker}
-Docker is an application which uses OS-level virtualization to deliver application in packages called containers. Docker containers do not include a Guest OS, and only contain the binaries and system libraries necessary to run the required application, leading to an increased performance, decrease container size and more portability across machines. Other virtualization technologies such as KVM~\cite{kvm}, require a host operating system in order to run the isolated environment, this means docker beats KVM in terms of performance in almost every regard~\cite{docker_performance}, and it even competes with native performance. To run containers, the host machine requires the docker engine, which acts as a sort of hypervisor. This makes docker extremely portable across machines, as the docker engine is not a full hypervisor and allows the host machine to run normally, as well as hosting the docker engine.
+Docker is an application which uses OS-level virtualisation to deliver application in packages called containers. Docker containers do not include a Guest OS, and only contain the binaries and system libraries necessary to run the required application, leading to an increased performance, decrease container size and more portability across machines. Other virtualisation technologies such as KVM~\cite{kvm}, require a host operating system in order to run the isolated environment, this means docker beats KVM in terms of performance in almost every regard~\cite{docker_performance}, and it even competes with native performance. To run containers, the host machine requires the docker engine, which acts as a sort of hypervisor. This makes docker extremely portable across machines, as the docker engine is not a full hypervisor and allows the host machine to run normally, as well as hosting the docker engine.
 
 \subsubsection{Docker Containers}
-A docker container is the packaged application, running on top of the docker engine. Containers are "Span up", from docker images which are made with Dockerfiles, these Dockerfiles describe the base image you are using (Ubuntu, Nodejs, Nginx, etc...), and allows you to copy, compile or do anything inside of this isolated environment. After these images are build, they can be ran and turned into containers. As mentioned before these containers only include the resources needed for the application to run, hence the performance improvements over full isolated, virtualized environments.
+A docker container is the packaged application, running on top of the docker engine. Containers are "Span up", from docker images which are made with Dockerfiles, these Dockerfiles describe the base image you are using (Ubuntu, Nodejs, Nginx, etc...), and allows you to copy, compile or do anything inside of this isolated environment. After these images are build, they can be ran and turned into containers. As mentioned before these containers only include the resources needed for the application to run, hence the performance improvements over full isolated, virtualised environments.
 
-\subsubsection{Docker Swarm and Microservices}
-Docker swarm~\cite{docker_swarm} is a native way to scale docker containers into thousand of notes. Docker swarm allows for a very easy way to create microservices. We can run our many services in a swarm which will deal with replication for us, therefore we have a better system resilience, but docker swarm also includes load balancing across these replicated instances, giving us better system performance and scalability. It also handles container restarts if any of them fail, and because of the nature of docker, these restarts are often less than a second (obviously depending on the size of the application).
+\subsubsection{Docker Swarm and Micro services}
+Docker swarm~\cite{docker_swarm} is a native way to scale docker containers into thousand of notes. Docker swarm allows for a very easy way to create micro services. We can run our many services in a swarm which will deal with replication for us, therefore we have a better system resilience, but docker swarm also includes load balancing across these replicated instances, giving us better system performance and scalability. It also handles container restarts if any of them fail, and because of the nature of docker, these restarts are often less than a second (obviously depending on the size of the application).
 
 \subsubsection{Docker Swarm vs Kubernetes}
 Another very popular solution to running docker containers is by using Kubernetes~\cite{kubernetes}. Kubernetes is a container orchestrator, meaning it manages the docker images in what it calls Pods and Nodes. These can individually scale horizontally and vertically, all automatically by Kubernetes depending on load. It can also handle replication and hot-swaps of different containers, across multiple machines, making it the perfect solution for a truly scalable, complex system. \\
@@ -144,7 +148,7 @@ React~\cite{react} is a library for building client side application using JavaS
 
 Even though React is trusted by many thousands of companies, and loved across the world I have decided to not use it in my project, mostly because of performance. React re-renders whole component when state updates, not only that but it has to re-render child components which can create a snow-ball effect where the entire application is re-rendered. It is hard to avoid this, to do so we have to employ memorization which react supports, but this means we need to write more code simply because React re-rendered every time state is updated. \\
 
-\subsubsection{SolidJs}
+\subsubsection{SolidJS}
 SolidJS~\cite{solid} is a client-side web framework, highly inspired by React, in fact programming with Solid is extremely similar to programming with React, which is a very big advantage for me because I have a lot of experience programming with React. However SolidJS beats most other web frameworks in terms of performance. \ref{solidvsworld} This is mostly because it lacks a virtual DOM, therefore component are rendered only once, however it maintains reactivity by making direct changes to the real DOM, when state changes, making massive improvements on performance because the whole component does NOT need to re-render, as it would in React. \\
 
 
@@ -155,7 +159,7 @@ SolidJS~\cite{solid} is a client-side web framework, highly inspired by React, i
 \centering
 \end{figure}
 
-There are some disadvantages of SolidJs, most of these come from the very reason that makes it good, the lack of a virtual DOM. Because Solid, needs to update the real DOM programmatically, you need to carefully understand how solid components actually re-render, otherwise the application might not update in some scenarios. \\
+There are some disadvantages of SolidJS, most of these come from the very reason that makes it good, the lack of a virtual DOM. Because Solid, needs to update the real DOM programmatically, you need to carefully understand how solid components actually re-render, otherwise the application might not update in some scenarios. \\
 
 Even though Solid is generally harder than React because it does not re-render as often, its very developer friendly APIs and brutal performance, make it the obvious pick for a performance based project such as this.
 
@@ -187,7 +191,7 @@ Vite uses ESBuild~\cite{esbuild}, which is a build tool written in Golang, in or
 
 \pagebreak
 \section{Designed Architecture}
-One of my projects main goals is to have a scalable architecture, which can automatically scale depending on load from the end users, I needed to create a robust architecture, by splitting the project into smaller systems (microservices) which all work and communicate together.
+One of my projects main goals is to have a scalable architecture, which can automatically scale depending on load from the end users, I needed to create a robust architecture, by splitting the project into smaller systems (micro services) which all work and communicate together.
 
 My project is split into the following (micro) services:
 \begin{itemize}
@@ -206,26 +210,26 @@ Each of these services has their own database, as to reduce the dependency on a 
 \end{figure}
 
 \subsection{Authentication}
-This system is the most isolated from the others. As you can see on the diagram is only communicates with the load balancer which comes straight from the user. This is because communication to and from the auth system contains very secure information such as passwords and access tokens, which if intercepted can allow users to access another users account. Therefore I don't want to handle this information for longer than I need to and definitely through the least number of systems possible - like this we go from the user to Nginx (A load balancer), straight to my authentication system. The specifics are described in this figure \ref{auth_tables} \\
+This system is the most isolated from the others. As you can see on the diagram is only communicates with the load balancer which comes straight from the user. This is because communication to and from the authentication system contains very secure information such as passwords and access tokens, which if intercepted can allow users to access another users account. Therefore I don't want to handle this information for longer than I need to and definitely through the least number of systems possible - like this we go from the user to Nginx (A load balancer), straight to my authentication system. The specifics are described in this figure \ref{auth_tables} \\
 
 The authentication system has its own database with a few tables that store user information. The database I choose is PostgreSQL, which as outlined in my plan, is one of the fastest, most robust and safest permanent storage databases in the world, often outperforming competition by magnitudes or performance. The tables for this database are as follows: \\
 
 \begin{figure}
 \includegraphics[width=1\textwidth]{auth_diagram.png}
   \label{auth_tables}
-  \caption{Auth system database tables}
+  \caption{Authentication system database tables}
 \centering
 \end{figure}
 
 \subsection{Hub}
-The hub is the only service without any permanent storage and this is very intentional. Its job is to act as a router for other services, but also a cache. My aim is to have this service serve from cache around 50 percent of the time. The hub communicates with a redis database which is a key pair in-memory database, which acts as a very fast caching system, that stores frequently requested data, as to avoid requesting this data from other systems. \\
+The hub is the only service without any permanent storage and this is very intentional. Its job is to act as a router for other services, but also a cache. My aim is to have this service serve from cache around 50 percent of the time. The hub communicates with a Redis database which is a key pair in-memory database, which acts as a very fast caching system, that stores frequently requested data, as to avoid requesting this data from other systems. \\
 
 The Hub can be vertically scaled very easily, together with the Redis database that it users, as Redis supports vertical scaling in a cluster mode. It is likely the system that will be scaled the most, as it will handle all of the users request (except for authentication).
 
 \subsection{Brain}
 A terrible name, but the Brain performs CRUD operations on the assets and transactions for the entire system, it acts as an API which the Hub can communicate with to fetch information from. The Brain like all other services has a database of its own, another PostgreSQL database, with the following schema \ref{brain_tables}. The Brain can also scale vertically just like all services but it's difficult to scale the PostgreSQL database vertically because it is difficult to split the data, instead a horizontal scaling approach will be required for the database portion of this service. \\
 
-The brain also communicates with the Redis cluster which the Hub primarily interacts with. This is to update the cache so that the Hub can in future requests return data from this cache database instead of requesting the data from the Brain. The reason I do this step in the Brain service instead of on the Hub on return of the data, is because I want the Hub to only be conserned with handling user requests and either returning the data from cache, or handing it off to another service, as to not "Hold up the line". \\
+The brain also communicates with the Redis cluster which the Hub primarily interacts with. This is to update the cache so that the Hub can in future requests return data from this cache database instead of requesting the data from the Brain. The reason I do this step in the Brain service instead of on the Hub on return of the data, is because I want the Hub to only be concerned with handling user requests and either returning the data from cache, or handing it off to another service, as to not "Hold up the line". \\
 
 The main database for the system is in the same service as the Brain. This is a PostgreSQL database which stores the permanent information required through the rest of the application. The schema for this is the following diagram. \\
 
@@ -237,14 +241,14 @@ The main database for the system is in the same service as the Brain. This is a 
 \centering
 \end{figure}
 
-All of the tables in the brain database also contain the fields: created\_at, updated\_at and deleted\_at, the same as the auth system.
+All of the tables in the brain database also contain the fields: created\_at, updated\_at and deleted\_at, the same as the authentication system.
 
 \subsection{Communication and Load Balancing}
 I have not yet described how these systems communicate with either one another or the user. To start with the user makes request to Nginx which can act as a very high performance web server, load balancer or reverse proxy. These requests are HTTP(s) requests (and also WS), and therefore this is what the Hub receives from the user. \\
 
 However, for the hub to communicate with the Brain service it does not use HTTP requests as these would be somewhat inefficient and not complex enough to handle some of the required distributed behaviour of the systems, therefore I am using RabbitMQ to communicate between the Brain service and the Hub. RabbitMQ acts as a message exchange which supports AMQP (Advanced Messaging Queue Protocol), and with this I can create a sort of RPC (Remote Procedural Call), from the Brain service. All whilst allowing many messages from multiple instances of both services. \\
 
-Microservices architectures generally have the problem of transmitting information across each other, efficiently. To mitigate this problem I have created a library which is shared across my multiple services, that includes the types for commonly used objects. This makes it much easier to share data across system because each one knows the shape of the data, and can easily encode it and decode it without many problems.
+Micro services architectures generally have the problem of transmitting information across each other, efficiently. To mitigate this problem I have created a library which is shared across my multiple services, that includes the types for commonly used objects. This makes it much easier to share data across system because each one knows the shape of the data, and can easily encode it and decode it without many problems.
 
 \pagebreak
 \section{Technologies used}
@@ -253,18 +257,18 @@ I have a variety of technologies for my project, these include frontend technolo
 \subsection{Databases}
 
 \subsubsection{Permanent Storage}
-One of the main technical challenges of my project, is choosing the correct database systems. My project requires performance first and foremost and therefore the main consideration when choosing a database is speed. My system also contains highly relational data spread across various areas. Users, assets which user owns which assets and what amount, all this data would be best representation in various table, and therefore SQL Relational Databases seem to be the way forward, the two most popular being: MySQL and PostgreSQL. After researching their features and performance~\cite{postgres_vs_mysql}, I have seen that PostgreSQL reliably beats MySQL in most performance tests, with an even more functionalily, making this an obvious choice, for my permanent storage solutionion. \\
+One of the main technical challenges of my project, is choosing the correct database systems. My project requires performance first and foremost and therefore the main consideration when choosing a database is speed. My system also contains highly relational data spread across various areas. Users, assets which user owns which assets and what amount, all this data would be best representation in various table, and therefore SQL Relational Databases seem to be the way forward, the two most popular being: MySQL and PostgreSQL. After researching their features and performance~\cite{postgres_vs_mysql}, I have seen that PostgreSQL reliably beats MySQL in most performance tests, with an even more functionality, making this an obvious choice, for my permanent storage solution. \\
 
-There is another paradigm of databases that have in recent years gotten a lot of transaction, these are document databases. Document databases have much more flexibility than relational databases because they do not (often) contain a set schema, and allows the programmer to easily add/remove parts of data without many constraint. After reading this chapter~\cite{relational_vs_document}, it is clear to me that applications often have a disconnect from the data on the database and the data they actually require in the application, hence why many solutions turn to Document Databases, as these tend to be flexible and denormalisation is common practice. However these databases have poor (or often no), support for joins across tables/collections making one-to-many or many-to-many relationships more difficult. \\
+There is another paradigm of databases that have in recent years gotten a lot of transaction, these are document databases. Document databases have much more flexibility than relational databases because they do not (often) contain a set schema, and allows the programmer to easily add/remove parts of data without many constraint. After reading this chapter~\cite{relational_vs_document}, it is clear to me that applications often have a disconnect from the data on the database and the data they actually require in the application, hence why many solutions turn to Document Databases, as these tend to be flexible and de normalisation is common practice. However these databases have poor (or often no), support for joins across tables/collections making one-to-many or many-to-many relationships more difficult. \\
 
 Furthermore, one of the most popular and advances document databases available is MongoDb~\cite{mongodb}, which uses JSON as a method of storage, and has support for data sharding (Splitting into multiple nodes), and (as most document databases do), does not require a schema, giving a lot of flexibility to the developer. However, as shown in this paper~\cite{mongo_vs_postgres}, MongoDb performs worst than PostgreSQL in almost all performance tests, often by some great magnitude. \\
 
 This is one of the easier decisions in the project, I am using PostgreSQL as my permanent storage database(s).
 
 \subsubsection{ORM - Object Relational Mapping}
-In complex project such as this one, it is often not enough to just run raw SQL statements on the database, the reason for this is because of how unmaintanable it is, do you keep them in plain text? What about parsing the data into structures? For these reasons I have decided to use an ORM (Object relational mapping) library, and the most popular one for Golang is GORM~\cite{gorm}. Gorm allows you to write SQL statements through a builder API, which is fully managed by GORM. \\
+In complex project such as this one, it is often not enough to just run raw SQL statements on the database, the reason for this is because of how unmaintainable it is, do you keep them in plain text? What about parsing the data into structures? For these reasons I have decided to use an ORM (Object relational mapping) library, and the most popular one for Golang is Gorm~\cite{gorm}. Gorm allows you to write SQL statements through a builder API, which is fully managed by GORM. \\
 
-GORM just like other ORM, allow the data from the database to be read into type definitions from inside the code itself, in Golang this means structs, this figure \ref{gorm_orm} shows how GORM does this. As you can see we have a normal golang struct definition but also some annotations, telling us how the struct should behave, in terms of Gorm, it allows us to specify primary or foreign keys easily.
+GORM just like other ORM, allow the data from the database to be read into type definitions from inside the code itself, in Golang this means structs, this figure \ref{gorm_orm} shows how GORM does this. As you can see we have a normal Golang struct definition but also some annotations, telling us how the struct should behave, in terms of Gorm, it allows us to specify primary or foreign keys easily.
 
 \begin{figure}
   \begin{verbatim}
@@ -296,23 +300,23 @@ Golang is a relatively new programming language that was designed at Google to f
 
 \begin{itemize}
   \item Concurrency - It is extremely easy to manage concurrent applications in Golang, simply by using a 'Go routine', which means the developer can focus on building the application instead of thinking about concurrent models.
-  \item Compiled - Unlike other popular languages in the cloud microservice space such as Node.js~\cite{nodejs} or Python~\cite{python}, which are interpreted and therefore have an overhead in their runtime, Golang compiles down to any desired machine code, making it inherintly more performant.
-  \item Simplicity - Unlike Java or Scala, Golang does not have classes, which are typically used when a program becomes complex enough that these organizational methods are needed. Golang only includes Sstructs, which are similar to the structs in C. This makes programming declarative and very pleasant to write.
-  \item Garbase Collection - Most other competitors also have a garbage collection system, however Golangs garbage collection does not involve a virtual machine (like in: Java, JavaScript, and python). Garbage collection is extremely efficient in Golang.
+  \item Compiled - Unlike other popular languages in the cloud micro service space such as Node.js~\cite{nodejs} or Python~\cite{python}, which are interpreted and therefore have an overhead in their runtime, Golang compiles down to any desired machine code, making it inherently more performant.
+  \item Simplicity - Unlike Java or Scala, Golang does not have classes, which are typically used when a program becomes complex enough that these organizational methods are needed. Golang only includes structs, which are similar to the structs in C. This makes programming declarative and very pleasant to write.
+  \item Garbage Collection - Most other competitors also have a garbage collection system, however Golang's garbage collection does not involve a virtual machine (like in: Java, JavaScript, and python). Garbage collection is extremely efficient in Golang.
 \end{itemize}
 
 \subsubsection{RabbitMQ}
-RabbitMq~\cite{rabbitmq} is a message broker. It allows various systems to communicate with each other through a reliable and scalable broker, which can be accessed from various system. RabbitMq is capable of broadcasting messages across systems or simple declaring queues which can be queued and dequeued from the various services accessing it. I am using RabbitMq to organise the communication between the Hub and the Brain service in my project, mostly due to RabbitMq supporting multiple clients accessing the queue at a time, meaning that I can have multiple instances of the Hub and Brain both pushing and pulling from the defined queues without much problem.
+RabbitMQ~\cite{rabbitmq} is a message broker. It allows various systems to communicate with each other through a reliable and scalable broker, which can be accessed from various system. RabbitMQ is capable of broadcasting messages across systems or simple declaring queues which can be queued and dequeued from the various services accessing it. I am using RabbitMQ to organise the communication between the Hub and the Brain service in my project, mostly due to RabbitMQ supporting multiple clients accessing the queue at a time, meaning that I can have multiple instances of the Hub and Brain both pushing and pulling from the defined queues without much problem.
 
 \subsubsection{JWT}
-JSON Web Tockets or JWTs for short, are cryptographically safe methods of client side authentication. A JWT is generated in the Authentication system, and signed with a private key, every time the user wishes to authenticate themselves, they serve the JWT to any system, and if the signature on the JWT is correct then the user is authenticated, if not, we know the user either tampered with the signature or it isn't a valid JWT. JWTs can only encode a small amount of data in them, ranging from user information and ids, however this information is assessible to anyone who views the JWT, so it is important that the data is public knowledge. \\
+JSON Web tokens or JWTs for short, are cryptographically safe methods of client side authentication. A JWT is generated in the Authentication system, and signed with a private key, every time the user wishes to authenticate themselves, they serve the JWT to any system, and if the signature on the JWT is correct then the user is authenticated, if not, we know the user either tampered with the signature or it isn't a valid JWT. JWTs can only encode a small amount of data in them, ranging from user information and ids, however this information is accessible to anyone who views the JWT, so it is important that the data is public knowledge. \\
 
 I choose to use JWTs instead of cookie because they are very safe but still quite practice. Like this I do not need to store cookies in the database and check every time against a database that the user is logged in, reducing the amount of lookups various systems would have to perform.
 
 \section{Software Engineering}
 
 \subsection{Methodology}
-There are various methodologies used in software engineering, but most of them focus on working with a team of various developers, as well as the client for whom you are making the software. But this is an individual project so I could not simply adopt an Agile strategy or an Extreme Programming strategy, as they aren't applicable to software being developed by one person. However there is a strategy called Rapid Application Development (RAD), which is similar to agile, where it takes an iterative approach to developing software, but excludes daily standups with other teams members, which there obviously aren't any. RAD starts off with a set of requirements which I have outlined in my plan, and it starts a loop of development, taking each feature from design to development. The reason that I chose this methodology is because it allows be to start with very little functionality and iterate over these features until they are complete, or until I run out of time. Because of this I am able to build a PoC (Proof of Concept), quickly, and later on iterate over the feature built in order to perfect them.
+There are various methodologies used in software engineering, but most of them focus on working with a team of various developers, as well as the client for whom you are making the software. But this is an individual project so I could not simply adopt an Agile strategy or an Extreme Programming strategy, as they aren't applicable to software being developed by one person. However there is a strategy called Rapid Application Development (RAD), which is similar to agile, where it takes an iterative approach to developing software, but excludes daily stand-ups with other teams members, which there obviously aren't any. RAD starts off with a set of requirements which I have outlined in my plan, and it starts a loop of development, taking each feature from design to development. The reason that I chose this methodology is because it allows be to start with very little functionality and iterate over these features until they are complete, or until I run out of time. Because of this I am able to build a POC (Proof of Concept), quickly, and later on iterate over the feature built in order to perfect them.
 
 \subsection{Project Management}
 My project is quite complex and has a lot of moving parts which all have different criteria and different objectives. This will be a big challenge, so I will need to employ a good project management strategy if I want to keep on top of everything, and understand the complexity of my project.
@@ -322,7 +326,7 @@ For this I will use an app called Todoist~\cite{todoist}, which allows you to ha
 \subsection{Version Control}
 
 \subsubsection{Monorepo}
-For this project, we were provided with 1 GitLab repo, however my project consists of various different services and parts that normally would not belong in the same repo. However, there is a common technique in industry of keeping all your code base in the same repository (monorepo), hence making CI (Contant Integration) and development easy, because everything is in one place and not scattered across multiple different project repositories. 
+For this project, we were provided with 1 GitLab repo, however my project consists of various different services and parts that normally would not belong in the same repo. However, there is a common technique in industry of keeping all your code base in the same repository (monorepo), hence making CI (Constant Integration) and development easy, because everything is in one place and not scattered across multiple different project repositories. 
 
 \subsubsection{Bare repo and Worktrees}
 Git has a feature called worktrees, this feature is not very well known, however I think it is a very powerful feature and one I have used through this project. Starting with cloning a bare repo, this means that we clone a Git Repository without cloning any of the files in the folder, with the main branch checked out. However, a bare clone just clones the .git file without any of the files, and we can use worktrees to edit various branches, worktrees are a way to have multiple branches in a git repository checked out at the same time, in separate folders. This feature is very powerful because I was often working on 2 things at the same time (Frontend, backend and maybe the report), and naturally these live in different branches, therefore it is extremely useful to have them all checkout out at the same time. 
@@ -333,9 +337,9 @@ Testing is an important part of the software engineering process, and there are 
 \subsubsection{Unit Testing}
 Unit testing is the most basic type of testing, it consists of isolating specific functions/files and testing their functionality. I find that in a distributed system these tests are the most useless out of all tests, and therefore I will give less energy to them. This is because the most important part in my system is to test the overall behaviour of all the services and not the individual behaviour. This is not to say unit tests are not important, they are, but in my case they will be the least important. \\
 
-I am using Golang's built in testing library, which consists of writing test files with the \_test.go postfix, and using the golang CLI to run the tests. \\
+I am using Golang's built in testing library, which consists of writing test files with the \_test.go postfix, and using the Golang CLI to run the tests. \\
 
-For the frontend I am using Jest~\cite{jest}, which gives you testing utilities for testing Javascript projects, and I will also use Solid Testing Library~\cite{solid_testing}, which provides utilities for testing SolidJs components specifically.
+For the frontend I am using Jest~\cite{jest}, which gives you testing utilities for testing Javascript projects, and I will also use Solid Testing Library~\cite{solid_testing}, which provides utilities for testing SolidJS components specifically.
 
 \subsubsection{Integration Testing}
 Integration testing includes the testing of an application or multiple applications running together, but falls short of the entire system. In my project, the Hub and Brain system would need integration tests because these systems work very close together. \\
@@ -359,7 +363,7 @@ In my project I created a subproject dedicated to integration testing with the b
   });
 \end{verbatim}
 
-Just like any good test, these tests are automatic, and describe themselves. I am making a request to the AuthUrl, sending some data and expecting certain data to come back to me. \\
+Just like any good test, these tests are automatic, and describe themselves. I am making a request to the Authentication Url, sending some data and expecting certain data to come back to me. \\
 
 \subsubsection{End-to-End Testing}
 End-to-end testing is the closest to the real world. These tests are mostly (but not always), done on the frontend application, because this is where the user would interact with the system from. The purpose behind these tests is the test the overall functionality of the system, without worrying about any of the details. \\
@@ -376,7 +380,7 @@ The easier part of my project was building an authentication system, which allow
 
 The user is issued 2 JWTs. A "refresh" token and an "access" token. The refresh token can only be used in the /refresh API Route, all it does it allows the user to get another "access" token, because it doesn't actually allow the user to access any of the other systems, it has a long lifespan (time for which it is valid), of 2 weeks. This also means the user can be logged in for up to 2 weeks at a time without having to login again. The access token grants the user access to the entire system, and because of this it has a very short lifespan of 5 minutes, again these can only be obtained when first registering or logging in, and subsequently using the /refresh endpoint, which issues a new access token. \\
 
-The auth system is implemented in Golang, just like the rest of my backend services.
+The authentication system is implemented in Golang, just like the rest of my backend services.
 
 There are 3 endpoints in the authentication system:
 \begin{itemize}
@@ -444,9 +448,9 @@ CMD [ "/brain/brain" ]
 \end{verbatim}
 
 \subsection{RPC Communication}
-RPC (Remote Procedural Call), is a mechanism to make calls to functions that do aren't on the program calling them, this is very useful in my microservices architecture because I want to retrieve data from other services in an easy and convinient way. To do this, I have made use of Golang's Go Routines and RabbitMQ as the message broker where the messages are sent to and pulled down from. \\
+RPC (Remote Procedural Call), is a mechanism to make calls to functions that do aren't on the program calling them, this is very useful in my micro services architecture because I want to retrieve data from other services in an easy and convenient way. To do this, I have made use of Golang's Go Routines and RabbitMQ as the message broker where the messages are sent to and pulled down from. \\
 
-When a services requests an RPC, they publish a request to RabbitMQs RPC Queue, which has declared when the services started up. Whilst this is happening any service that should receive RPCs, waits for an event to be pushed onto the RPC Queue, this waiting occurs in a Go routine, which in this case is just another thread, this is done so checking for new messages and regular program operations can both happen concurrently. When a new event was published to the RPC queue the Go routine picks up on it and perform the required function asked by the request, after it's done it send an event to the Callback Queue with the same Id as the call received, this means in the other service that made the RPC call, we can do the same type of waiting, and check if an event with the same Id was received in the Callback Queue. A diagram that better illustrates this is below:
+When a services requests an RPC, they publish a request to RabbitMQ RPC Queue, which has declared when the services started up. Whilst this is happening any service that should receive RPCs, waits for an event to be pushed onto the RPC Queue, this waiting occurs in a Go routine, which in this case is just another thread, this is done so checking for new messages and regular program operations can both happen concurrently. When a new event was published to the RPC queue the Go routine picks up on it and perform the required function asked by the request, after it's done it send an event to the Callback Queue with the same Id as the call received, this means in the other service that made the RPC call, we can do the same type of waiting, and check if an event with the same Id was received in the Callback Queue. A diagram that better illustrates this is below:
 
 \begin{figure}
 \includegraphics[width=\textwidth]{RPC.png}
@@ -543,7 +547,7 @@ services:
       - 5442:5432
 \end{verbatim}
 
-As you can see the docker compose file is quite extensively because it has to contain the various services used for my project, it runs the RabbitMq service, various databases and all the services which I have coded. It also configures ports and environment variables as well as docker volumes.
+As you can see the docker compose file is quite extensively because it has to contain the various services used for my project, it runs the RabbitMQ service, various databases and all the services which I have coded. It also configures ports and environment variables as well as docker volumes.
 
 \pagebreak
 
@@ -592,7 +596,7 @@ In my project I took liberal use of branching from a main branch, where all feat
 |/ /
 \end{verbatim}
 
-As you can see, the development occurs on seperate branches from main, and often take place in parallel because of the amount of different features throughout my project. As you can see, there are also places where the main branch is merged into my feature branch, this is because I would often merge features into the main code base and then it is good practice to always work with the most up to date version of the trunk, or in this case the main branch. \\
+As you can see, the development occurs on separate branches from main, and often take place in parallel because of the amount of different features throughout my project. As you can see, there are also places where the main branch is merged into my feature branch, this is because I would often merge features into the main code base and then it is good practice to always work with the most up to date version of the trunk, or in this case the main branch. \\
 
 Through the beginning of my project I simply used Git on its own to manage my project, however towards the end stages of developing the project I ran into the limitation that I was working on multiple features at the same time, and these can be managed just fine by Git, but it is difficult as an engineer to context switch between these features whilst maintaining a good level of code quality. To help solve this problem I looked at GitLab's~\cite{gitlab_cite} own merge request environments. Instead of merging into main using regular terminal Git commands, I started a merge/pull request on GitLab, and would use that environment as a hub for the code, where I would often leave comments to myself and do some code review of my own code. An example of this is shown in this figure \ref{gitlab}. \\
 
@@ -602,7 +606,7 @@ Through the beginning of my project I simply used Git on its own to manage my pr
 \label{gitlab}
 \end{figure}
 
-This might seem strange at first, afterall these features were designed with a team of engineers in mind and not just a single person, however I found that having a space to make myself accountable to myself was extremely useful, specially when doing refactoring work towards the end of the project, as often it was not technical decisions that I needed to review, but simply code quality, which is something the figure \ref{gitlab} demonstrates. \\
+This might seem strange at first, after all these features were designed with a team of engineers in mind and not just a single person, however I found that having a space to make myself accountable to myself was extremely useful, specially when doing refactoring work towards the end of the project, as often it was not technical decisions that I needed to review, but simply code quality, which is something the figure \ref{gitlab} demonstrates. \\
 
 Another important Git convention which I followed is the commit messages. We know that these must be descriptive to what the commit is doing, however I went a step further in starting all my commits (Bar a handful), with keywords such as: FIX, REFACTOR, FEAT, CHORE, which indicate very clearly to myself what I was working on on certain commits. This convention proved to be so useful to myself that I stopped using the log book which I had stuck to throughout term one because I found myself simply rewriting the commit messages that I had done for the day. 
 
@@ -634,11 +638,11 @@ docker_build:
     - docker push johncosta27/fyp-hub
 \end{verbatim}
 
-The CI file itself only took a while to write because I wasn't familiar with the configuration and the only way to test it was to push into the main branch and see if it worked (this was one of the few instances where I pushed straight into the main branch). You can see environment variables scattered throughout the file like: DOCKER\_TOKEN. These were sensative secrets which wouldn't be appropriate to place inside a text file, instead GitLab provides its own secret management system, where I store these tokens, maintaining them away from my Git history. \\
+The CI file itself only took a while to write because I wasn't familiar with the configuration and the only way to test it was to push into the main branch and see if it worked (this was one of the few instances where I pushed straight into the main branch). You can see environment variables scattered throughout the file like: DOCKER\_TOKEN. These were sensitive secrets which wouldn't be appropriate to place inside a text file, instead GitLab provides its own secret management system, where I store these tokens, maintaining them away from my Git history. \\
 
-This file worked well, and the runner was very stable and never seemed to crash on the VM, therefore I was able to have an automatic docker image builder which pushed to my docker registery. \\
+This file worked well, and the runner was very stable and never seemed to crash on the VM, therefore I was able to have an automatic docker image builder which pushed to my docker registry. \\
 
-I also attempted to use the same CI pipeline to run the integration tests. Unfortunately I was not able to do this, because of a lack of expertise in CI environments. The problem was that the runner itself is a docker image, and I was asking it to run a bunch of docker images (my project), and run the integration tests on it. The pipeline went as far as spinning up the images but I ended up with being unable to access the databases, which is obviously a big issue. This was taking up a lot of hours to try and solve and so I decided to abandom this prospect. 
+I also attempted to use the same CI pipeline to run the integration tests. Unfortunately I was not able to do this, because of a lack of expertise in CI environments. The problem was that the runner itself is a docker image, and I was asking it to run a bunch of docker images (my project), and run the integration tests on it. The pipeline went as far as spinning up the images but I ended up with being unable to access the databases, which is obviously a big issue. This was taking up a lot of hours to try and solve and so I decided to abandon this prospect. 
 
 \pagebreak
 \subsection{Testing}
@@ -646,14 +650,14 @@ Testing in my project was mostly carried out through the testing of API requests
 
 \subsubsection{Integration Testing}
 Integration tests are the primary tests in my project, these involve running all the backend together, including all the databases, and testing the system by sending HTTP Requests and checking the responses are adequate, this tests access rights, the shape of data, and various other things. \\ 
-My integration tests also have a mechanism to clear the databases clean and add testing data so that the tests can stay determanistic. \\
+My integration tests also have a mechanism to clear the databases clean and add testing data so that the tests can stay deterministic. \\
 
 The tests are written using Node.js~\cite{nodejs}, this is purely because it is much faster to write and use from a developers perspective, at the cost of performance. However during tests that are not touched by the user, performance is not a concern. The testing libraries I use are:
 
 \begin{itemize}
   \item Jest~\cite{jest} - Testing framework
   \item Supertest~\cite{supertest} - Builder pattern request builder
-  \item Prisma~\cite{prisma} - Typesafe ORM, to create dummy data and clear the databases.
+  \item Prisma~\cite{prisma} - Type safe ORM, to create dummy data and clear the databases.
 \end{itemize}
 
 I have added an example of the tests in the report before, but in this figure \ref{integration} you can see what the results of the tests look like.
@@ -734,7 +738,7 @@ For my Hub service to communicate with the Brain service they use an AMQP Queue~
 
 I could have instead just used HTTP requests to access the Brain service, but I choose against this because I wanted to control exactly who is communicating with the Brain, instead of having an open API that anyone can access. Furthermore HTTP requests are harder to control and predict when running in multi-node environment (If I have 2 instances of the brain, which one is getting the requests?), this problem can be avoided by using some load balancer, but I decided to avoid it all together. \\
 
-Furthermore, RabbitMQ has more advanced features such as fanout exchanges, which allow you to publish messages onto various queues at the same time without ever having to manage this complexity, I am not using this in my system currently, but it could be a feature I took advange of in the future.
+Furthermore, RabbitMQ has more advanced features such as fanout exchanges, which allow you to publish messages onto various queues at the same time without ever having to manage this complexity, I am not using this in my system currently, but it could be a feature I took advantage of in the future.
 
 \subsubsection{Queue per service system}
 Every node on my system has an attached RabbitMQ queue. So the Hub service has a queue which other services can push items onto and the Hub will process these accordingly, it is important to note that this queue is unique to the instance of the service, so it is easy to know which instance is actually handling which parts of the requests. \\
@@ -757,7 +761,7 @@ The hard problem to solve here has nothing to do with the actual caching itself,
 
 \pagebreak
 \subsubsection{Shared types and utilities}
-Because my entire backend systems were written in Go (CITE HERE), and they all involve similar problem, it is only natural that I was going to run into code repeatition whilst working on this project. I began tackling this by not tackling it at all within the first few weeks of development, I would often copy various parts of the code into different folders so that I could use it in all the services. This worked because it allowed me to move fast and actually get the work of getting the project started done. However, it came a time where this was a liability. \\
+Because my entire backend systems were written in Golang, and they all involve similar problem, it is only natural that I was going to run into code repetition whilst working on this project. I began tackling this by not tackling it at all within the first few weeks of development, I would often copy various parts of the code into different folders so that I could use it in all the services. This worked because it allowed me to move fast and actually get the work of getting the project started done. However, it came a time where this was a liability. \\
 
 As you are now aware, the Hub service and the Brain service communicate constantly. However, how can I ensure that the format of the data is preserved on either end? Because if I try to parse some data into a certain memory allocation and I get it wrong, the program is going to have a run time error. This is a big problem even in the industry, with many tools to help prevent these. Some of the tools are. \\
 
@@ -768,11 +772,11 @@ CITE HERE
   \item gRPC~\cite{grpc} - Multi-language RPC framework.
 \end{itemize}
 
-Some of the listed solutions are more opinionated than others, but they all had the drawback of having a significant learning curve, and if I was to use any of them I would be simply over-engineering my project. As the project stands now, there is a much simpler solution to the problem of achieving end-to-end type safety, so long as the project remains small. If the project was to be used by more than 2 or 3 engineers, and be seriously developed, I would definetly invest the time and effort into looking into a more robust solution. \\
+Some of the listed solutions are more opinionated than others, but they all had the drawback of having a significant learning curve, and if I was to use any of them I would be simply over-engineering my project. As the project stands now, there is a much simpler solution to the problem of achieving end-to-end type safety, so long as the project remains small. If the project was to be used by more than 2 or 3 engineers, and be seriously developed, I would definitely invest the time and effort into looking into a more robust solution. \\
 
 For now I am simply using a shared types library, which is copied into each of the service's docker images when they are build. This ensures that I have consistent type definitions on every service that requires them, and as long as I stay consistent on type casting into these structs, there cannot be any run-time errors. The figure \ref{sharedtype} shows an example of such type definition. This figure shows the type Transaction, which the Hub requests from the Brain using simple RPC. Because the services communicate using JSON that is turned into bytes, there must be a way of converting the JSON back into a struct, to be used by either side of the events. This solution ensures the consistent typing of data on both ends. \\
 
-You can also the the json type annotation, to know how to Marshall and Unmarshall the JSON data and what keys to use.
+You can also the json type annotation, to know how to Marshall and Unmarshall the JSON data and what keys to use.
 
 \begin{figure}
   \begin{verbatim}
@@ -797,12 +801,12 @@ type Transaction struct {
   \label{sharedtype}
 \end{figure}
 
-Another part of my project that is shared is a few utility functions, and even the RabbitMQ client which I designed to work specifically for my system. I won't add code snippets here because it is quite extensive, but in my projects 'apps/backend/utils', you will find various pieces of code that are shared throughout my 3 services, the most important one being the RabbitMQ client, which enables the services to send and recieve messages through my RabbitMQ system without needing to implement this logic everytime.
+Another part of my project that is shared is a few utility functions, and even the RabbitMQ client which I designed to work specifically for my system. I won't add code snippets here because it is quite extensive, but in my projects 'apps/backend/utils', you will find various pieces of code that are shared throughout my 3 services, the most important one being the RabbitMQ client, which enables the services to send and receive messages through my RabbitMQ system without needing to implement this logic every time.
 
 \pagebreak
 
 \subsection{Authentication}
-Authentication in my system is done using JWTs~\cite{jwt}, which allows users to authenticate themselves with a cryptographically safe token. This token is sent between the client and either the Hub or the Auth system, it is not required between the Hub and the Brain as this communication is controlled only through the Hub, and the Brain cannot be accessed from the outside world. To validate this token I have create another middleware, that simply checks that the JWT is correct. The figure \ref{authmiddleware} shows an example
+Authentication in my system is done using JWTs~\cite{jwt}, which allows users to authenticate themselves with a cryptographically safe token. This token is sent between the client and either the Hub or the Authentication system, it is not required between the Hub and the Brain as this communication is controlled only through the Hub, and the Brain cannot be accessed from the outside world. To validate this token I have create another middleware, that simply checks that the JWT is correct. The figure \ref{authmiddleware} shows an example
 
 \begin{figure}
   \begin{verbatim}
@@ -858,12 +862,12 @@ func Auth() gin.HandlerFunc {
 
 \pagebreak
 \section{Performance Evaluation}
-It is important for me to access how my system performs both internally (how long does the server take to fullfil a request), and also end-to-end (how quickly does the user get their request back). Especially I will look at the differences between the user of caching in the Hub service, and not caching, to hopefully see that caching is significantly faster. \\
+It is important for me to access how my system performs both internally (how long does the server take to fulfil a request), and also end-to-end (how quickly does the user get their request back). Especially I will look at the differences between the user of caching in the Hub service, and not caching, to hopefully see that caching is significantly faster. \\
 
-When planning my end-to-end testing I recognized a problem that I am unable to fix with this type of testing. The server is not a particulatly fast machine, however it does have access to business grade internet (about 1GB internet), which is magnitudes faster than my residential internet (about 80 MB), therefore even with the entire bandwidth of my internet, I am unable to load the server enough to affect its performance beyond a basic point, so I can't completely reach the systems limit.
+When planning my end-to-end testing I recognized a problem that I am unable to fix with this type of testing. The server is not a particularly fast machine, however it does have access to business grade internet (about 1GB internet), which is magnitudes faster than my residential internet (about 80 MB), therefore even with the entire bandwidth of my internet, I am unable to load the server enough to affect its performance beyond a basic point, so I can't completely reach the systems limit.
 
-\subsection{Whitebox Serverside Performance Testing}
-I use the term Whitebox to describe testing the performance os the system from within the request receiving services (Auth and Hub), this measures the complete turn around time (how long a request takes to fulfil), all the way from recieving it and returning a result. The results will be measured in microseconds, 1 seconds = 1000 milliseconds = 1 000 000 microseconds. \\
+\subsection{Whitebox Server side Performance Testing}
+I use the term Whitebox to describe testing the performance of the system from within the request receiving services (Authentication and Hub), this measures the complete turn around time (how long a request takes to fulfil), all the way from receiving it and returning a result. The results will be measured in microseconds, 1 seconds = 1000 milliseconds = 1 000 000 microseconds. \\
 
 All the requests are sent as fast as my home network can, all at the same time.
 
@@ -872,7 +876,7 @@ TODO: Add VM specs and local machine specs.
 
 \pagebreak
 \subsubsection{/login route}
-The /login method is a POST request, where the user sends over their email and password, and the server returns an access and refresh token. This involves hashing the user's password and doing a read from the PostgreSQL database from the auth service, in order to check the user's details are correct. It is a single service request (meaning it doesnt ask anything from any other services), which will make it fairly fast. The results are plotted below.
+The /login method is a POST request, where the user sends over their email and password, and the server returns an access and refresh token. This involves hashing the user's password and doing a read from the PostgreSQL database from the authentication service, in order to check the user's details are correct. It is a single service request (meaning it doesn't ask anything from any other services), which will make it fairly fast. The results are plotted below.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/login.png}
@@ -890,7 +894,7 @@ The /asset route is a GET request that goes to the Hub service first. The hub re
   \caption{/asset route results}
 \end{figure}
 
-Starting with the non-cached results in orange, we can see that because the service has to make a request to the brain service and the brain then needs to perform a read from permanent storage from the PostgreSQL database, we end up with a much slower (but still very fast) turn around time. Averaging at around 2000 micro seconds, or just about 2 milliseconds. Noticably there is a spike towards the end of the dataset, however this is an anomaly it seems and needs no further investigation, I attribute it to system noise. \\
+Starting with the non-cached results in orange, we can see that because the service has to make a request to the brain service and the brain then needs to perform a read from permanent storage from the PostgreSQL database, we end up with a much slower (but still very fast) turn around time. Averaging at around 2000 micro seconds, or just about 2 milliseconds. Noticeably there is a spike towards the end of the dataset, however this is an anomaly it seems and needs no further investigation, I attribute it to system noise. \\
 
 The cached results are the most interesting ones, as you can see the request time averages at around 500 micro seconds (0.5 milliseconds), with a few spikes towards the end of the dataset, but averaging back down towards the end. This is significantly faster than requesting the brain for the information, 4 times faster in fact. This is extremely good to see that all the effort that went into creating an effective caching sub-system in the hub service has paid off.
 
@@ -916,7 +920,7 @@ This is a POST request to create a trade for a given asset, for a price. This ca
   \caption{/trade/create route results}
 \end{figure}
 
-These results are much more chaotic, and naturally so because of how much more complex this endpoint is compared to other ones. We see the average at around 8000 microseconds (8 milliseconds), with quite a few data points that jump in terms of response time. I believe this is because of the lack of available threads on the virtual machine the test was conducted on, with around 4 threads some requests have to wait for others to finish before starting to handle the next one, hence explaining the jumps. This could be solved by having a better virtual machine (after all the one I am using isn't anything special). And then these results would look much more plausable. \\
+These results are much more chaotic, and naturally so because of how much more complex this endpoint is compared to other ones. We see the average at around 8000 microseconds (8 milliseconds), with quite a few data points that jump in terms of response time. I believe this is because of the lack of available threads on the virtual machine the test was conducted on, with around 4 threads some requests have to wait for others to finish before starting to handle the next one, hence explaining the jumps. This could be solved by having a better virtual machine (after all the one I am using isn't anything special). And then these results would look much more plausible. \\
 
 \pagebreak
 \subsubsection{/trade/complete route}
@@ -937,7 +941,7 @@ These results are slightly less chaotic, due to the number of reads needed befor
 There were a variety of professional issues that deal with topics that stretch beyond Computer Science. I discuss these below.
 
 \subsection{Open Source}
-I believe that any project must be extremely careful to use reputable tools to achieve their goals in the project, and I also believe that these tools should (in general), be open sourced. There are a few reasons for this, but the most important one is transparency. If you use a propriatery database system for example, you are at the mercy of the corporation, you are also restricted with how far you can extend the functionality of such software. Furtheremore you tend to be a victim to Vendor Lock-in, discussed below. \\ 
+I believe that any project must be extremely careful to use reputable tools to achieve their goals in the project, and I also believe that these tools should (in general), be open sourced. There are a few reasons for this, but the most important one is transparency. If you use a proprietary database system for example, you are at the mercy of the corporation, you are also restricted with how far you can extend the functionality of such software. Furthermore you tend to be a victim to Vendor Lock-in, discussed below. \\ 
 
 There is a downside to using open source tools, and that is the fact that they don't have a warranty. If you make a mistake whilst using the open source tool there is no one obligated to help you solve the problem, nor is there anyone responsible except the engineer, if anything goes wrong.  \\
 
@@ -952,10 +956,10 @@ The license of open source software changes. Some open source projects cannot be
   \item BSD~\cite{bsd}
 \end{itemize}
 
-All these licenses allow the use or software, free of charge, and to modify it freely and freely charge or use it in a propriatery product, the only restriction to some is that you cannot sell the exact software you are using from a license (You cant take an open source project and rebrand it and sell it), but obviously this isn't a problem in my project.
+All these licenses allow the use or software, free of charge, and to modify it freely and freely charge or use it in a proprietary product, the only restriction to some is that you cannot sell the exact software you are using from a license (You cant take an open source project and rebrand it and sell it), but obviously this isn't a problem in my project.
 
 \subsection{Vendor Lock-in}
-I mentioned above that you might become locked-in to a certain vendor when using propriatery software, the most common case for this comes with the hosting of your product. Typically engineers do not own big servers to host their products on and this was the case with me, so I had to resort to using some cloud service which is owned and managed by a big corporation. \\
+I mentioned above that you might become locked-in to a certain vendor when using proprietary software, the most common case for this comes with the hosting of your product. Typically engineers do not own big servers to host their products on and this was the case with me, so I had to resort to using some cloud service which is owned and managed by a big corporation. \\
 
 I could have made this project a lot easier for me if I used technologies such as AWS Container Engine, or even AWS Lambdas, however these technologies lock you into only using the services of that certain cloud provider, and once you are in, it becomes very difficult to change your code so that it works somewhere else. Hence my decision to use only open source software in my project. \\
 
@@ -972,20 +976,20 @@ This also become an issue when developing my caching mechanism, because if you k
 And so my project concludes. I have learnt a lot from doing this project, specially how do develop distributed systems which is something I had never quite done before, I have also never really focused on performance in a backend project like I have in this one, and there was a lot of learning to do. \\
 
 \subsection{Things that I planned correctly}
-Generally, my planned risks were very correct. The platform performance and scalability being highlighted in my plan as the two main risks, and there were. However because of my well designed system with loosely coupled modules, I was able to make sure that each node was able to scale and work independently of the others, the seperate database design also made this much easier. Furthermore the performance of the system is something I am very proud of, achieving sub 10 millisecond processing time for most requests, and some requests - through the use of chaching going below the 1 millisecond mark is a much better result than I could have hoped for. I attribute this great performance to my ability to choose the correct tools for the job, it is clear to me now that Goland was the perfect language of choice, for dealing with distributed, networked systems such as the ones I developed, due to its very easy to use concurrency model, and effective garbage collection. \\
+Generally, my planned risks were very correct. The platform performance and scalability being highlighted in my plan as the two main risks, and there were. However because of my well designed system with loosely coupled modules, I was able to make sure that each node was able to scale and work independently of the others, the separate database design also made this much easier. Furthermore the performance of the system is something I am very proud of, achieving sub 10 millisecond processing time for most requests, and some requests - through the use of caching going below the 1 millisecond mark is a much better result than I could have hoped for. I attribute this great performance to my ability to choose the correct tools for the job, it is clear to me now that Golang was the perfect language of choice, for dealing with distributed, networked systems such as the ones I developed, due to its very easy to use concurrency model, and effective garbage collection. \\
 
 \subsection{Things that I didn't plan correct}
 
 \subsubsection{BOTs}
-In my plan I put a lot of emphasis on having BOTs trading across the network, when I realise now that this is was not going to help me massively improve the performance or stability of the system, it would have been interesting to see how the system would behave, and in some senses I have tested this, but the time it would have taken to create intelligent enough BOTs would have far outweighted the benefit to be gained, and would have bled over into an intelligents agent project, therefore during the development I choose to simply do basic API stress testing, using preset trades and assets without the need for intelligent agents. \\
+In my plan I put a lot of emphasis on having BOTs trading across the network, when I realise now that this is was not going to help me massively improve the performance or stability of the system, it would have been interesting to see how the system would behave, and in some senses I have tested this, but the time it would have taken to create intelligent enough BOTs would have far outweighed the benefit to be gained, and would have bled over into an intelligent agent project, therefore during the development I choose to simply do basic API stress testing, using preset trades and assets without the need for intelligent agents. \\
 
 \subsubsection{Development Time}
 Furthermore, I severely underestimated the development time needed for the project. I mostly estimated the MVP development time correctly, and I did finish most of the development within Term 1, but I didn't account for the last 20\% of the project taking so long, this I should have been more aware of and could have made my timeline more realistic by giving myself more time for development. It is very common in the industry for the last 20\% to take longer than the first 80\% of the project.
 
 \subsection{Conclusion}
-My systems allows users to trade assets with other users. It seems innocent on the surface and could have been developed very quickly if I had no regard for performance and scalability. But with these conserns in mind I was able to make correct decisions in increasing the complexity of my project overall by splitting it into multiple parts (Microservices), and therefore allow for the indivual scaling of each system. \\
+My systems allows users to trade assets with other users. It seems innocent on the surface and could have been developed very quickly if I had no regard for performance and scalability. But with these concerns in mind I was able to make correct decisions in increasing the complexity of my project overall by splitting it into multiple parts (Micro services), and therefore allow for the individual scaling of each system. \\
 
-The web interface for the project works seemlessly and is very responsive, and also has great UX (User experience) and UI (User interface) patterns that users are already familiar with.
+The web interface for the project works seamlessly and is very responsive, and also has great UX (User experience) and UI (User interface) patterns that users are already familiar with.
 
 \section{Bibliography}
 
