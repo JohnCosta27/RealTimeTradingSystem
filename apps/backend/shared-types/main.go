@@ -7,13 +7,13 @@ import (
 )
 
 type EnvConf struct {
-	AuthDbHost     string `env:"AUTH_DB_HOST" envDefault:"auth_postgres"`
+	AuthDbHost     string `env:"AUTH_DB_HOST" envDefault:"localhost"`
 	AuthDbPort     string `env:"AUTH_DB_PORT" envDefault:"5442"`
 	AuthDbName     string `env:"AUTH_DB_NAME" envDefault:"postgres"`
 	AuthDbUser     string `env:"AUTH_DB_USER" envDefault:"postgres"`
 	AuthDbPassword string `env:"AUTH_DB_PASSWORD" envDefault:"postgres"`
 
-	BrainDbHost     string `env:"BRAIN_DB_HOST" envDefault:"brain_postgres"`
+	BrainDbHost     string `env:"BRAIN_DB_HOST" envDefault:"localhost"`
 	BrainDbPort     string `env:"BRAIN_DB_PORT" envDefault:"5443"`
 	BrainDbName     string `env:"BRAIN_DB_NAME" envDefault:"postgres"`
 	BrainDbUser     string `env:"BRAIN_DB_USER" envDefault:"postgres"`

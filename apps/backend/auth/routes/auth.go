@@ -2,8 +2,10 @@ package routes
 
 import (
 	"auth/database"
+	"auth/rabbitmq"
 	"crypto/sha512"
 	"encoding/hex"
+	"encoding/json"
 	"log"
 	"net/http"
 	sharedtypes "sharedTypes"
@@ -42,10 +44,40 @@ func RegisterRoute(r *gin.Engine) {
 			Password:      hashedPassword,
 			Password_salt: salt,
 		}
+
+    paramMap := make(map[string]string)
+    paramMap["uuid"] = id.String()
+
+    brainReq := sharedtypes.BrainReq{
+      Url: sharedtypes.SYNC_REGISTER,
+      Params: paramMap,
+    }
+
+    // To create a user we must sync the IDs across databases,
+    // to facilitate lookups, throughout the system without the need
+    // of constant communication across system.
 		res := database.Db.Create(&user)
 
-		// TODO: Make this transaction safe. Across databases...
-		database.BrainDb.Exec("INSERT INTO users (id, balance) VALUES (?, 0)", id.String())
+    brainResponse := rabbitmq.AuthEventClient.Send(brainReq)
+
+    var isUserCreated bool
+    err := json.Unmarshal(brainResponse, &isUserCreated)
+
+    if err != nil || !isUserCreated {
+			log.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"Error": "There has been a server error creating user",
+			})
+
+      // The user was created on the auth database.
+      // But not on the brain, therefore we need to rollback
+      if res.Error == nil {
+        // TODO: Implement the user creation as a transaction
+        // database.Db.Rollback()
+      }
+
+			return
+    }
 
 		if res.Error != nil {
 			log.Println(res.Error)

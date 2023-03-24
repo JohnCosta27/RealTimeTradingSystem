@@ -17,6 +17,7 @@ import (
 )
 
 var EventClient *utils.EventStreamClient
+const DEFAULT_BALANCE float64 = 1000
 
 func main() {
 	var wg sync.WaitGroup
@@ -24,13 +25,20 @@ func main() {
 
 	actions := make(chan sharedtypes.BrainReq)
 
-	EventClient = utils.CreateEventClient("0002", func(msg []byte) []byte {
+	EventClient = utils.CreateEventClient(ServicesIds.BRAIN, func(msg []byte) []byte {
 		var req sharedtypes.BrainReq
 		err := json.Unmarshal(msg, &req)
 
 		var returnValue []byte
 
 		switch req.Url {
+    case sharedtypes.SYNC_REGISTER:
+      
+      response := model.CreateUser(req.Params["uuid"], DEFAULT_BALANCE)
+
+      // Golang supports json marshaling booleans (Just like JSON spec permits)
+      returnValue, _ = json.Marshal(response)
+
 		case sharedtypes.GET_USER:
 			user := model.GetUser(req.Access)
 			returnValue, _ = json.Marshal(&user)

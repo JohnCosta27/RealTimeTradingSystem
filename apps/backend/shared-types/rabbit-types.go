@@ -21,9 +21,9 @@ const (
 	GET_ASSET_TRADES string = "get-asset-trades"
 	CREATE_TRADE     string = "create-trade"
 	COMPLETE_TRADE   string = "complete-trade"
+  SYNC_REGISTER    string = "sync-register"
 )
 
-// TODO: Use enums for route selection
 type BrainReq struct {
 	Url    string            `json:"url"`
 	Access uuid.UUID         `json:"access"`

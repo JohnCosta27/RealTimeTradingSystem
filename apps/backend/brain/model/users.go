@@ -8,6 +8,25 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+// Creates a user in the Brain database, used to sync between
+// the auth database and the brain database.
+func CreateUser(id string, balance float64) bool {
+  var newUser sharedtypes.User
+  newUserId, err := uuid.Parse(id)
+
+  if err != nil {
+    return false
+  }
+
+  newUser.ID = newUserId
+  newUser.Balance = balance
+
+  database.Db.Create(&newUser)
+
+  // If no rows were affected, this means the user could not be created
+  return database.Db.RowsAffected > 0
+}
+
 func FindAsset(assets []sharedtypes.Asset, assetId string) *sharedtypes.Asset {
 	for _, asset := range assets {
 		if asset.Base.ID.String() == assetId {
