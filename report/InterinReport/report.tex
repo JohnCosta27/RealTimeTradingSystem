@@ -255,6 +255,15 @@ These are the technologies which I used to build the backend system, which consi
 \subsubsection{Golang}
 As a backend programming language I have used Golang , it is a statically typed compiled language, known for its simplicity and ability to write extremely scalable systems, doing my own research I have found that a lot of modern architectures use Golang Real-time Trading Platform \\
 
+Golang is a relatively new programming language that was designed at Google to fit the gap in programming languages for a language that can be adaptive for cloud native use cases, which my system would be. This book~\cite{andrawos2017cloud} describes Golang and its use in cloud computing in more detail but I will state my main reasons for using this programming language.
+
+\begin{itemize}
+  \item Concurrency - It is extremely easy to manage concurrent applications in Golang, simply by using a 'Go routine', which means the developer can focus on building the application instead of thinking about concurrent models.
+  \item Compiled - Unlike other popular languages in the cloud microservice space such as Node.js~\cite{nodejs} or Python~\cite{python}, which are interpreted and therefore have an overhead in their runtime, Golang compiles down to any desired machine code, making it inherintly more performant.
+  \item Simplicity - Unlike Java or Scala, Golang does not have classes, which are typically used when a program becomes complex enough that these organizational methods are needed. Golang only includes Sstructs, which are similar to the structs in C. This makes programming declarative and very pleasant to write.
+  \item Garbase Collection - Most other competitors also have a garbage collection system, however Golangs garbage collection does not involve a virtual machine (like in: Java, JavaScript, and python). Garbage collection is extremely efficient in Golang.
+\end{itemize}
+
 \subsubsection{RabbitMQ}
 RabbitMq~\cite{rabbitmq} is a message broker. It allows various systems to communicate with each other through a reliable and scalable broker, which can be accessed from various system. RabbitMq is capable of broadcasting messages across systems or simple declaring queues which can be queued and dequeued from the various services accessing it. I am using RabbitMq to organise the communication between the Hub and the Brain service in my project, mostly due to RabbitMq supporting multiple clients accessing the queue at a time, meaning that I can have multiple instances of the Hub and Brain both pushing and pulling from the defined queues without much problem.
 
