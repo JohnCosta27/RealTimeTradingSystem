@@ -30,7 +30,8 @@ type ByteFunc func(msg []byte) []byte
 type ByteFuncNoRet func(msg []byte)
 
 func CreateEventClient(id string, listen ByteFunc, action ByteFuncNoRet) *EventStreamClient {
-	localConn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+  // TODO: Make this logic come from some variables above
+	localConn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
 		log.Println(err)
 		panic(err)
