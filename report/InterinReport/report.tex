@@ -33,6 +33,8 @@ I will use a variaty of accronims throughout the project, so I will define them 
 \begin{itemize}
   \item MVP - Minimal Viable Product
   \item BOT - Software Robot
+  \item ORM - Object Relational Mapping
+  \item SQL - Structured Query Language
 \end{itemize}
 
 \subsection{The Problem}
@@ -258,6 +260,25 @@ There is another paradigm of databases that have in recent years gotten a lot of
 Furthermore, one of the most popular and advances document databases available is MongoDb~\cite{mongodb}, which uses JSON as a method of storage, and has support for data sharding (Splitting into multiple nodes), and (as most document databases do), does not require a schema, giving a lot of flexibility to the developer. However, as shown in this paper~\cite{mongo_vs_postgres}, MongoDb performs worst than PostgreSQL in almost all performance tests, often by some great magnitude. \\
 
 This is one of the easier decisions in the project, I am using PostgreSQL as my permanent storage database(s).
+
+\subsubsection{ORM - Object Relational Mapping}
+In complex project such as this one, it is often not enough to just run raw SQL statements on the database, the reason for this is because of how unmaintanable it is, do you keep them in plain text? What about parsing the data into structures? For these reasons I have decided to use an ORM (Object relational mapping) library, and the most popular one for Golang is GORM~\cite{gorm}. Gorm allows you to write SQL statements through a builder API, which is fully managed by GORM. \\
+
+GORM just like other ORM, allow the data from the database to be read into type definitions from inside the code itself, in Golang this means structs, this figure \ref{gorm_orm} shows how GORM does this. As you can see we have a normal golang struct definition but also some annotations, telling us how the struct should behave, in terms of Gorm, it allows us to specify primary or foreign keys easily.
+
+\begin{figure}
+  \begin{verbatim}
+type User struct {
+	Base
+	Balance          float64       `json:"Balance"`
+	UserAssets       []UserAsset   `json:"UserAssets"`
+	BuyTransactions  []Transaction `json:"BuyTransactions" gorm:"foreignKey:BuyerId"`
+	SellTransactions []Transaction `json:"SellTransactions" gorm:"foreignKey:SellerId"`
+}
+  \end{verbatim}
+  \caption{GORM type mapping example}
+  \label{gorm_orm}
+\end{figure}
 
 \subsubsection{Caching}
 Caching is a common technique to store commonly used items of data, in a faster, readily available way. For this I am using an in-memory database called Redis~\cite{redis}.
