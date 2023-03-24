@@ -58,7 +58,20 @@ func RegisterRoute(r *gin.Engine) {
     // To create a user we must sync the IDs across databases,
     // to facilitate lookups, throughout the system without the need
     // of constant communication across system.
-		res := database.Db.Create(&user)
+    // GORM does this by default, but here we need to do this manually
+    // because of the 2 different databases.
+
+    transaction := database.Db.Begin()
+		res := transaction.Create(&user)
+
+		if res.Error != nil {
+			log.Println(res.Error)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"Error": "Duplicate email found",
+			})
+      transaction.Rollback()
+			return
+		}
 
     brainResponse := rabbitmq.AuthEventClient.Send(brainReq)
 
@@ -74,20 +87,14 @@ func RegisterRoute(r *gin.Engine) {
       // The user was created on the auth database.
       // But not on the brain, therefore we need to rollback
       if res.Error == nil {
-        // TODO: Implement the user creation as a transaction
-        // database.Db.Rollback()
+        transaction.Rollback()
       }
 
 			return
     }
 
-		if res.Error != nil {
-			log.Println(res.Error)
-			c.JSON(http.StatusBadRequest, gin.H{
-				"Error": "Duplicate email found",
-			})
-			return
-		}
+    // After all validation, it is safe to commit to database.
+    transaction.Commit()
 
 		refresh, rErr := utils.GenRefreshToken(user.ID.String())
 		access, aErr := utils.GenAccessToken(user.ID.String())
