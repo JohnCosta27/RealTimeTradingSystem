@@ -192,12 +192,11 @@ async function runPerfTests() {
   // await HubHealth();
   // await HubAssets();
   // await AuthLogin();
-  // await HubCreateTrade();
+  await HubCreateTrade();
   // await HubCompleteTrade();
   // await HubAllTradesInvalidateCache();
-  await HubGetTrades();
+  // await HubGetTrades();
 
-  return;
   fs.writeFile("./results.json", JSON.stringify(results), (err) => {
     if (err) {
       console.log(err);

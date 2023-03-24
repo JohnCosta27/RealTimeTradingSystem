@@ -940,7 +940,15 @@ This endpoint is also a POST request, and it is very similar to the create trade
 These results are slightly less chaotic, due to the number of reads needed before being able to complete the transaction being less. Also the body is the request is significantly smaller than when you create a trade. We can see that the average is around 7000 microseconds (7 milliseconds), with only a few outliers where the system seems to have ran out of available threads. 
 
 \subsection{End-to-End Performance}
+I have mentioned before in the report that this type of testing is not very useful for my project because I do not have the resources to fully exhaust the system with my residential internet, and limited computational power. Nevertheless, I will still perform some tests to (hopefully) show that in my limited internet I cannot overpower the system. \\
 
+To do this I will use a POST endpoints (/trade/create), which is the most CPU intensive end point in my system because it cannot be cached, and it needs to perform several validation checks before the user is allowed to actually create a trade. This figure \ref{e2e_route} shows the results and as we can see they are generally stable, with a few spikes in results, which I attribute to the machine temporarility  running out of threads to process the following request, but very quickly recovering. It is also worth noting that the virtual machine is running a whole operating system and therefore other processes could every once in a way require CPU time.
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{../results/e2e-createtrade.png}
+  \caption{/trade/create route testing (End to end)}
+  \label{e2e_route}
+\end{figure}
 
 \pagebreak
 \section{Professional Issues}
