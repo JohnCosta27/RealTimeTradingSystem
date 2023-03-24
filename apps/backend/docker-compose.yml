@@ -24,16 +24,12 @@ services:
     restart: on-failure
     networks:
       - app_net
-    deploy:
-      replicas: 3
   
     # Brain service consumes RabbitMQ request and deals with permanent storage
   brain:
     build: 
       context: .
       dockerfile: ./Brain.Dockerfile
-    ports:
-      - 5672:5672
     depends_on: 
       - brain_postgres
       - rabbitmq
