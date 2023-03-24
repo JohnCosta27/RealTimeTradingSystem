@@ -19,6 +19,22 @@ Royal Holloway, University of London}}
 \newpage
 
 \section{Introduction}
+
+\subsection{What this report will cover}
+This report will cover the development process that I went through whilst building this system. It will include various research around the space of distributed systems, but also research on specific technologies that make these massive systems possible and how I can use them for my advantage to build a reliable and scalable system. \\
+
+I will also document my approach when it comes to software engineering, the use of tools, processes and techniques to make sure that the development of such a big project runs smoothly throughout the entirety of the project. \\
+
+And finally I will evaluate the performance of the system, how it behaves with some stress testing and how the frontend advanced web interface allows the user to easily interact with the system as a whole.
+
+\subsection{Accoronims}
+I will use a variaty of accronims throughout the project, so I will define them here.
+
+\begin{itemize}
+  \item MVP - Minimal Viable Product
+  \item BOT - Software Robot
+\end{itemize}
+
 \subsection{The Problem}
 For my final year project, I am creating a Real-time Trading platform, with a web interface and a robust backend, allowing the many users of the platform to trade - in real-time - with each other, with very low latency. The reason I picked this project was due to my interest in distributed systems and desire to learn more, but also because I believe that current solutions to this problem are too highly coupled with the service they are providing. For example Ebay's trading and auctioning system is tightly coupled with Ebay itself. Furthermore systems such as the London Stock Exchange (LSE), which I took majority of my inspiration for this project from, are focused on only 1 group of stocks, as well as running on somewhat primitive technology. My goal is to provide a universal system, where users are allowed to trade any type of asset, whose ownership can be determined by a centralized system (This does mean that Cryptocurrency and NFT are not something my project will be able to do).
 
@@ -560,9 +576,8 @@ As you can see, the development occurs on seperate branches from main, and often
 Through the beginning of my project I simply used Git on its own to manage my project, however towards the end stages of developing the project I ran into the limitation that I was working on multiple features at the same time, and these can be managed just fine by Git, but it is difficult as an engineer to context switch between these features whilst maintaining a good level of code quality. To help solve this problem I looked at GitLab's~\cite{gitlab_cite} own merge request environments. Instead of merging into main using regular terminal Git commands, I started a merge/pull request on GitLab, and would use that environment as a hub for the code, where I would often leave comments to myself and do some code review of my own code. An example of this is shown in this figure \ref{gitlab}. \\
 
 \begin{figure}[h!]
-\includegraphics[width=1.5\textwidth]{../Diagrams/GitLab.png}
+\includegraphics[width=\textwidth]{../Diagrams/GitLab.png}
   \caption{GitLab Code Review Example}
-\hspace*{-3cm}
 \label{gitlab}
 \end{figure}
 
