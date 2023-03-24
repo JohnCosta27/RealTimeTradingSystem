@@ -922,7 +922,7 @@ The non-cached results average at around 2000 microseconds (2 milliseconds), whi
 
 \pagebreak
 \subsubsection{/trade/create route}
-This is a POST request to create a trade for a given asset, for a price. This can be a sell or buy transaction, but it is a fairly complicate endpoint because there is a lot of business logic that needs to happen. The system must check the user can trade this asset, or if they have enough money, as well as other general validation. It is also a request where basically no real caching is possible, and therefore the brain service takes almost all the load for this request. The results for the test are below.
+This is a POST request to create a trade for a given asset, for a price. This can be a sell or buy transaction, but it is a fairly complicate endpoint because there is a lot of business logic that needs to happen. The system must check the user can trade this asset, or if they have enough money, as well as other general validation. It is also a request where basically no real caching is possible, and therefore the brain service takes almost all the load for this request. The results for the test are on the following figure \ref{create-trade}.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/create-trade.png}
