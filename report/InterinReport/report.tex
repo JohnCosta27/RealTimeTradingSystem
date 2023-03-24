@@ -872,7 +872,13 @@ I use the term Whitebox to describe testing the performance of the system from w
 All the requests are sent as fast as my home network can, all at the same time.
 
 \subsubsection{Machine Specifications}
-TODO: Add VM specs and local machine specs.
+The specification of the virtual machine where I conducted these tests are as follows
+
+\begin{itemize}
+  \item CPU - Intel Xeon E5-2673 v4 (2 cores) x86
+  \item Memory - 4 GB
+  \item Operating System - Ubuntu 20.04 LTS
+\end{itemize}
 
 \pagebreak
 \subsubsection{/login route}
@@ -934,7 +940,7 @@ This endpoint is also a POST request, and it is very similar to the create trade
 These results are slightly less chaotic, due to the number of reads needed before being able to complete the transaction being less. Also the body is the request is significantly smaller than when you create a trade. We can see that the average is around 7000 microseconds (7 milliseconds), with only a few outliers where the system seems to have ran out of available threads. 
 
 \subsection{End-to-End Performance}
-?
+
 
 \pagebreak
 \section{Professional Issues}
