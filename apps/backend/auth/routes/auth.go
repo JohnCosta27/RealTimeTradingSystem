@@ -6,10 +6,10 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	sharedtypes "sharedTypes"
+	ServiceIds "sharedTypes/services"
 	"utils"
 
 	"github.com/gin-gonic/gin"
