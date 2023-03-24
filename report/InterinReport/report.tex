@@ -882,22 +882,24 @@ The specification of the virtual machine where I conducted these tests are as fo
 
 \pagebreak
 \subsubsection{/login route}
-The /login method is a POST request, where the user sends over their email and password, and the server returns an access and refresh token. This involves hashing the user's password and doing a read from the PostgreSQL database from the authentication service, in order to check the user's details are correct. It is a single service request (meaning it doesn't ask anything from any other services), which will make it fairly fast. The results are plotted below.
+The /login method is a POST request, where the user sends over their email and password, and the server returns an access and refresh token. This involves hashing the user's password and doing a read from the PostgreSQL database from the authentication service, in order to check the user's details are correct. It is a single service request (meaning it doesn't ask anything from any other services), which will make it fairly fast. The results are plotted in this figure \ref{login-test}.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/login.png}
   \caption{/login route results}
+  \label{login-test}
 \end{figure}
 
 This was very good to see, that my simplest service has a very consistent curve, sitting at around 700 microseconds, which is very fast. Most importantly it stayed fairly consistent throughout the testing with only 2 requests reaching over the 1000 microseconds barrier, I attribute these to system the system being under some load from other background processes.
 
 \pagebreak
 \subsubsection{/asset route}
-The /asset route is a GET request that goes to the Hub service first. The hub requests the brain service for all its persistent storage needs, except for the ones that are cached. I have implemented caching using a Redis database and a strategy of storing the endpoint with some metadata as a key for the Redis database, if the key is present then we can serve cache. This is described in further detail above. The results for this request, are plotted below.
+The /asset route is a GET request that goes to the Hub service first. The hub requests the brain service for all its persistent storage needs, except for the ones that are cached. I have implemented caching using a Redis database and a strategy of storing the endpoint with some metadata as a key for the Redis database, if the key is present then we can serve cache. This is described in further detail above. The results for this request, are plotted in this figure \ref{asset-test}.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/asset.png}
   \caption{/asset route results}
+  \label{asset-test}
 \end{figure}
 
 Starting with the non-cached results in orange, we can see that because the service has to make a request to the brain service and the brain then needs to perform a read from permanent storage from the PostgreSQL database, we end up with a much slower (but still very fast) turn around time. Averaging at around 2000 micro seconds, or just about 2 milliseconds. Noticeably there is a spike towards the end of the dataset, however this is an anomaly it seems and needs no further investigation, I attribute it to system noise. \\
@@ -906,11 +908,12 @@ The cached results are the most interesting ones, as you can see the request tim
 
 \pagebreak
 \subsubsection{/trade route}
-This endpoint returns all the active trades in the system, a value that can be cached if the system is not under load and being used to actively trade, this would be especially useful when potential markets are closed or during periods of low activity. It is unlikely that I could achieve any sort of caching when the system is being used to constantly trade because the trades cache has to be constantly invalidated. The following test does however test caching requests as well, but take into account this is only realistic to achieve during these periods of low activity.
+This endpoint returns all the active trades in the system, a value that can be cached if the system is not under load and being used to actively trade, this would be especially useful when potential markets are closed or during periods of low activity. It is unlikely that I could achieve any sort of caching when the system is being used to constantly trade because the trades cache has to be constantly invalidated. The following test \ref{gettrade-test} does however test caching requests as well, but take into account this is only realistic to achieve during these periods of low activity.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/get-trades.png}
-  \caption{/asset route results}
+  \caption{/trade/ route results}
+  \label{gettrade-test}
 \end{figure}
 
 We see around the same improvement from cached results vs non-cached results when compared to the /asset endpoint results, an improvement of around 4 times. The average result for a cached request is around 600 microseconds, a number slightly higher than the assets because at any given point there are a lot more trades than there are assets, therefore the read from PostgreSQL naturally takes more time. \\
@@ -924,17 +927,19 @@ This is a POST request to create a trade for a given asset, for a price. This ca
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/create-trade.png}
   \caption{/trade/create route results}
+  \label{create-trade}
 \end{figure}
 
 These results are much more chaotic, and naturally so because of how much more complex this endpoint is compared to other ones. We see the average at around 8000 microseconds (8 milliseconds), with quite a few data points that jump in terms of response time. I believe this is because of the lack of available threads on the virtual machine the test was conducted on, with around 4 threads some requests have to wait for others to finish before starting to handle the next one, hence explaining the jumps. This could be solved by having a better virtual machine (after all the one I am using isn't anything special). And then these results would look much more plausible. \\
 
 \pagebreak
 \subsubsection{/trade/complete route}
-This endpoint is also a POST request, and it is very similar to the create trade endpoint, slightly less complex but still has to do a fair amount of validation in order to make sure that the transaction is a valid one (making sure the user has enough money, or enough of that asset, etc...). Again, no real caching is possible on this one and therefore I expect some more chaotic results.
+This endpoint is also a POST request, and it is very similar to the create trade endpoint, slightly less complex but still has to do a fair amount of validation in order to make sure that the transaction is a valid one (making sure the user has enough money, or enough of that asset, etc...). Again, no real caching is possible on this one and therefore I expect some more chaotic results. The results are plotted in the following figure \ref{create-trade-test}.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/complete-trade.png}
   \caption{/trade/create route results}
+  \label{create-trade-test}
 \end{figure}
 
 These results are slightly less chaotic, due to the number of reads needed before being able to complete the transaction being less. Also the body is the request is significantly smaller than when you create a trade. We can see that the average is around 7000 microseconds (7 milliseconds), with only a few outliers where the system seems to have ran out of available threads. 
@@ -942,7 +947,9 @@ These results are slightly less chaotic, due to the number of reads needed befor
 \subsection{End-to-End Performance}
 I have mentioned before in the report that this type of testing is not very useful for my project because I do not have the resources to fully exhaust the system with my residential internet, and limited computational power. Nevertheless, I will still perform some tests to (hopefully) show that in my limited internet I cannot overpower the system. \\
 
-To do this I will use a POST endpoints (/trade/create), which is the most CPU intensive end point in my system because it cannot be cached, and it needs to perform several validation checks before the user is allowed to actually create a trade. This figure \ref{e2e_route} shows the results and as we can see they are generally stable, with a few spikes in results, which I attribute to the machine temporarility  running out of threads to process the following request, but very quickly recovering. It is also worth noting that the virtual machine is running a whole operating system and therefore other processes could every once in a way require CPU time.
+To do this I will use a POST endpoints (/trade/create), which is the most CPU intensive end point in my system because it cannot be cached, and it needs to perform several validation checks before the user is allowed to actually create a trade. This figure \ref{e2e_route} shows the results and as we can see they are generally stable, with a few spikes in results, which I attribute to the machine temporarility  running out of threads to process the following request, but very quickly recovering. It is also worth noting that the virtual machine is running a whole operating system and therefore other processes could every once in a way require CPU time. \\
+
+Just an extra note that this test is measured in milliseconds as opposed to the whitebox tests which are measured in microseconds, this means these tests take a significant amount of time, and seeing that in here \ref{create-trade} we have an average of 8 milliseconds, it seems that around 95\% of the end to end request comes from: Creating the request, sending the request, receiving it. This is why it is not feasible to use end-to-end testing to measure the performance is the system, because it does not fairly evaluate it.
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{../results/e2e-createtrade.png}
