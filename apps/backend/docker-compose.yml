@@ -2,6 +2,7 @@ version: "3"
 
 services:
   rabbitmq:
+    image: backend-rabbitmq
     build: ./rabbitmq
     ports:
       - 15672:15672 #Management console
@@ -12,6 +13,7 @@ services:
 
   # Hub service is the entry point for all thing (except authentication)
   hub:
+    image: backend-hub
     build: 
       context: .
       dockerfile: ./Hub.Dockerfile
@@ -27,6 +29,7 @@ services:
   
     # Brain service consumes RabbitMQ request and deals with permanent storage
   brain:
+    image: backend-brain
     build: 
       context: .
       dockerfile: ./Brain.Dockerfile
@@ -38,6 +41,7 @@ services:
       - app_net
 
   brain_postgres:
+    image: backend-brain_postgres
     build: ./brain_postgres
     volumes:
       - ./brain_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -57,6 +61,7 @@ services:
     command: -p 5443
 
   auth:
+    image: backend-auth
     build: 
       context: .
       dockerfile: ./Auth.Dockerfile
@@ -72,6 +77,7 @@ services:
       - app_net
 
   auth_postgres:
+    image: backend-auth_postgres
     build: ./auth_postgres
     volumes:
       - ./auth_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
