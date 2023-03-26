@@ -48,6 +48,7 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
           type="number"
           placeholder="69"
           class="input input-secondary input-bordered w-full"
+          aria-roledescription='trade-amount'
           onChange={(e) => setSellAmount(parseFloat(e.currentTarget.value))}
         />
         <label class="label">
@@ -57,11 +58,13 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
           type="number"
           placeholder="420"
           class="input input-secondary input-bordered w-full"
+          aria-roledescription='trade-price'
           onChange={(e) => setSellPrice(parseFloat(e.currentTarget.value))}
         />
         <div class="flex flex-col mt-auto">
           <button
             class="btn btn-secondary"
+            aria-roledescription="create-trade"
             onClick={() =>
               sell.mutate({
                 assetId: sellAsset()!.Id,
