@@ -36,7 +36,7 @@ func GetAssets(r *gin.Engine) {
 				})
 				return
 			}
-      c.Set(cache.CACHE, string(msg))
+			c.Set(cache.CACHE, string(msg))
 			c.JSON(http.StatusOK, GetAssetBody(assets))
 		})
 }

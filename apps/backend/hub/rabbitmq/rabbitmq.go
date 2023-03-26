@@ -25,11 +25,11 @@ func InitRabbit() {
 	RabbitClient = utils.CreateEventClient("0001", func(msg []byte) []byte {
 		return []byte("")
 	},
-  func (msg []byte) {
-    var info sharedtypes.BrainReq
-    json.Unmarshal(msg, &info)
-    cache.Invalidate(info.Url)
-  })
+		func(msg []byte) {
+			var info sharedtypes.BrainReq
+			json.Unmarshal(msg, &info)
+			cache.Invalidate(info.Url)
+		})
 }
 
 func SendRPC(msg sharedtypes.BrainReq) []byte {
@@ -38,5 +38,5 @@ func SendRPC(msg sharedtypes.BrainReq) []byte {
 }
 
 func CloseRabbit() {
-  utils.Close()
+	utils.Close()
 }

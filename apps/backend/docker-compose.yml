@@ -2,15 +2,18 @@ version: "3"
 
 services:
   rabbitmq:
+    image: backend-rabbitmq
     build: ./rabbitmq
     ports:
       - 15672:15672 #Management console
       - 5672:5672 #Actual exchange
-    network_mode: host
+    networks:
+      - app_net
     restart: on-failure
 
   # Hub service is the entry point for all thing (except authentication)
   hub:
+    image: backend-hub
     build: 
       context: .
       dockerfile: ./Hub.Dockerfile
@@ -21,21 +24,24 @@ services:
     depends_on:
       - rabbitmq
     restart: on-failure
-    network_mode: host
+    networks:
+      - app_net
   
     # Brain service consumes RabbitMQ request and deals with permanent storage
   brain:
+    image: backend-brain
     build: 
       context: .
       dockerfile: ./Brain.Dockerfile
-    ports:
-      - 5672:5672
     depends_on: 
       - brain_postgres
       - rabbitmq
     restart: on-failure
-    network_mode: host
+    networks:
+      - app_net
+
   brain_postgres:
+    image: backend-brain_postgres
     build: ./brain_postgres
     volumes:
       - ./brain_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -46,10 +52,16 @@ services:
       - POSTGRES_PASSWORD=postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+    expose:
+      - 5443
     ports:
-      - 5443:5432
+      - 5443:5443
+    networks:
+      - app_net
+    command: -p 5443
 
   auth:
+    image: backend-auth
     build: 
       context: .
       dockerfile: ./Auth.Dockerfile
@@ -61,9 +73,11 @@ services:
       - brain_postgres
       - auth_postgres
     restart: on-failure
-    network_mode: host
+    networks:
+      - app_net
 
   auth_postgres:
+    image: backend-auth_postgres
     build: ./auth_postgres
     volumes:
       - ./auth_postgres/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -74,8 +88,13 @@ services:
       - POSTGRES_PASSWORD=postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+    expose:
+      - 5442
     ports:
-      - 5442:5432
+      - 5442:5442
+    networks:
+      - app_net
+    command: -p 5442
 
   # Redis cache server
   redis:
@@ -86,3 +105,8 @@ services:
       - REDIS_PASSWORD=redis
     ports:
       - 6379:6379
+    networks:
+      - app_net
+
+networks:
+  app_net: {}

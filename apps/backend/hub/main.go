@@ -12,10 +12,12 @@ func main() {
 
 	wg.Add(1)
 
-  cache.InitRedisCache()
+	cache.InitRedisCache()
 	rabbitmq.InitRabbit()
-	InitGin()
+
+	Router := InitGin()
+	go Router.Run("0.0.0.0:4545")
 
 	wg.Wait()
-  rabbitmq.CloseRabbit()
+	rabbitmq.CloseRabbit()
 }

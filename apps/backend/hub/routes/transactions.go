@@ -17,9 +17,9 @@ import (
 )
 
 func BroadcastTrade(wsMap map[*websocket.Conn]bool, trade sharedtypes.Transaction) {
-  for ws := range wsMap {
-    ws.WriteJSON(trade)
-  }
+	for ws := range wsMap {
+		ws.WriteJSON(trade)
+	}
 }
 
 func PostTrade(ws map[*websocket.Conn]bool) gin.HandlerFunc {
@@ -59,7 +59,7 @@ func PostTrade(ws map[*websocket.Conn]bool) gin.HandlerFunc {
 			return
 		}
 
-    BroadcastTrade(ws, newTrade)
+		BroadcastTrade(ws, newTrade)
 
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
@@ -102,7 +102,7 @@ func PostCompleteTrade(ws map[*websocket.Conn]bool) gin.HandlerFunc {
 			return
 		}
 
-    BroadcastTrade(ws, newTrade)
+		BroadcastTrade(ws, newTrade)
 
 		c.JSON(http.StatusOK, gin.H{
 			"trade": newTrade,
@@ -146,33 +146,33 @@ func GetAllTradesAssetsBody(data []sharedtypes.Transaction) any {
 
 func GetAllTradesAssets() gin.HandlerFunc {
 	return func(c *gin.Context) {
-    AssetId, exists := c.GetQuery("AssetId")
+		AssetId, exists := c.GetQuery("AssetId")
 
-    if !exists {
-				c.JSON(http.StatusNotFound, gin.H{
-					"error": "This asset could not be found",
-				})
-      return
-    }
+		if !exists {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "This asset could not be found",
+			})
+			return
+		}
 
 		bodyReqBody := make(map[string]string)
-    bodyReqBody["AssetId"] = AssetId
+		bodyReqBody["AssetId"] = AssetId
 		bodyReq := sharedtypes.BrainReq{
 			Url:  sharedtypes.GET_ASSET_TRADES,
 			Body: bodyReqBody,
 		}
 
 		msg := rabbitmq.SendRPC(bodyReq)
-    var res []sharedtypes.Transaction
+		var res []sharedtypes.Transaction
 
-    err := json.Unmarshal(msg, &res)
-    if err != nil {
-      log.Println(err)
+		err := json.Unmarshal(msg, &res)
+		if err != nil {
+			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "This service has encountered an issue",
 			})
-      return
-    }
+			return
+		}
 
 		c.JSON(http.StatusOK, GetAllTradesAssetsBody(res))
 	}
@@ -183,14 +183,14 @@ func TradeRoutes(r *gin.Engine, ws map[*websocket.Conn]bool) {
 	tradeGroup.Use(middleware.Auth())
 
 	tradeGroup.POST(CREATE_TRADE_ROUTE,
-    middleware.ParsePostMiddleware(sharedtypes.GetTransactionBody),
-    PostTrade(ws),
-  )
+		utils.ParsePostMiddleware(sharedtypes.GetTransactionBody),
+		PostTrade(ws),
+	)
 
 	tradeGroup.POST(COMPLETE_TRADE_ROUTE,
-    middleware.ParsePostMiddleware(sharedtypes.GetCompleteTransaction),
-    PostCompleteTrade(ws),
-  )
+		utils.ParsePostMiddleware(sharedtypes.GetCompleteTransaction),
+		PostCompleteTrade(ws),
+	)
 
 	tradeGroup.GET(ASSET_TRADES_ROUTE,
 		middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
@@ -198,7 +198,7 @@ func TradeRoutes(r *gin.Engine, ws map[*websocket.Conn]bool) {
 	)
 
 	tradeGroup.GET("/",
-    middleware.CacheReq(false, false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody),
-    GetAllTrades(),
-  )
+		middleware.CacheReq(false, false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody),
+		GetAllTrades(),
+	)
 }

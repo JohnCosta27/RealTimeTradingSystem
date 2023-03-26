@@ -7,6 +7,9 @@ A platform that allows multiple users to buy and sell resources, in real time. C
 ### Backend
 - Golang
 - Docker
+- RabbitMQ
+- Postgres
+- Redis
 
 ### Frontend
 - SolidJS (known for its speed)
@@ -34,6 +37,16 @@ cd apps/backend
 docker-compose up --build //The flag is optional but ensures the containers are re-built.
 ```
 
+There are also various useful scripts you might want. All in the apps/backend folder.
+- CleanDb.bash -> Requires sudo to run and deletes the data of your local databases. 
+- HubAndBrain.bash -> Runs the hub and brain services as simple processes (without docker), useful for development.
+- NoHub.bash -> Runs the docker compose file but without the hub, which you can run individually. Again, useful for development.
+
+Sometimes you might also want to run the docker images without the hub and brain, for development, which you can do with the following command.
+```
+docker-compose -f no-brain-hub.yml up --build //Again, the flag is optional if you want to rebuild the containers.
+```
+
 ### Integration Testing
 Integration testing must be done whilst the backend services are running, so you must perform the stage above and only after run this. Will make this process nicer in the future.
 
@@ -41,5 +54,10 @@ You will also need a `.env` file, which you need to create in the integration te
 ```
 cd apps/integration
 npm install
-npm run test //Can also do npm run test:watch
+npm run prisma:gen // Generates the required type files for the Prisma ORM.
+npm run test // Can also do npm run test:watch
 ```
+
+## Extra information
+
+There is a README.md in each backend service (Auth, Hub and Brain), where you can find out more about each service.

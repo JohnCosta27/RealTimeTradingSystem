@@ -4,9 +4,9 @@ import (
 	"brain/database"
 	"brain/model"
 	"encoding/json"
-	"fmt"
 	"log"
 	sharedtypes "sharedTypes"
+	ServicesIds "sharedTypes/services"
 	"strconv"
 	"sync"
 
@@ -17,20 +17,28 @@ import (
 )
 
 var EventClient *utils.EventStreamClient
+const DEFAULT_BALANCE float64 = 1000
 
 func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
-  
-  actions := make(chan sharedtypes.BrainReq)
 
-  EventClient = utils.CreateEventClient("0002", func(msg []byte) []byte {
+	actions := make(chan sharedtypes.BrainReq)
+
+	EventClient = utils.CreateEventClient(ServicesIds.BRAIN, func(msg []byte) []byte {
 		var req sharedtypes.BrainReq
 		err := json.Unmarshal(msg, &req)
 
 		var returnValue []byte
 
 		switch req.Url {
+    case sharedtypes.SYNC_REGISTER:
+      
+      response := model.CreateUser(req.Params["uuid"], DEFAULT_BALANCE)
+
+      // Golang supports json marshaling booleans (Just like JSON spec permits)
+      returnValue, _ = json.Marshal(response)
+
 		case sharedtypes.GET_USER:
 			user := model.GetUser(req.Access)
 			returnValue, _ = json.Marshal(&user)
@@ -43,7 +51,7 @@ func main() {
 			assets := model.GetUserAssets(req.Access)
 			returnValue, _ = json.Marshal(&assets)
 
-    // Create trade and complete trades need to let hub know to invalidate certain cache
+			// Create trade and complete trades need to let hub know to invalidate certain cache
 		case sharedtypes.CREATE_TRADE:
 			var transaction sharedtypes.Transaction
 			price, errPrice := strconv.ParseFloat(req.Body["Price"], 64)
@@ -54,13 +62,13 @@ func main() {
 				log.Println(err)
 			}
 			returnValue, _ = json.Marshal(&transaction)
-      req := sharedtypes.BrainReq{
-        Url: sharedtypes.GET_TRADES,
-        From: "0002",
-        To: "0001",
-        Type: sharedtypes.INFO,
-      }
-      actions <- req
+			req := sharedtypes.BrainReq{
+				Url:  sharedtypes.GET_TRADES,
+				From: ServicesIds.BRAIN,
+				To:   ServicesIds.HUB,
+				Type: sharedtypes.INFO,
+			}
+			actions <- req
 
 		case sharedtypes.COMPLETE_TRADE:
 			transaction, err := model.CompleteTradeAsset(uuid.MustParse(req.Body["TransactionId"]), req.Access)
@@ -68,15 +76,15 @@ func main() {
 				log.Println(err)
 			}
 			returnValue, _ = json.Marshal(&transaction)
-      req := sharedtypes.BrainReq{
-        Url: sharedtypes.GET_TRADES,
-        From: "0002",
-        To: "0001",
-        Type: sharedtypes.INFO,
-      }
-      actions <- req
-      req.Url = sharedtypes.GET_ASSET_TRADES
-      actions <- req
+			req := sharedtypes.BrainReq{
+				Url:  sharedtypes.GET_TRADES,
+				From: ServicesIds.BRAIN,
+				To:   ServicesIds.HUB,
+				Type: sharedtypes.INFO,
+			}
+			actions <- req
+			req.Url = sharedtypes.GET_ASSET_TRADES
+			actions <- req
 
 		case sharedtypes.GET_TRADES:
 			transactions := model.GetAllTransactions()
@@ -84,19 +92,18 @@ func main() {
 
 		case sharedtypes.GET_ASSET_TRADES:
 			transactions := model.GetAllAssetTrades(req.Body["AssetId"])
-      returnValue, _ = json.Marshal(transactions)
+			returnValue, _ = json.Marshal(transactions)
 		}
 		return returnValue
 	}, func(msg []byte) {
-    // No need
+		// No need
 	})
 
-  go func() {
-    for a := range actions {
-      fmt.Println(a)
-      EventClient.SendNoRes(a)
-    }
-  }()
+	go func() {
+		for a := range actions {
+			EventClient.SendNoRes(a)
+		}
+	}()
 
 	EnvConf := sharedtypes.EnvConf{}
 	if err := env.Parse(&EnvConf); err != nil {

@@ -1,17 +1,15 @@
-package middleware
+package utils
 
 import (
 	"log"
 	"net/http"
-	sharedtypes "sharedTypes"
 
 	"github.com/gin-gonic/gin"
 )
 
-func ParsePostMiddleware[T sharedtypes.HubPosts](GetStruct func() T) gin.HandlerFunc {
+func ParsePostMiddleware[T any](GetStruct func() T) gin.HandlerFunc {
   return func (c *gin.Context) {
     BodyStruct := GetStruct()
-
     err := c.ShouldBindJSON(BodyStruct)
 
     if err != nil {

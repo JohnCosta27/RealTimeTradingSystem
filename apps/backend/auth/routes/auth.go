@@ -2,12 +2,14 @@ package routes
 
 import (
 	"auth/database"
-	"auth/middleware"
-	"auth/structs"
+	"auth/rabbitmq"
 	"crypto/sha512"
 	"encoding/hex"
+	"encoding/json"
 	"log"
 	"net/http"
+	sharedtypes "sharedTypes"
+	ServiceIds "sharedTypes/services"
 	"utils"
 
 	"github.com/gin-gonic/gin"
@@ -21,40 +23,78 @@ import (
  * Body: GetRegisterBody functions returns a struct of the required information
  */
 func RegisterRoute(r *gin.Engine) {
-	r.POST(REGISTER, middleware.ParsePostMiddleware(structs.GetRegisterBody), func(c *gin.Context) {
+	r.POST(REGISTER, utils.ParsePostMiddleware(sharedtypes.GetRegisterBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
-		registerBody := b.(*structs.RegisterBody)
+		registerBody := b.(*sharedtypes.RegisterBody)
 
 		salt := utils.GenSalt()
 		hashBytes := sha512.Sum512([]byte(registerBody.Password + salt))
 		hashedPassword := hex.EncodeToString(hashBytes[:])
 
-    id := uuid.New()
+		id := uuid.New()
 
-    userBase := database.Base {
-      ID: id,
-    }
+		userBase := database.Base{
+			ID: id,
+		}
 
 		user := database.User{
-      Base: userBase,
+			Base:          userBase,
 			Email:         registerBody.Email,
 			Firstname:     registerBody.Firstname,
 			Surname:       registerBody.Surname,
 			Password:      hashedPassword,
 			Password_salt: salt,
 		}
-    res := database.Db.Create(&user)
 
-    // TODO: Make this transaction safe. Across databases...
-    database.BrainDb.Exec("INSERT INTO users (id, balance) VALUES (?, 0)", id.String())
+    paramMap := make(map[string]string)
+    paramMap["uuid"] = id.String()
 
-    if res.Error != nil {
-      log.Println(res.Error)
-      c.JSON(http.StatusBadRequest, gin.H{
-        "Error": "Duplicate email found",
-      })
-      return
-    } 
+    brainReq := sharedtypes.BrainReq{
+      Url: sharedtypes.SYNC_REGISTER,
+      Params: paramMap,
+      To: ServiceIds.BRAIN,
+    }
+
+    // To create a user we must sync the IDs across databases,
+    // to facilitate lookups, throughout the system without the need
+    // of constant communication across system.
+    // GORM does this by default, but here we need to do this manually
+    // because of the 2 different databases.
+
+    transaction := database.Db.Begin()
+		res := transaction.Create(&user)
+
+		if res.Error != nil {
+			log.Println(res.Error)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"Error": "Duplicate email found",
+			})
+      transaction.Rollback()
+			return
+		}
+
+    brainResponse := rabbitmq.AuthEventClient.Send(brainReq)
+
+    var isUserCreated bool
+    err := json.Unmarshal(brainResponse, &isUserCreated)
+
+    if err != nil || !isUserCreated {
+			log.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"Error": "There has been a server error creating user",
+			})
+
+      // The user was created on the auth database.
+      // But not on the brain, therefore we need to rollback
+      if res.Error == nil {
+        transaction.Rollback()
+      }
+
+			return
+    }
+
+    // After all validation, it is safe to commit to database.
+    transaction.Commit()
 
 		refresh, rErr := utils.GenRefreshToken(user.ID.String())
 		access, aErr := utils.GenAccessToken(user.ID.String())
@@ -81,9 +121,9 @@ func RegisterRoute(r *gin.Engine) {
  * Body: GetLoginBody functions returns a struct of the required information
  */
 func LoginRoute(r *gin.Engine) {
-	r.POST(LOGIN, middleware.ParsePostMiddleware(structs.GetLoginBody), func(c *gin.Context) {
+	r.POST(LOGIN, utils.ParsePostMiddleware(sharedtypes.GetLoginBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
-		loginBody := b.(*structs.LoginBody)
+		loginBody := b.(*sharedtypes.LoginBody)
 
 		user := &database.User{}
 		db := database.Db.Where("email = ?", loginBody.Email).Find(user)
@@ -130,9 +170,9 @@ func LoginRoute(r *gin.Engine) {
  * Body: GetRefreshBody functions returns a struct of the required information
  */
 func RefreshRoute(r *gin.Engine) {
-	r.POST(REFRESH, middleware.ParsePostMiddleware(structs.GetRefreshBody), func(c *gin.Context) {
+	r.POST(REFRESH, utils.ParsePostMiddleware(sharedtypes.GetRefreshBody), func(c *gin.Context) {
 		b, _ := c.Get("body")
-		refreshBody := b.(*structs.RefreshBody)
+		refreshBody := b.(*sharedtypes.RefreshBody)
 
 		claims, err := utils.DecodeJwt(refreshBody.Refresh, "refresh")
 		if err != nil || claims.Type != "refresh" {
