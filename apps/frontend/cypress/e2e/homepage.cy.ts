@@ -16,12 +16,12 @@ describe('Home page testing', () => {
   });
 
   it('Allows users to see the price of an asset', () => {
-    cy.get('[aria-roledescription="asset-card"] [aria-roledescription="view-graph-button"]')
+    cy.get(
+      '[aria-roledescription="asset-card"] [aria-roledescription="view-graph-button"]',
+    )
       .eq(0)
-      .click()
+      .click();
 
-    cy.location('pathname')
-      .location('pathname')
-      .should('match',/\/assets\/\b.{36}$/)
+    cy.location('pathname').should('match', /\/assets\/\b.{36}$/);
   });
 });
