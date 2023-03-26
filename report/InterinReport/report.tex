@@ -735,6 +735,7 @@ As you can see I have 5 sections, which follow the advice given by David Allen i
 The backend of my system is where most of the complexity lies, I discussed earlier on why I have decided to split it into 3 components (Hub, Brain and Authentication), but I will now discuss some more technical details.
 
 \subsubsection{Why RabbitMQ?}
+\label{rabbitmq_comms}
 For my Hub service to communicate with the Brain service they use an AMQP Queue~\cite{amqp}, which RabbitMQ provides. The reason for this is because of the reliability and versatility of RabbitMQ. It is known in the industry to be extremely reliable and predictable which is important for the stability to my system. \\
 
 I could have instead just used HTTP requests to access the Brain service, but I choose against this because I wanted to control exactly who is communicating with the Brain, instead of having an open API that anyone can access. Furthermore HTTP requests are harder to control and predict when running in multi-node environment (If I have 2 instances of the brain, which one is getting the requests?), this problem can be avoided by using some load balancer, but I decided to avoid it all together. \\
@@ -742,6 +743,7 @@ I could have instead just used HTTP requests to access the Brain service, but I 
 Furthermore, RabbitMQ has more advanced features such as fanout exchanges, which allow you to publish messages onto various queues at the same time without ever having to manage this complexity, I am not using this in my system currently, but it could be a feature I took advantage of in the future.
 
 \subsubsection{Queue per service system}
+\label{one_queue}
 Every node on my system has an attached RabbitMQ queue. So the Hub service has a queue which other services can push items onto and the Hub will process these accordingly, it is important to note that this queue is unique to the instance of the service, so it is easy to know which instance is actually handling which parts of the requests. \\
 
 This decision comes at the cost of having to manage multiple queues in the system and manage IDs for these given queues. I talk more about how I managed this in the "shared types and utilities" section of the report.
@@ -863,6 +865,15 @@ transaction.Commit()
   \caption{Authentication and Brain syncing with newly registered user.}
   \label{auth_register_safe}
 \end{figure}
+
+\pagebreak
+
+\subsection{Inter Service Communication}
+I mentioned earlier that I have used RabbitMQ for my services to communicate with each other \ref{rabbitmq_comms}. However to communicate with an AMQP queue, takes a fair bit of boilerplate code, and because of this I have created a small shared library that facilitates the attachment of services onto the RabbitMQ messaging service. The code is quite long but can be found at \lstinline{apps/backend/utils/rabbitmq.go}. \\
+
+What it does is allow each service to have an ID, which will be the name of their queue (I have talked about the design decision to have 1 queue per system here \ref{one_queue}). It then connects to RabbitMQ and does all the error and validation checks for you, instead of the developer having to write it out each time. To create a new event client (which is what I called this system), one must also supply two callback functions, one for listening to RPC requests, and another for listening to simple info request, which do not need to supply a response. Interestingly, you can just create empty functions if you do not which the service to do anything when it is requested upon. \\
+
+The event client also supplies basic functions to help with sending RPC communication between services, furthermore it also helps with type safety, because it returns the correct Golang struct each time, meaning that you will get a compile error if you try and send anything except this struct through the system.
 
 \pagebreak
 
