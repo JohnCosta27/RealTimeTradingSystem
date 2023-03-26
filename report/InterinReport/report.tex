@@ -266,6 +266,7 @@ Furthermore, one of the most popular and advances document databases available i
 This is one of the easier decisions in the project, I am using PostgreSQL as my permanent storage database(s).
 
 \subsubsection{ORM - Object Relational Mapping}
+\label{orm}
 In complex project such as this one, it is often not enough to just run raw SQL statements on the database, the reason for this is because of how unmaintainable it is, do you keep them in plain text? What about parsing the data into structures? For these reasons I have decided to use an ORM (Object relational mapping) library, and the most popular one for Golang is Gorm~\cite{gorm}. Gorm allows you to write SQL statements through a builder API, which is fully managed by GORM. \\
 
 GORM just like other ORM, allow the data from the database to be read into type definitions from inside the code itself, in Golang this means structs, this figure \ref{gorm_orm} shows how GORM does this. As you can see we have a normal Golang struct definition but also some annotations, telling us how the struct should behave, in terms of Gorm, it allows us to specify primary or foreign keys easily.
@@ -802,6 +803,66 @@ type Transaction struct {
 \end{figure}
 
 Another part of my project that is shared is a few utility functions, and even the RabbitMQ client which I designed to work specifically for my system. I won't add code snippets here because it is quite extensive, but in my projects 'apps/backend/utils', you will find various pieces of code that are shared throughout my 3 services, the most important one being the RabbitMQ client, which enables the services to send and receive messages through my RabbitMQ system without needing to implement this logic every time.
+
+\subsection{ACID Compliant Transactions}
+I have mentioned in an earlier section \ref{orm} the use of ORM, and specifically GORM~\cite{gorm} in my project, and how GORM (An ORM library for Golang, which I used when interacting with databases), uses transactions by default on every create, update and delete statement it performs. However there is one part of my project where this is not so easy because I need two databases to be in sync at the same time. This happens when there is a new user registered into the system. \\
+
+When a user registers themselves onto my system they do so on the Authentication system, then the Brain database must also create a new user with the same ID, this part is crucial for performance because if the IDs were not in sync the JWT what authenticates the user could not be used in the brain, and at best we would have to request the Auth system to validate the JWT and then processed with the request, which adds a lot of internal traffic that can simply be avoided. \\
+
+To avoid this, when I create a user on the Authentication database, I do the same, with the same ID on the Brain database, however a problem arrises - How do I make sure that if one of the databases fails to create a user, we can roll back both databases? The answer comes with the use of manual transactions. We first create the user on the Auth database, use RabbitMQ to tell the Brain service to also create a user, and if an error occurs at any point we roll back the database. Here is a code snippet from the Authentication service where this is done \ref{auth_register_safe}. \\
+
+Ideally, every database is independent from each other, and technically they still are as the authentication service isn't directly communicating with the Brains database (Which is a core principle or micro service architectures), however the complexity of having different user records in different databases for the same user would create too much further complexity than this would, and therefore that is why I choose to do it. But it is the only place in the project where an inter database dependence happens.
+
+\begin{figure}
+  \begin{verbatim}
+// To create a user we must sync the IDs across databases,
+// to facilitate lookups, throughout the system without the need
+// of constant communication across system.
+// GORM does this by default, but here we need to do this manually
+// because of the 2 different databases.
+
+transaction := database.Db.Begin()
+res := transaction.Create(&user)
+
+// Early return if the auth database has had an error.
+if res.Error != nil {
+  log.Println(res.Error)
+  c.JSON(http.StatusBadRequest, gin.H{
+    "Error": "Duplicate email found",
+  })
+  transaction.Rollback()
+  return
+}
+
+// Request the brain to create a new user.
+brainResponse := rabbitmq.AuthEventClient.Send(brainReq)
+
+// Get the response.
+var isUserCreated bool
+err := json.Unmarshal(brainResponse, &isUserCreated)
+
+// Error checking
+if err != nil || !isUserCreated {
+  log.Println(err)
+  c.JSON(http.StatusInternalServerError, gin.H{
+    "Error": "There has been a server error creating user",
+  })
+
+  // The user was created on the auth database.
+  // But not on the brain, therefore we need to rollback
+  if res.Error == nil {
+    transaction.Rollback()
+  }
+
+  return
+}
+
+// After all validation, it is safe to commit to database.
+transaction.Commit()
+  \end{verbatim}
+  \caption{Authentication and Brain syncing with newly registered user.}
+  \label{auth_register_safe}
+\end{figure}
 
 \pagebreak
 
