@@ -17,17 +17,17 @@ export const FrontLayout: Component = () => {
         data-testid="sidebar"
       >
         <Link href="/">
-          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded">
+          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded" aria-roledescription='goto-home'>
             Home
           </div>
         </Link>
         <Link href="/assets">
-          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded">
+          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded" aria-roledescription='goto-my-assets'>
             My Assets
           </div>
         </Link>
         <Link href="/trades">
-          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded">
+          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded" aria-roledescription='goto-trades'>
             Trades
           </div>
         </Link>

@@ -1,0 +1,1 @@
+describe('Create trades testing', () => {});
