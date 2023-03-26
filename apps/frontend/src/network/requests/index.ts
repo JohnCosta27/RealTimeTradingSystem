@@ -1,8 +1,15 @@
 import axios, { AxiosResponse } from 'axios';
+import jwtDecode from 'jwt-decode';
 import { isTokenValid } from './isAccessTokenValid';
 
 export const AuthUrl = import.meta.env.VITE_AUTH_URL ?? 'http://localhost:4546';
 export const HubUrl = import.meta.env.VITE_HUB_URL ?? 'http://localhost:4545';
+
+export interface Token {
+  Uuid: string;
+  Exp: string;
+  Type: 'access' | 'refresh';
+}
 
 export const hubClient = axios.create({
   baseURL: HubUrl,
@@ -39,6 +46,20 @@ export async function getNewAccess(): Promise<string | undefined> {
 
   if (newToken.status !== 200) return undefined;
   return newToken.data.access;
+}
+
+/**
+ * Returns the user ID from the JWT, or undefined if
+ * for some reason the JWT is not valid.
+ */
+export function getUserId(): string | undefined {
+  const token = localStorage.getItem('access');
+  if (!token) return undefined;
+
+  if (!isTokenValid('access')) return undefined;
+
+  const decoded = jwtDecode(token) as Token;
+  return decoded.Uuid;
 }
 
 hubClient.interceptors.request.use(
