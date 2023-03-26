@@ -1,19 +1,23 @@
-import { Component, onMount } from "solid-js";
+import { Component, onCleanup, onMount } from "solid-js";
 import Chart from 'chart.js/auto';
+import { useParams } from "@solidjs/router";
 
 interface AssetChartProps {
   prices: number[];
 }
 
 export const AssetChart: Component<AssetChartProps> = (props) => {
+  const params = useParams<{id: string}>();
+
+  let graph: Chart<'line'>;
 
   onMount(() => {
-    const ctx = document.getElementById('asset_canvas') as HTMLCanvasElement;
+    const ctx = document.getElementsByTagName('canvas')[0] as HTMLCanvasElement;
 
-    new Chart(ctx, {
+    graph  = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: Array(props.prices.length).fill("bruh"),
+        labels: Array(props.prices.length).fill("Price"),
         datasets: [
           {
             label: 'Price of asset',
@@ -26,7 +30,13 @@ export const AssetChart: Component<AssetChartProps> = (props) => {
     });
   });
 
+  onCleanup(() => {
+    if (graph) {
+      graph.destroy();
+    }
+  })
+
   return (
-      <canvas width={1000} height={600} id="asset_canvas" />
+      <canvas width={1000} height={600} id={params.id} />
   );
 }
