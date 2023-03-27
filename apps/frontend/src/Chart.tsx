@@ -21,7 +21,10 @@ export const ChartPage: Component = () => {
     <div class="w-full h-full p-4 flex flex-col gap-4 bg-neutral-focus rounded shadow-lg">
       <Show when={allTradesAsset.data} fallback={<Loading />}>
         <AssetChart
-          prices={allTradesAsset.data!.trades.map((t) => t.Price / t.Amount)}
+          info={allTradesAsset.data!.trades.map((t) => [
+            t.Price / t.Amount,
+            t.UpdatedAt,
+          ])}
         />
       </Show>
     </div>
