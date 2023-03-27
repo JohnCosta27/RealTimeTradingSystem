@@ -58,6 +58,8 @@ npm run prisma:gen // Generates the required type files for the Prisma ORM.
 npm run test // Can also do npm run test:watch
 ```
 
+Note: The integration tests completely wipes your database to get accurate testing results, so you might need to run `CleanDb.bash`, to get the test users back.
+
 ## Extra information
 
 There is a README.md in each backend service (Auth, Hub and Brain), where you can find out more about each service.
