@@ -1,10 +1,8 @@
 import { useParams } from '@solidjs/router';
 import { createQuery } from '@tanstack/solid-query';
 import { Component, Show } from 'solid-js';
-import { AssetChart } from './AssetChart';
-import { GetAssetTrades } from './network/requests';
-import { Requests } from './types';
-import { Loading } from './ui/Loading';
+import { GetAssetTrades, Requests } from '@network';
+import { Loading, AssetChart } from '@ui';
 
 export const ChartPage: Component = () => {
   const params = useParams();

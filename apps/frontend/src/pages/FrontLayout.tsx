@@ -1,6 +1,6 @@
 import { Outlet, Link } from '@solidjs/router';
 import { Component, Show } from 'solid-js';
-import { useStore } from '../state';
+import { useStore } from '@state';
 
 export const FrontLayout: Component = () => {
   const { store } = useStore();

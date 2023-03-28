@@ -1,5 +1,5 @@
 import { useNavigate } from "@solidjs/router";
-import { getUserId } from "./network/requests"
+import { getUserId } from "@network"
 
 /**
  * Returns the user id as a SolidJs hook,

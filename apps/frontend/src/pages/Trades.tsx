@@ -1,10 +1,8 @@
 import { createMutation } from '@tanstack/solid-query';
 import { Component, createSignal, For, onCleanup, Show } from 'solid-js';
-import { PostCompleteTransaction } from './network/requests';
-import { useStore } from './state';
-import { CreateTransaction } from './ui/CreateTransaction';
-import { Loading } from './ui/Loading';
-import { TradeCard } from './ui/TradeCard';
+import { PostCompleteTransaction } from '@network';
+import { useStore } from '@state';
+import { CreateTransaction, Loading, TradeCard } from '@ui';
 
 export const Trades: Component = () => {
   const { store, mutate } = useStore();

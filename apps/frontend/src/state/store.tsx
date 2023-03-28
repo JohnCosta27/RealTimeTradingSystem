@@ -9,9 +9,9 @@ import {
   GetUser,
   GetUserAssets,
   GetUserType,
-} from '../network/requests';
-import { useWebsocket } from '../network/WebSocket';
-import { Requests } from '../types';
+  useWebsocket,
+  Requests,
+} from '@network';
 
 // Helper type for async values
 type Maybe<T> = T | undefined;

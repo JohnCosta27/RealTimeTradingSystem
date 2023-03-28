@@ -16,7 +16,15 @@
     "noEmit": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["cypress", "solid-js"]
+    "types": ["cypress", "solid-js"],
+    "baseUrl": "./",
+    "paths": {
+      "@auth": ["./src/auth"],
+      "@network": ["./src/network"],
+      "@pages": ["./src/pages"],
+      "@ui": ["./src/ui"],
+      "@state": ["./src/state"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }],

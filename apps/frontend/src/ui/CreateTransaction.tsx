@@ -4,7 +4,7 @@ import {
   GetAssets,
   GetUserAssets,
   PostCreateTransaction,
-} from '../network/requests';
+} from '@network';
 
 interface CreateTransactionProps {
   assets: GetUserAssets[];

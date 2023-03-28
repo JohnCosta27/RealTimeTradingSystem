@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Component, Show } from 'solid-js';
-import { GetTransaction } from '../network/requests';
-import { useUserId } from '../useUserId';
+import { GetTransaction } from '@network';
+import { useUserId } from '@auth';
 
 export interface TradeCardProps {
   trade: GetTransaction;

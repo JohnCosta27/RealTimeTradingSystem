@@ -2,7 +2,7 @@ import { useNavigate } from '@solidjs/router';
 import { createMutation } from '@tanstack/solid-query';
 import clsx from 'clsx';
 import { Component, createSignal, Show } from 'solid-js';
-import { PostLogin, setTokens } from '../network/requests';
+import { PostLogin, setTokens } from '@network';
 
 export const Login: Component = () => {
   const nav = useNavigate();

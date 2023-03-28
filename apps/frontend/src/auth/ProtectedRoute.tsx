@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from '@solidjs/router';
 import { Component, createResource, Show, Suspense } from 'solid-js';
-import { getNewAccess } from './network/requests';
+import { getNewAccess } from '@network';
 
 export const ProtectedRoute: Component = () => {
   const [isAuth] = createResource(getNewAccess);

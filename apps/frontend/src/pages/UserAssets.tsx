@@ -1,7 +1,6 @@
 import { Component, For, Show } from 'solid-js';
-import { useStore } from './state';
-import { Asset } from './ui/Asset';
-import { Loading } from './ui/Loading';
+import { useStore } from '@state';
+import { Asset, Loading } from '@ui';
 
 export const UserAssets: Component = () => {
   const { store } = useStore();

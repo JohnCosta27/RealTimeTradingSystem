@@ -1,7 +1,7 @@
 import { useNavigate } from '@solidjs/router';
 import { createMutation } from '@tanstack/solid-query';
 import { Component, createSignal } from 'solid-js';
-import { PostRegister, setTokens } from '../network/requests';
+import { PostRegister, setTokens } from '@network';
 
 export const Register: Component = () => {
   const nav = useNavigate();
