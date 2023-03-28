@@ -6,6 +6,7 @@ import { useUserId } from '../useUserId';
 export interface TradeCardProps {
   trade: GetTransaction;
   complete: (transactionId: string) => void;
+  disabled?: boolean;
 }
 
 export const TradeCard: Component<TradeCardProps> = (props) => {
@@ -32,8 +33,10 @@ export const TradeCard: Component<TradeCardProps> = (props) => {
       </div>
       <Show when={!isUsersTrade}>
         <button
-          class="btn btn-secondary hover:btn-accent col-span-2"
-          onClick={() => props.complete(props.trade.Id)}
+          class={clsx("btn btn-secondary hover:btn-accent col-span-2", props.disabled && "btn-disabled")}
+          onClick={
+            props.disabled ? () => {} : () => props.complete(props.trade.Id)
+          }
         >
           <Show when={props.trade.BuyerId === ''} fallback={<>Sell</>}>
             Buy

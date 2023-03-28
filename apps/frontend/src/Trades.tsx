@@ -8,6 +8,7 @@ import {
   GetAllTrades,
   GetAssets,
   GetTransaction,
+  GetUser,
   GetUserAssets,
   PostCompleteTransaction,
 } from './network/requests';
@@ -53,6 +54,15 @@ export const Trades: Component = () => {
     () => GetUserAssets().then((res) => res.data),
   );
 
+  function doesUserHaveAsset(assetId: string, amount: number): boolean {
+    if (!userAssets.data) return false;
+
+    const asset = userAssets.data.assets.find((a) => a.Id === assetId);
+    if (!asset) return false;
+
+    return asset.Amount >= amount;
+  }
+
   const allTrades = createQuery(
     () => [Requests.AllTrades],
     () => GetAllTrades().then((res) => res.data),
@@ -66,6 +76,11 @@ export const Trades: Component = () => {
       query.invalidateQueries({ queryKey: [Requests.User] });
     },
   });
+
+  const user = createQuery(
+    () => [Requests.User],
+    () => GetUser().then((res) => res.data),
+  );
 
   const tradeCallback = (TransactionId: string) => {
     completeTrade.mutate({
@@ -85,9 +100,18 @@ export const Trades: Component = () => {
       </div>
       <div class="w-full col-span-1 row-span-3 bg-neutral-focus rounded shadow-lg flex flex-col p-4 overflow-y-auto">
         <h2 class="text-2xl mb-2">Sell</h2>
-        <Show when={allTrades.data} fallback={<Loading />}>
+        <Show when={allTrades.data && user.data} fallback={<Loading />}>
           <For each={allTrades.data!.trades.filter((t) => t.BuyerId === '')}>
-            {(trade) => <TradeCard trade={trade} complete={tradeCallback} />}
+            {(trade) => (
+              <TradeCard
+                trade={trade}
+                complete={tradeCallback}
+                disabled={
+                  doesUserHaveAsset(trade.AssetId, trade.Amount) ||
+                  trade.Price > user.data!.user.Balance
+                }
+              />
+            )}
           </For>
         </Show>
       </div>
