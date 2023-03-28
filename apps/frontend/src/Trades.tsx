@@ -1,86 +1,32 @@
-import {
-  createMutation,
-  createQuery,
-  useQueryClient,
-} from '@tanstack/solid-query';
-import { Component, For, Show } from 'solid-js';
-import {
-  GetAllTrades,
-  GetAssets,
-  GetTransaction,
-  GetUser,
-  GetUserAssets,
-  PostCompleteTransaction,
-} from './network/requests';
-import { useWebsocket } from './network/WebSocket';
-import { Requests } from './types';
+import { createMutation } from '@tanstack/solid-query';
+import { Component, createSignal, For, onCleanup, Show } from 'solid-js';
+import { PostCompleteTransaction } from './network/requests';
+import { useStore } from './state';
 import { CreateTransaction } from './ui/CreateTransaction';
 import { Loading } from './ui/Loading';
 import { TradeCard } from './ui/TradeCard';
 
 export const Trades: Component = () => {
-  const query = useQueryClient();
-  const ws = useWebsocket();
+  const { store, mutate } = useStore();
 
-  ws.onMessage.subscribe((m) => {
-    query.setQueryData([Requests.AllTrades], (oldData) => {
-      const oldTrades = (oldData as { trades: GetTransaction[] }).trades;
+  const [trades, setTrades] = createSignal(Array.from(store.trades.values()));
 
-      const exists = oldTrades.findIndex((t) => t.Id === m.Id);
-      if (exists !== -1) {
-        // Trade already exists, so we have to replace it.
-        return {
-          trades: [
-            m,
-            ...oldTrades.slice(0, exists),
-            ...oldTrades.slice(exists + 1),
-          ],
-        };
-      } else {
-        return {
-          trades: [oldTrades, m],
-        };
-      }
-    });
+  const tradeSub = store.notifyTrade.subscribe(() => {
+    setTrades(Array.from(store.trades.values()));
   });
 
-  const assets = createQuery(
-    () => [Requests.Assets],
-    () => GetAssets().then((res) => res.data),
-  );
-
-  const userAssets = createQuery(
-    () => [Requests.UserAssets],
-    () => GetUserAssets().then((res) => res.data),
-  );
-
-  function doesUserHaveAsset(assetId: string, amount: number): boolean {
-    if (!userAssets.data) return false;
-
-    const asset = userAssets.data.assets.find((a) => a.Id === assetId);
-    if (!asset) return false;
-
-    return asset.Amount >= amount;
-  }
-
-  const allTrades = createQuery(
-    () => [Requests.AllTrades],
-    () => GetAllTrades().then((res) => res.data),
-  );
+  onCleanup(() => {
+    tradeSub.unsubscribe();
+  });
 
   const completeTrade = createMutation({
     mutationFn: PostCompleteTransaction,
     onSuccess: () => {
-      query.invalidateQueries({ queryKey: [Requests.AllTrades] });
-      query.invalidateQueries({ queryKey: [Requests.UserAssets] });
-      query.invalidateQueries({ queryKey: [Requests.User] });
+      mutate('refetch-trades');
+      mutate('refetch-userAssets');
+      mutate('refetch-user');
     },
   });
-
-  const user = createQuery(
-    () => [Requests.User],
-    () => GetUser().then((res) => res.data),
-  );
 
   const tradeCallback = (TransactionId: string) => {
     completeTrade.mutate({
@@ -92,34 +38,31 @@ export const Trades: Component = () => {
     <div class="w-full p-4 grid grid-cols-2 grid-rows-5 gap-4 overflow-y-auto max-h-[120vh]">
       <div class="w-full col-span-1 row-span-3 bg-neutral-focus rounded shadow-lg flex flex-col p-4 overflow-y-auto gap-2">
         <h2 class="text-2xl mb-2">Buy</h2>
-        <Show when={allTrades.data} fallback={<Loading />}>
-          <For each={allTrades.data!.trades.filter((t) => t.SellerId === '')}>
+        <Show when={trades()} fallback={<Loading />}>
+          <For each={trades().filter((t) => t.SellerId === '')}>
             {(trade) => <TradeCard trade={trade} complete={tradeCallback} />}
           </For>
         </Show>
       </div>
       <div class="w-full col-span-1 row-span-3 bg-neutral-focus rounded shadow-lg flex flex-col p-4 overflow-y-auto">
         <h2 class="text-2xl mb-2">Sell</h2>
-        <Show when={allTrades.data && user.data} fallback={<Loading />}>
-          <For each={allTrades.data!.trades.filter((t) => t.BuyerId === '')}>
+        <Show when={trades() && store.user} fallback={<Loading />}>
+          <For each={trades().filter((t) => t.BuyerId === '')}>
             {(trade) => (
               <TradeCard
                 trade={trade}
                 complete={tradeCallback}
-                disabled={
-                  doesUserHaveAsset(trade.AssetId, trade.Amount) ||
-                  trade.Price > user.data!.user.Balance
-                }
+                disabled={trade.Price > store.user!.Balance}
               />
             )}
           </For>
         </Show>
       </div>
       <div class="w-full col-span-2 row-span-2 bg-neutral-focus rounded shadow-lg flex flex-col p-4">
-        <Show when={userAssets.data && assets.data} fallback={<Loading />}>
+        <Show when={store.userAssets && store.assets} fallback={<Loading />}>
           <CreateTransaction
-            assets={userAssets.data!.assets}
-            allAssets={assets.data!.assets}
+            assets={store.userAssets!}
+            allAssets={store.assets!}
           />
         </Show>
       </div>

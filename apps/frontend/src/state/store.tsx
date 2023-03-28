@@ -1,4 +1,5 @@
 import { createQuery, useQueryClient } from '@tanstack/solid-query';
+import { Subject } from 'rxjs';
 import { Component, createContext, JSX, useContext } from 'solid-js';
 import { createStore, Store } from 'solid-js/store';
 import {
@@ -21,6 +22,7 @@ interface StoreType {
   userAssets: Maybe<GetUserAssets[]>;
   assets: Maybe<GetAssets[]>;
   trades: Map<string, GetTransaction>;
+  notifyTrade: Subject<undefined>;
 }
 
 interface StoreContext {
@@ -33,6 +35,7 @@ const initialStoreValue: StoreType = {
   userAssets: undefined,
   assets: undefined,
   trades: new Map(),
+  notifyTrade: new Subject<undefined>(),
 };
 
 export const StoreContext = createContext<StoreContext>({
@@ -73,6 +76,9 @@ export const StoreContextProvider: Component<{ children: JSX.Element }> = (
         for (const trade of res.data.trades) {
           store.trades.set(trade.Id, trade);
         }
+        // Send a small notification to components that might
+        // need to react to this change.
+        store.notifyTrade.next(undefined);
         return res.data;
       }),
   );
@@ -88,6 +94,7 @@ export const StoreContextProvider: Component<{ children: JSX.Element }> = (
 
   ws.onMessage.subscribe((wsTrade) => {
     store.trades.set(wsTrade.Id, wsTrade);
+    store.notifyTrade.next(undefined);
   });
 
   function mutate(action: MutateActions) {
