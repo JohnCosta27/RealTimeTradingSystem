@@ -1,7 +1,15 @@
 import { createQuery, useQueryClient } from '@tanstack/solid-query';
 import { Component, createContext, JSX, useContext } from 'solid-js';
 import { createStore, Store } from 'solid-js/store';
-import { GetUser, GetUserAssets, GetUserType } from '../network/requests';
+import {
+  GetAllTrades,
+  GetAssets,
+  GetTransaction,
+  GetUser,
+  GetUserAssets,
+  GetUserType,
+} from '../network/requests';
+import { useWebsocket } from '../network/WebSocket';
 import { Requests } from '../types';
 
 // Helper type for async values
@@ -11,6 +19,8 @@ type MutateActions = `refetch-${keyof StoreType}`;
 interface StoreType {
   user: Maybe<GetUserType>;
   userAssets: Maybe<GetUserAssets[]>;
+  assets: Maybe<GetAssets[]>;
+  trades: Map<string, GetTransaction>;
 }
 
 interface StoreContext {
@@ -19,9 +29,11 @@ interface StoreContext {
 }
 
 const initialStoreValue: StoreType = {
-    user: undefined,
-    userAssets: undefined,
-  }
+  user: undefined,
+  userAssets: undefined,
+  assets: undefined,
+  trades: new Map(),
+};
 
 export const StoreContext = createContext<StoreContext>({
   store: initialStoreValue,
@@ -32,36 +44,64 @@ export const StoreContextProvider: Component<{ children: JSX.Element }> = (
   props,
 ) => {
   const query = useQueryClient();
+  const ws = useWebsocket();
+
+  const [store, setStore] = createStore<StoreType>(initialStoreValue);
 
   createQuery(
     () => [Requests.User],
-    () => GetUser().then((res) => {
-      setStore({...store, user: res.data.user});
-      return res.data;
-    }),
+    () =>
+      GetUser().then((res) => {
+        setStore({ ...store, user: res.data.user });
+        return res.data;
+      }),
   );
 
   createQuery(
     () => [Requests.UserAssets],
-    () => GetUserAssets().then((res) => {
-      setStore({...store, userAssets: res.data.assets});
-      return res.data;
-    }),
+    () =>
+      GetUserAssets().then((res) => {
+        setStore({ ...store, userAssets: res.data.assets });
+        return res.data;
+      }),
   );
 
+  createQuery(
+    () => [Requests.AllTrades],
+    () =>
+      GetAllTrades().then((res) => {
+        for (const trade of res.data.trades) {
+          store.trades.set(trade.Id, trade);
+        }
+        return res.data;
+      }),
+  );
 
-  const mutate = (action: MutateActions) => {
+  createQuery(
+    () => [Requests.Assets],
+    () =>
+      GetAssets().then((res) => {
+        setStore({ ...store, assets: res.data.assets });
+        return res.data;
+      }),
+  );
+
+  ws.onMessage.subscribe((wsTrade) => {
+    store.trades.set(wsTrade.Id, wsTrade);
+  });
+
+  function mutate(action: MutateActions) {
     switch (action) {
       case 'refetch-user':
         query.invalidateQueries({ queryKey: [Requests.User] });
         break;
       case 'refetch-userAssets':
-        query.invalidateQueries({queryKey: [Requests.UserAssets]})
+        query.invalidateQueries({ queryKey: [Requests.UserAssets] });
         break;
+      case 'refetch-trades':
+        query.invalidateQueries({ queryKey: [Requests.Assets] });
     }
-  };
-
-  const [store, setStore] = createStore<StoreType>(initialStoreValue);
+  }
 
   return (
     <StoreContext.Provider value={{ store, mutate }}>

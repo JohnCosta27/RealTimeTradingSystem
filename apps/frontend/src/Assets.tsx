@@ -1,15 +1,10 @@
-import { createQuery } from '@tanstack/solid-query';
-import { Component, For, Match, Switch } from 'solid-js';
-import { GetAssets } from './network/requests';
-import { Requests } from './types';
+import { Component, For, Show } from 'solid-js';
+import { useStore } from './state';
 import { Asset } from './ui/Asset';
 import { Loading } from './ui/Loading';
 
 export const Assets: Component = () => {
-  const assets = createQuery(
-    () => [Requests.Assets],
-    () => GetAssets().then((res) => res.data),
-  );
+  const { store } = useStore();
 
   return (
     <div
@@ -17,16 +12,11 @@ export const Assets: Component = () => {
       data-testid="asset-page"
     >
       <h2 class="text-4xl">Assets</h2>
-      <Switch>
-        <Match when={assets.isLoading}>
-          <Loading />
-        </Match>
-        <Match when={assets.data}>
-          <For each={assets.data!.assets}>
-            {(asset) => <Asset id={asset.Id} name={asset.Name} />}
-          </For>
-        </Match>
-      </Switch>
+      <Show when={store.assets} fallback={<Loading />}>
+        <For each={store.assets}>
+          {(asset) => <Asset id={asset.Id} name={asset.Name} />}
+        </For>
+      </Show>
     </div>
   );
 };
