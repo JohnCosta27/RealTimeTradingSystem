@@ -1,14 +1,9 @@
 import { Outlet, Link } from '@solidjs/router';
-import { createQuery } from '@tanstack/solid-query';
 import { Component, Show } from 'solid-js';
-import { GetUser } from '../network/requests';
-import { Requests } from '../types';
+import { useStore } from '../state';
 
 export const FrontLayout: Component = () => {
-  const allTrades = createQuery(
-    () => [Requests.User],
-    () => GetUser().then((res) => res.data),
-  );
+  const { store } = useStore();
 
   return (
     <div class="w-full h-screen bg-base-100 flex">
@@ -17,22 +12,31 @@ export const FrontLayout: Component = () => {
         data-testid="sidebar"
       >
         <Link href="/">
-          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded" aria-roledescription='goto-home'>
+          <div
+            class="w-full hover:bg-primary flex items-center transition-all p-2 rounded"
+            aria-roledescription="goto-home"
+          >
             Home
           </div>
         </Link>
         <Link href="/assets">
-          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded" aria-roledescription='goto-my-assets'>
+          <div
+            class="w-full hover:bg-primary flex items-center transition-all p-2 rounded"
+            aria-roledescription="goto-my-assets"
+          >
             My Assets
           </div>
         </Link>
         <Link href="/trades">
-          <div class="w-full hover:bg-primary flex items-center transition-all p-2 rounded" aria-roledescription='goto-trades'>
+          <div
+            class="w-full hover:bg-primary flex items-center transition-all p-2 rounded"
+            aria-roledescription="goto-trades"
+          >
             Trades
           </div>
         </Link>
-        <Show when={allTrades.data}>
-          <div class="mt-auto">Balance: ${allTrades.data!.user.Balance}</div>
+        <Show when={store.user}>
+          <div class="mt-auto">Balance: ${store.user!.Balance}</div>
         </Show>
       </div>
       <div class="w-full p-4 flex justify-center overflow-y-auto">

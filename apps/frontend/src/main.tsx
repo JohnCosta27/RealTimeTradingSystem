@@ -13,11 +13,13 @@ import { Trades } from './Trades';
 import { UserAssets } from './UserAssets';
 import { ChartPage } from './Chart';
 import { WebSocketComponent } from './network/WebSocket';
+import { StoreContextProvider } from './state';
 
 export const Main: Component = () => {
   return (
     <QueryProvider>
       <WebSocketComponent>
+        <StoreContextProvider>
           <Router>
             <Routes>
               <Route path="/" component={ProtectedRoute}>
@@ -34,6 +36,7 @@ export const Main: Component = () => {
               </Route>
             </Routes>
           </Router>
+        </StoreContextProvider>
       </WebSocketComponent>
     </QueryProvider>
   );
