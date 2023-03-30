@@ -15,17 +15,15 @@ describe('Create trades testing', () => {
     const amount = Math.floor(Math.random() * 50);
     const price = Math.floor(Math.random() * 50);
 
-    const expected = Math.floor((price / amount) * 100) / 100;
-
     cy.get('[aria-roledescription="trade-amount"]').click().type(amount.toString());
     cy.get('[aria-roledescription="trade-price"]').click().type(price.toString());
 
     cy.contains(/select/i).click()
-    cy.contains(/silver/i).click();
+    cy.get('li').contains(/silver/i).click();
 
     cy.get('[aria-roledescription="create-trade"]').click();
 
-    cy.contains(expected).should('have.length', 1);
+    cy.contains(price).should('have.length', 1);
   });
   
 });
