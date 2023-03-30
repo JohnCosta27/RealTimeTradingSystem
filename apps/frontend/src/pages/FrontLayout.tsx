@@ -40,7 +40,7 @@ export const FrontLayout: Component = () => {
         </Show>
       </div>
       <div class="w-full p-4 flex justify-center overflow-y-auto">
-        <div class="w-full max-w-6xl">
+        <div class="w-full max-w-[80vw]">
           <Outlet />
         </div>
       </div>

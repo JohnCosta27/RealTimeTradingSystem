@@ -33,8 +33,8 @@ export const Trades: Component = () => {
   };
 
   return (
-    <div class="w-full p-4 grid grid-cols-2 grid-rows-5 gap-4 overflow-y-auto max-h-[120vh]">
-      <div class="w-full col-span-1 row-span-3 bg-neutral-focus rounded shadow-lg flex flex-col gap-4 p-4 overflow-y-auto">
+    <div class="w-full h-full p-4 grid grid-cols-3 gap-4 overflow-y-auto">
+      <div class="w-full h-full col-span-1 bg-neutral-focus rounded shadow-lg flex flex-col gap-4 p-4 overflow-y-auto">
         <h2 class="text-2xl mb-2">Buy</h2>
         <Show when={trades()} fallback={<Loading />}>
           <For each={trades().filter((t) => t.SellerId === '')}>
@@ -42,7 +42,7 @@ export const Trades: Component = () => {
           </For>
         </Show>
       </div>
-      <div class="w-full col-span-1 row-span-3 bg-neutral-focus rounded shadow-lg flex flex-col gap-4 p-4 overflow-y-auto">
+      <div class="w-full h-full col-span-1 bg-neutral-focus rounded shadow-lg flex flex-col gap-4 p-4 overflow-y-auto">
         <h2 class="text-2xl mb-2">Sell</h2>
         <Show when={trades() && store.user} fallback={<Loading />}>
           <For each={trades().filter((t) => t.BuyerId === '')}>
@@ -57,7 +57,7 @@ export const Trades: Component = () => {
           </For>
         </Show>
       </div>
-      <div class="w-full col-span-2 row-span-2 bg-neutral-focus rounded shadow-lg flex flex-col p-4">
+      <div class="w-full h-full col-span-1 bg-neutral-focus rounded shadow-lg flex flex-col p-4">
         <Show when={store.userAssets && store.assets} fallback={<Loading />}>
           <CreateTransaction
             assets={store.userAssets!}
