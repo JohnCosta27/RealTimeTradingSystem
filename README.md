@@ -74,6 +74,11 @@ There are also various useful scripts you might want. All in the apps/backend fo
 - HubAndBrain.bash -> Runs the hub and brain services as simple processes (without docker), useful for development.
 - NoHub.bash -> Runs the docker compose file but without the hub, which you can run individually. Again, useful for development.
 
+If you are developing the system, and want docker to run only some services for you, take the names of the services from `docker-compose/yml` in the `apps/backend` directory, and run:
+```
+docker-compose start auth_database brain_database rabbitmq name_of_service_here...
+```
+
 Sometimes you might also want to run the docker images without the hub and brain, for development, which you can do with the following command.
 ```
 docker-compose -f no-brain-hub.yml up --build 
