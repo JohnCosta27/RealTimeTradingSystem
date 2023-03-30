@@ -2,11 +2,12 @@
 
 A platform that allows multiple users to buy and sell resources, in real time. Call it a stock exchange if you will.
 
-## Dependencies
-- Nodejs version 18 or above
-- Pnpm (I used version 8, but I believe most are fine).
-- Golang (Used 1.20)
-- Docker and Docker Compose
+## Demo Links
+- Demo: https://youtu.be/OlzLp7X_UnY
+- Deployment: https://youtu.be/IOcSUKTTSqc
+
+## Report
+A copy of the report is found at the root of the project: final_report.pdf
 
 ## Technologies
 
@@ -22,10 +23,21 @@ A platform that allows multiple users to buy and sell resources, in real time. C
 
 ## Dependencies
 There are a few dependencies in the project so, there are some requirements:
-- Nodejs (Tested on V16 and V19): This is to run the frontend dev server.
-- Docker engine (Tested on Arch Linux and Ubuntu): Runs the backend.
-- Golang: For developing the backend.
-- Pnpm: Improved NPM. (Package manager for the frontend).
+- Nodejs (Tested on V16 and V18): This is to run the frontend dev server.
+- Docker (Tested on Arch Linux and Ubuntu): Runs the backend.
+  - This will depend on your machine, but there are plenty of information online on installing docker: https://docs.docker.com/get-docker/
+- Docker Compose: Frontend for running docker images
+- Golang: For developing the backend. (Tested on 1.20, should work on 1.19 or above).
+- Pnpm: Improved NPM. (Package manager for the frontend, tested with version 8).
+
+## Folder structure
+- report. Includes all the .tex files for the report, along with screenshots and other materials.
+- apps. The applications in my entire system
+  - apps/frontend - Frontend folders, make sure you `cd` into this directory when doing any frontend work.
+  - apps/backend - Main folder for my backend, here you can find docker images, docker compose files and all 3 of my backend systems.
+    - apps/backend/hub - The hub service.
+    - apps/backend/brain - The brain service.
+    - apps/backend/auth - The auth service.
 
 ## Running the project
 ### Frontend
@@ -43,6 +55,10 @@ I have used Cypress for end to end testing, which creates a browser and attempts
 ```
 cd apps/frontend
 pnpx cypress install
+pnpx cypress run
+
+(Optimally you can run the following command to access the GUI):
+pnpx cypress open
 ```
 
 NOTE: You need to have the application running for the tests to work, cypress mimics the user as much as possible and won't run the application for us. Look at the sections on how to run the frontend and backend.
