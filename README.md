@@ -39,10 +39,13 @@ pnpm run dev
 
 ### E2E Testing
 I have used Cypress for end to end testing, which creates a browser and attempts to use to create trades and use the website in a black box kind of way, to mimic a real user, to use it:
+
 ```
 cd apps/frontend
 pnpx cypress install
 ```
+
+NOTE: You need to have the application running for the tests to work, cypress mimics the user as much as possible and won't run the application for us. Look at the sections on how to run the frontend and backend.
 
 ### Backend
 ```
