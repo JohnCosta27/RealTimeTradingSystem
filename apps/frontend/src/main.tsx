@@ -14,8 +14,8 @@ export const Main: Component = () => {
         <Router>
           <Routes>
             <Route path="/" component={ProtectedRoute}>
-              <Route path="/" component={FrontLayout}>
-                <Route path="/" component={StoreContextProvider}>
+              <Route path="/" component={StoreContextProvider}>
+                <Route path="/" component={FrontLayout}>
                   <Route path="/" component={Assets} />
                   <Route path="/assets" component={UserAssets} />
                   <Route path="/trades" component={Trades} />
