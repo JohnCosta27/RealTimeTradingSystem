@@ -1,6 +1,6 @@
 import { createQuery, useQueryClient } from '@tanstack/solid-query';
 import { Subject } from 'rxjs';
-import { Component, createContext, JSX, useContext } from 'solid-js';
+import { Component, createContext, useContext } from 'solid-js';
 import { createStore, Store } from 'solid-js/store';
 import {
   GetAllTrades,
@@ -12,6 +12,7 @@ import {
   useWebsocket,
   Requests,
 } from '@network';
+import { Outlet } from '@solidjs/router';
 
 // Helper type for async values
 type Maybe<T> = T | undefined;
@@ -45,9 +46,7 @@ export const StoreContext = createContext<StoreContext>({
   mutate: () => {},
 });
 
-export const StoreContextProvider: Component<{ children: JSX.Element }> = (
-  props,
-) => {
+export const StoreContextProvider: Component = () => {
   const query = useQueryClient();
   const ws = useWebsocket();
 
@@ -117,7 +116,7 @@ export const StoreContextProvider: Component<{ children: JSX.Element }> = (
 
   return (
     <StoreContext.Provider value={{ store, mutate }}>
-      {props.children}
+      <Outlet />
     </StoreContext.Provider>
   );
 };

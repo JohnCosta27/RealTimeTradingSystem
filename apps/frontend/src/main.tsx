@@ -5,6 +5,7 @@ import { ProtectedRoute, AuthLayout, Login, Register } from '@auth';
 import { Assets, Trades, UserAssets, ChartPage, FrontLayout } from '@pages';
 import { WebSocketComponent, QueryProvider } from '@network';
 import './index.css';
+import { StoreContextProvider } from './state/store';
 
 export const Main: Component = () => {
   return (
@@ -14,10 +15,12 @@ export const Main: Component = () => {
           <Routes>
             <Route path="/" component={ProtectedRoute}>
               <Route path="/" component={FrontLayout}>
-                <Route path="/" component={Assets} />
-                <Route path="/assets" component={UserAssets} />
-                <Route path="/trades" component={Trades} />
-                <Route path="/assets/:id" component={ChartPage} />
+                <Route path="/" component={StoreContextProvider}>
+                  <Route path="/" component={Assets} />
+                  <Route path="/assets" component={UserAssets} />
+                  <Route path="/trades" component={Trades} />
+                  <Route path="/assets/:id" component={ChartPage} />
+                </Route>
               </Route>
             </Route>
             <Route path="/auth" component={AuthLayout}>
