@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import { Component, Show } from 'solid-js';
-import { GetTransaction } from '@network';
+import { GetAssets, GetTransaction } from '@network';
 import { useUserId } from '@auth';
 
 export interface TradeCardProps {
   trade: GetTransaction;
+  asset?: GetAssets;
   complete: (transactionId: string) => void;
   disabled?: boolean;
 }
@@ -23,6 +24,9 @@ export const TradeCard: Component<TradeCardProps> = (props) => {
       )}
     >
       <div class="flex gap-2 flex-col col-span-1">
+        <Show when={props.asset}>
+          <p class="text-2xl">{props.asset!.Name}</p>
+        </Show>
         <p>Amount: {props.trade.Amount}</p>
         <p>Price: {props.trade.Price}</p>
       </div>

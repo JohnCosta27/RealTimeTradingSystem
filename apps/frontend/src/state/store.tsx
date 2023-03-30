@@ -21,6 +21,7 @@ interface StoreType {
   user: Maybe<GetUserType>;
   userAssets: Maybe<GetUserAssets[]>;
   assets: Maybe<GetAssets[]>;
+  assetMap: Map<string, GetAssets>;
   trades: Map<string, GetTransaction>;
   notifyTrade: Subject<undefined>;
 }
@@ -35,6 +36,7 @@ const initialStoreValue: StoreType = {
   userAssets: undefined,
   assets: undefined,
   trades: new Map(),
+  assetMap: new Map(),
   notifyTrade: new Subject<undefined>(),
 };
 
@@ -88,6 +90,9 @@ export const StoreContextProvider: Component<{ children: JSX.Element }> = (
     () =>
       GetAssets().then((res) => {
         setStore({ ...store, assets: res.data.assets });
+        for (const asset of res.data.assets) {
+          store.assetMap.set(asset.Id, asset);
+        }
         return res.data;
       }),
   );
