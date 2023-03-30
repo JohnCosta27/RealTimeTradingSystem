@@ -15,7 +15,6 @@ export const UserAssets: Component = () => {
               id={asset.Asset.Id}
               name={asset.Asset.Name}
               amount={asset.Amount}
-              price={20}
             />
           )}
         </For>

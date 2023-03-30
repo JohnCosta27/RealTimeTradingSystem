@@ -53,7 +53,7 @@ export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
     sell.mutate({
       assetId: sellAsset()!.Id,
       type: type(),
-      Price: sellPrice(),
+      Price: sellPrice() * sellAmount(),
       Amount: sellAmount(),
     });
   };
