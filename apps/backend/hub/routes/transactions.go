@@ -192,10 +192,7 @@ func TradeRoutes(r *gin.Engine, ws map[*websocket.Conn]bool) {
 		PostCompleteTrade(ws),
 	)
 
-	tradeGroup.GET(ASSET_TRADES_ROUTE,
-		middleware.CacheReq(true, true, sharedtypes.GET_ASSET_TRADES, []sharedtypes.Transaction{}, GetAllTradesAssetsBody),
-		GetAllTradesAssets(),
-	)
+	tradeGroup.GET(ASSET_TRADES_ROUTE, GetAllTradesAssets())
 
 	tradeGroup.GET("/",
 		middleware.CacheReq(false, false, sharedtypes.GET_TRADES, []sharedtypes.Transaction{}, GetAllTradesBody),
