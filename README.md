@@ -76,7 +76,8 @@ There are also various useful scripts you might want. All in the apps/backend fo
 
 Sometimes you might also want to run the docker images without the hub and brain, for development, which you can do with the following command.
 ```
-docker-compose -f no-brain-hub.yml up --build //Again, the flag is optional if you want to rebuild the containers.
+docker-compose -f no-brain-hub.yml up --build 
+//Again, the flag is optional if you want to rebuild the containers.
 ```
 
 ### Integration Testing
