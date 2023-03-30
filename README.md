@@ -5,6 +5,7 @@ A platform that allows multiple users to buy and sell resources, in real time. C
 ## Demo Links
 - Demo: https://youtu.be/OlzLp7X_UnY
 - Deployment: https://youtu.be/IOcSUKTTSqc
+- Installation Guide: https://youtu.be/ep9KwYss-X0
 
 ## Report
 A copy of the report is found at the root of the project: final_report.pdf
