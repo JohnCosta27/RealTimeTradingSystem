@@ -21,7 +21,7 @@ const CACHE = "cache"
 // Initialises cluster and sets global variable to correct pointer.
 func InitRedisCache() {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "redis:6379",
 		Password: "",
 		DB:       0,
 	})
