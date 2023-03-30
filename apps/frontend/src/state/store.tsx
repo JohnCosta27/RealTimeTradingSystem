@@ -18,6 +18,7 @@ import { Outlet } from '@solidjs/router';
 type Maybe<T> = T | undefined;
 type MutateActions = `refetch-${keyof StoreType}`;
 
+// Type of the entire store.
 interface StoreType {
   user: Maybe<GetUserType>;
   userAssets: Maybe<GetUserAssets[]>;
@@ -27,6 +28,7 @@ interface StoreType {
   notifyTrade: Subject<undefined>;
 }
 
+// Context type.
 interface StoreContext {
   store: Store<StoreType>;
   mutate: (action: MutateActions) => void;
@@ -46,12 +48,22 @@ export const StoreContext = createContext<StoreContext>({
   mutate: () => {},
 });
 
+/**
+ * The store provides a global and efficnent way to access shared state,
+ * throughout the application. It just needs to rendered above other
+ * components that are using it.
+ *
+ * It contains most of the queries the client makes to the server,
+ * and strategically updates the store as needed, which in turn will
+ * update components that are below them.
+ */
 export const StoreContextProvider: Component = () => {
   const query = useQueryClient();
   const ws = useWebsocket();
 
   const [store, setStore] = createStore<StoreType>(initialStoreValue);
 
+  // User information query
   createQuery(
     () => [Requests.User],
     () =>
@@ -61,6 +73,7 @@ export const StoreContextProvider: Component = () => {
       }),
   );
 
+  // User asset query.
   createQuery(
     () => [Requests.UserAssets],
     () =>
@@ -70,6 +83,7 @@ export const StoreContextProvider: Component = () => {
       }),
   );
 
+  // Get all trades query.
   createQuery(
     () => [Requests.AllTrades],
     () =>
@@ -84,6 +98,7 @@ export const StoreContextProvider: Component = () => {
       }),
   );
 
+  // Get all assets query.
   createQuery(
     () => [Requests.Assets],
     () =>
@@ -96,11 +111,16 @@ export const StoreContextProvider: Component = () => {
       }),
   );
 
+  // When we have a new web socket message (new trade).
+  // We need to update our trades map, which is used to efficiently,
+  // remove trades from view. We also send a message through our
+  // observable so that components know to update their views.
   ws.onMessage.subscribe((wsTrade) => {
     store.trades.set(wsTrade.Id, wsTrade);
     store.notifyTrade.next(undefined);
   });
 
+  // Wrapper function to refetch various state in the store.
   function mutate(action: MutateActions) {
     switch (action) {
       case 'refetch-user':

@@ -15,6 +15,11 @@ interface CreateTransactionProps {
   allAssets: GetAssets[];
 }
 
+/**
+ * Component where the user can create their own transaction.
+ * It has some validation logic to make the user has entered all their fields.
+ * and some nice previous.
+ */
 export const CreateTransaction: Component<CreateTransactionProps> = (props) => {
   const query = useQueryClient();
 

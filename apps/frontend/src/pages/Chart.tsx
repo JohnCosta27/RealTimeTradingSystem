@@ -4,6 +4,9 @@ import { Component, Show } from 'solid-js';
 import { GetAssetTrades, Requests } from '@network';
 import { Loading, AssetChart } from '@ui';
 
+/**
+ * Charts the price of a specific asset over time.
+ */
 export const ChartPage: Component = () => {
   const params = useParams();
 

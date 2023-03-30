@@ -3,6 +3,10 @@ import { createMutation } from '@tanstack/solid-query';
 import { Component, createSignal } from 'solid-js';
 import { PostRegister, setTokens } from '@network';
 
+/**
+ * Register component, takes a user email and password and registers them.
+ * It redirects to '/' if successful, otherwise shows an error message.
+ */
 export const Register: Component = () => {
   const nav = useNavigate();
 

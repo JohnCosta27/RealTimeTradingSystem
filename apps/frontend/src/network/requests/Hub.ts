@@ -1,5 +1,9 @@
 import { BaseType, GetRequestType, hubClient, PostRequestType } from '.';
 
+/**
+ * Various requests and types for the Hub.
+ */
+
 export interface Access {
   access: string;
 }

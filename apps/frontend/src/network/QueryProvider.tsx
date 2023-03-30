@@ -9,6 +9,11 @@ const queryClient = new QueryClient({
     }
   }  
 });
+
+/**
+ * Should be rendered at the top of the application tree, because it
+ * provides the state for the query library I am using. 
+ */
 export const QueryProvider: Component<{children: JSX.Element}> = (props) => {
   return (
     <QueryClientProvider client={queryClient}>

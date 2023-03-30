@@ -4,6 +4,12 @@ import { PostCompleteTransaction } from '@network';
 import { useStore } from '@state';
 import { CreateTransaction, Loading, TradeCard } from '@ui';
 
+/**
+ * Renders the trades that are present in the system, and updates them as
+ * we get web socket requests that new trades are coming on (or closing).
+ *
+ * It also allows the user to create trades, but most of the login is in another component.
+ */
 export const Trades: Component = () => {
   const { store, mutate } = useStore();
 

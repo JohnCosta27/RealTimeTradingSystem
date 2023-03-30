@@ -31,6 +31,10 @@ dist
 ## Ignore database data volume
 db/
 
+## Ignore cypress videos and snapshots
+apps/frontend/cypress/videos/*
+apps/frontend/cypress/screenshots/*
+
 ## Ignore executables
 apps/backend/auth/auth
 apps/backend/brain/brain

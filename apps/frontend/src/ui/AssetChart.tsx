@@ -7,6 +7,7 @@ interface AssetChartProps {
   info: [number, string][];
 }
 
+// Creates a ChartJS chart and plots the information on it.
 export const AssetChart: Component<AssetChartProps> = (props) => {
   const params = useParams<{ id: string }>();
 

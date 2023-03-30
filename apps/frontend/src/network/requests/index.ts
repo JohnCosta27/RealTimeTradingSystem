@@ -11,6 +11,9 @@ export interface Token {
   Type: 'access' | 'refresh';
 }
 
+// Creates the axios clients to make it easier,
+// to manage the requests to each service.
+
 export const hubClient = axios.create({
   baseURL: HubUrl,
   timeout: 5000,

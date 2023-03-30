@@ -2,6 +2,9 @@ import { Component, For, Show } from 'solid-js';
 import { useStore } from '@state';
 import { Asset, Loading } from '@ui';
 
+/**
+ * Displays the asset that the system supports.
+ */
 export const Assets: Component = () => {
   const { store } = useStore();
 

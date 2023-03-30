@@ -4,9 +4,10 @@ import { Route, Router, Routes } from '@solidjs/router';
 import { ProtectedRoute, AuthLayout, Login, Register } from '@auth';
 import { Assets, Trades, UserAssets, ChartPage, FrontLayout } from '@pages';
 import { WebSocketComponent, QueryProvider } from '@network';
+import { StoreContextProvider } from '@state';
 import './index.css';
-import { StoreContextProvider } from './state/store';
 
+// Displays the main DOM tree of the application
 export const Main: Component = () => {
   return (
     <QueryProvider>

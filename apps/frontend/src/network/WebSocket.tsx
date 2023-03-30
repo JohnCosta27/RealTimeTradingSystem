@@ -15,6 +15,7 @@ interface WebSocketComponentProps {
 
 export const WebsocketUrl = import.meta.env.VITE_HUB_WS_URL ?? "ws://localhost:4545/ws";
 
+// Various RxJS channels to be used for websockets.
 const wsObject = new WebSocket(WebsocketUrl);
 const openSubject = new Subject<Event>();
 const messageSubject = new Subject<GetTransaction>();
@@ -44,6 +45,9 @@ const ws: WebSocketContextType = {
 
 const WebSocketContext = createContext<WebSocketContextType>(ws);
 
+/**
+ * Should be rendered above the components that use this context.
+ */
 export const WebSocketComponent: Component<WebSocketComponentProps> = (
   props
 ) => {

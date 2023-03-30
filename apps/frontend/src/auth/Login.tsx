@@ -4,6 +4,10 @@ import clsx from 'clsx';
 import { Component, createSignal, Show } from 'solid-js';
 import { PostLogin, setTokens } from '@network';
 
+/**
+ * Login component, takes a user email and password and logs them in.
+ * It redirects to '/' if successful, otherwise shows an error message.
+ */
 export const Login: Component = () => {
   const nav = useNavigate();
 

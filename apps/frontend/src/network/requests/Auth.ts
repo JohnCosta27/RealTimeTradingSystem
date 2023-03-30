@@ -1,5 +1,9 @@
 import { authClient, PostRequestType } from './index';
 
+/**
+ * Various requests and types for the authentication system.
+ */
+
 export interface PostRegisterType {
   firstname: string;
   surname: string;

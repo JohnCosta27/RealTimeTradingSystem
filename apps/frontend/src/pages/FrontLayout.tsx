@@ -2,6 +2,11 @@ import { Outlet, Link } from '@solidjs/router';
 import { Component, Show } from 'solid-js';
 import { useStore } from '@state';
 
+/**
+ * A simple UI layout, that creates the sidebar and shows the users balance.
+ * and also renders the applications page in the center of the screen. 
+ * Renders the `Outlet`, which is the routers child route.
+ */
 export const FrontLayout: Component = () => {
   const { store } = useStore();
 

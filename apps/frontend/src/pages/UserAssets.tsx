@@ -2,6 +2,9 @@ import { Component, For, Show } from 'solid-js';
 import { useStore } from '@state';
 import { Asset, Loading } from '@ui';
 
+/**
+ * Displays the asset the user owns.
+ */
 export const UserAssets: Component = () => {
   const { store } = useStore();
 

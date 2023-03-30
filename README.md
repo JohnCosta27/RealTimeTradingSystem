@@ -2,6 +2,12 @@
 
 A platform that allows multiple users to buy and sell resources, in real time. Call it a stock exchange if you will.
 
+## Dependencies
+- Nodejs version 18 or above
+- Pnpm (I used version 8, but I believe most are fine).
+- Golang (Used 1.20)
+- Docker and Docker Compose
+
 ## Technologies
 
 ### Backend
@@ -29,6 +35,13 @@ To run the frontend you will also need an .env file, which has already been fill
 cd apps/frontend
 pnpm install
 pnpm run dev
+```
+
+### E2E Testing
+I have used Cypress for end to end testing, which creates a browser and attempts to use to create trades and use the website in a black box kind of way, to mimic a real user, to use it:
+```
+cd apps/frontend
+pnpx cypress install
 ```
 
 ### Backend

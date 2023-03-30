@@ -10,6 +10,8 @@ export interface TradeCardProps {
   disabled?: boolean;
 }
 
+// UI component to show a trade, with some logic to now display
+// if disabled, and button to use the trade.
 export const TradeCard: Component<TradeCardProps> = (props) => {
   const userId = useUserId();
 
